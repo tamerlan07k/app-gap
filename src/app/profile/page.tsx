@@ -8,8 +8,6 @@ import { Label } from "~/components/ui/label";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-// State for the "basic academic info" section.
-// Expand this interface as more form sections are added.
 interface AcademicInfo {
   gradeLevel: string;
   unweightedGpa: string;
@@ -17,7 +15,17 @@ interface AcademicInfo {
   actScore: string;
 }
 
+interface CollegeDirection {
+  majorCategory: string;
+  specificMajor: string;
+  selectivity: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
+
+// Shared className for all native <select> elements — mirrors the Input style.
+const SELECT_CLASS =
+  "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
 
 const GRADE_OPTIONS = [
   { value: "", label: "Select grade level" },
@@ -27,6 +35,46 @@ const GRADE_OPTIONS = [
   { value: "12", label: "12th grade (senior)" },
   { value: "gap", label: "Graduated / gap year" },
 ];
+
+const MAJOR_CATEGORIES = [
+  { value: "", label: "Select a category" },
+  { value: "cs", label: "Computer Science / Software / Data" },
+  { value: "engineering", label: "Engineering" },
+  { value: "bio-premed", label: "Biology / Pre-Med / Health Sciences" },
+  { value: "business", label: "Business / Finance / Economics" },
+  { value: "math-physics", label: "Math / Physics / Statistics" },
+  { value: "polisci", label: "Political Science / International Relations" },
+  { value: "psych", label: "Psychology / Neuroscience" },
+  { value: "humanities", label: "English / History / Humanities" },
+  { value: "design", label: "Architecture / Design / Arts" },
+  { value: "education", label: "Education / Social Work / Public Policy" },
+  { value: "undecided", label: "Undecided" },
+  { value: "other", label: "Other" },
+];
+
+const SELECTIVITY_OPTIONS = [
+  { value: "", label: "Select a goal" },
+  { value: "highly-selective", label: "Highly selective / reach schools" },
+  { value: "competitive", label: "Competitive target schools" },
+  { value: "balanced", label: "Balanced mix" },
+  { value: "safer", label: "Mostly safer / likely schools" },
+  { value: "unsure", label: "Not sure yet" },
+];
+
+// ─── Validation helpers ──────────────────────────────────────────────────────
+
+// Clamps a numeric string into [min, max] on blur.
+// Pass integer=true to round to a whole number (SAT, ACT).
+function clamp(
+  value: string,
+  min: number,
+  max: number,
+  integer = false,
+): string {
+  const n = integer ? parseInt(value, 10) : parseFloat(value);
+  if (Number.isNaN(n) || value === "") return value;
+  return String(Math.min(max, Math.max(min, integer ? Math.round(n) : n)));
+}
 
 // ─── Field helper ────────────────────────────────────────────────────────────
 
@@ -64,13 +112,23 @@ export default function ProfilePage() {
     actScore: "",
   });
 
-  function set(field: keyof AcademicInfo, value: string) {
+  const [direction, setDirection] = useState<CollegeDirection>({
+    majorCategory: "",
+    specificMajor: "",
+    selectivity: "",
+  });
+
+  function setAcademic(field: keyof AcademicInfo, value: string) {
     setInfo((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function setDir(field: keyof CollegeDirection, value: string) {
+    setDirection((prev) => ({ ...prev, [field]: value }));
   }
 
   return (
     <main className="px-6 py-16">
-      <div className="mx-auto max-w-2xl space-y-10">
+      <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
@@ -101,8 +159,8 @@ export default function ProfilePage() {
               <select
                 id="grade-level"
                 value={info.gradeLevel}
-                onChange={(e) => set("gradeLevel", e.target.value)}
-                className="h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30"
+                onChange={(e) => setAcademic("gradeLevel", e.target.value)}
+                className={SELECT_CLASS}
               >
                 {GRADE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -119,10 +177,14 @@ export default function ProfilePage() {
                 inputMode="decimal"
                 min={0}
                 max={4}
-                step={0.01}
+                step={0.1}
                 placeholder="e.g. 3.7"
                 value={info.unweightedGpa}
-                onChange={(e) => set("unweightedGpa", e.target.value)}
+                onChange={(e) => setAcademic("unweightedGpa", e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value)
+                    setAcademic("unweightedGpa", clamp(e.target.value, 0, 4));
+                }}
               />
             </Field>
 
@@ -136,7 +198,14 @@ export default function ProfilePage() {
                 step={10}
                 placeholder="e.g. 1350"
                 value={info.satScore}
-                onChange={(e) => set("satScore", e.target.value)}
+                onChange={(e) => setAcademic("satScore", e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value)
+                    setAcademic(
+                      "satScore",
+                      clamp(e.target.value, 400, 1600, true),
+                    );
+                }}
               />
             </Field>
 
@@ -150,18 +219,83 @@ export default function ProfilePage() {
                 step={1}
                 placeholder="e.g. 30"
                 value={info.actScore}
-                onChange={(e) => set("actScore", e.target.value)}
+                onChange={(e) => setAcademic("actScore", e.target.value)}
+                onBlur={(e) => {
+                  if (e.target.value)
+                    setAcademic("actScore", clamp(e.target.value, 1, 36, true));
+                }}
               />
             </Field>
           </div>
+        </div>
 
-          <div className="flex justify-end pt-2">
-            {/* TODO: wire up to step 2 (courses & extracurriculars) */}
-            <Button>
-              Continue
-              <ArrowRight />
-            </Button>
+        {/* Section: College direction */}
+        <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-1">
+            <h2 className="font-semibold">College direction</h2>
+            <p className="text-sm text-muted-foreground">
+              Help AppGap understand where you're aiming and what field you're
+              interested in pursuing.
+            </p>
           </div>
+
+          <div className="space-y-5">
+            <Field
+              id="major-category"
+              label="Academic interest / intended major"
+            >
+              <select
+                id="major-category"
+                value={direction.majorCategory}
+                onChange={(e) => setDir("majorCategory", e.target.value)}
+                className={SELECT_CLASS}
+              >
+                {MAJOR_CATEGORIES.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field
+              id="specific-major"
+              label="Specific intended major"
+              hint="optional"
+            >
+              <Input
+                id="specific-major"
+                type="text"
+                placeholder="e.g. Computational Biology, Finance, Architecture"
+                value={direction.specificMajor}
+                onChange={(e) => setDir("specificMajor", e.target.value)}
+              />
+            </Field>
+
+            <Field id="selectivity" label="College goals / selectivity">
+              <select
+                id="selectivity"
+                value={direction.selectivity}
+                onChange={(e) => setDir("selectivity", e.target.value)}
+                className={SELECT_CLASS}
+              >
+                {SELECTIVITY_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          </div>
+        </div>
+
+        {/* Continue — sits below all sections */}
+        <div className="flex justify-end">
+          {/* TODO: wire up to step 2 (extracurriculars) */}
+          <Button>
+            Continue
+            <ArrowRight />
+          </Button>
         </div>
       </div>
     </main>
