@@ -19,9 +19,8 @@ function Hero() {
           strong, where the gaps are, and what to do before applying.
         </p>
         <div className="pt-2">
-          {/* Replace href with the actual app route once the profile form is built */}
           <Button size="lg" asChild>
-            <Link href="#get-started">
+            <Link href="/profile">
               Try AppGap
               <ArrowRight />
             </Link>
@@ -180,9 +179,8 @@ function FinalCTA() {
         <p className="text-muted-foreground">
           Takes a few minutes. No account needed.
         </p>
-        {/* Replace href with the actual app route once the profile form is built */}
         <Button size="lg" asChild>
-          <Link href="#get-started">
+          <Link href="/profile">
             Try AppGap
             <ArrowRight />
           </Link>

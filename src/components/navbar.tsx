@@ -9,7 +9,7 @@ export function Navbar() {
           AppGap
         </Link>
         <Button variant="outline" size="sm" asChild>
-          <Link href="#get-started">Try AppGap</Link>
+          <Link href="/profile">Try AppGap</Link>
         </Button>
       </div>
     </nav>
