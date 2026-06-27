@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { type ReactNode, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -15,15 +16,8 @@ interface AcademicInfo {
   actScore: string;
 }
 
-interface CollegeDirection {
-  majorCategory: string;
-  specificMajor: string;
-  selectivity: string;
-}
-
 // ─── Constants ───────────────────────────────────────────────────────────────
 
-// Shared className for all native <select> elements — mirrors the Input style.
 const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
 
@@ -36,35 +30,8 @@ const GRADE_OPTIONS = [
   { value: "gap", label: "Graduated / gap year" },
 ];
 
-const MAJOR_CATEGORIES = [
-  { value: "", label: "Select a category" },
-  { value: "cs", label: "Computer Science / Software / Data" },
-  { value: "engineering", label: "Engineering" },
-  { value: "bio-premed", label: "Biology / Pre-Med / Health Sciences" },
-  { value: "business", label: "Business / Finance / Economics" },
-  { value: "math-physics", label: "Math / Physics / Statistics" },
-  { value: "polisci", label: "Political Science / International Relations" },
-  { value: "psych", label: "Psychology / Neuroscience" },
-  { value: "humanities", label: "English / History / Humanities" },
-  { value: "design", label: "Architecture / Design / Arts" },
-  { value: "education", label: "Education / Social Work / Public Policy" },
-  { value: "undecided", label: "Undecided" },
-  { value: "other", label: "Other" },
-];
-
-const SELECTIVITY_OPTIONS = [
-  { value: "", label: "Select a goal" },
-  { value: "highly-selective", label: "Highly selective / reach schools" },
-  { value: "competitive", label: "Competitive target schools" },
-  { value: "balanced", label: "Balanced mix" },
-  { value: "safer", label: "Mostly safer / likely schools" },
-  { value: "unsure", label: "Not sure yet" },
-];
-
 // ─── Validation helpers ──────────────────────────────────────────────────────
 
-// Clamps a numeric string into [min, max] on blur.
-// Pass integer=true to round to a whole number (SAT, ACT).
 function clamp(
   value: string,
   min: number,
@@ -78,8 +45,6 @@ function clamp(
 
 // ─── Field helper ────────────────────────────────────────────────────────────
 
-// Wraps a Label + optional hint text above any input element.
-// Pass the same `id` to this component and to the input inside it.
 function Field({
   id,
   label,
@@ -112,18 +77,8 @@ export default function ProfilePage() {
     actScore: "",
   });
 
-  const [direction, setDirection] = useState<CollegeDirection>({
-    majorCategory: "",
-    specificMajor: "",
-    selectivity: "",
-  });
-
   function setAcademic(field: keyof AcademicInfo, value: string) {
     setInfo((prev) => ({ ...prev, [field]: value }));
-  }
-
-  function setDir(field: keyof CollegeDirection, value: string) {
-    setDirection((prev) => ({ ...prev, [field]: value }));
   }
 
   return (
@@ -132,7 +87,7 @@ export default function ProfilePage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 1 of 3
+            Step 1 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile
@@ -149,8 +104,8 @@ export default function ProfilePage() {
           <div className="space-y-1">
             <h2 className="font-semibold">Basic academic info</h2>
             <p className="text-sm text-muted-foreground">
-              Fill in what you have. You can estimate GPA if you're not sure of
-              the exact number.
+              Fill in what you have. You can estimate GPA if you&apos;re not
+              sure of the exact number.
             </p>
           </div>
 
@@ -229,72 +184,13 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Section: College direction */}
-        <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="space-y-1">
-            <h2 className="font-semibold">College direction</h2>
-            <p className="text-sm text-muted-foreground">
-              Help AppGap understand where you're aiming and what field you're
-              interested in pursuing.
-            </p>
-          </div>
-
-          <div className="space-y-5">
-            <Field
-              id="major-category"
-              label="Academic interest / intended major"
-            >
-              <select
-                id="major-category"
-                value={direction.majorCategory}
-                onChange={(e) => setDir("majorCategory", e.target.value)}
-                className={SELECT_CLASS}
-              >
-                {MAJOR_CATEGORIES.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            <Field
-              id="specific-major"
-              label="Specific intended major"
-              hint="optional"
-            >
-              <Input
-                id="specific-major"
-                type="text"
-                placeholder="e.g. Computational Biology, Finance, Architecture"
-                value={direction.specificMajor}
-                onChange={(e) => setDir("specificMajor", e.target.value)}
-              />
-            </Field>
-
-            <Field id="selectivity" label="College goals / selectivity">
-              <select
-                id="selectivity"
-                value={direction.selectivity}
-                onChange={(e) => setDir("selectivity", e.target.value)}
-                className={SELECT_CLASS}
-              >
-                {SELECTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-        </div>
-
-        {/* Continue — sits below all sections */}
+        {/* Navigation */}
         <div className="flex justify-end">
-          {/* TODO: wire up to step 2 (extracurriculars) */}
-          <Button>
-            Continue
-            <ArrowRight />
+          <Button asChild>
+            <Link href="/profile/career-direction">
+              Continue
+              <ArrowRight />
+            </Link>
           </Button>
         </div>
       </div>
