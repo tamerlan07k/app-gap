@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -28,10 +28,18 @@ interface Award {
   grade: string;
 }
 
+interface FormErrors {
+  name?: string;
+  category?: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
+
+const SELECT_ERROR_CLASS =
+  "h-9 w-full rounded-md border border-destructive bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
 
 const TEXTAREA_CLASS =
   "min-h-[72px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30 resize-none";
@@ -74,21 +82,80 @@ const MEANINGFULNESS_LABELS: Record<number, string> = {
 const MAX_ACTIVITIES = 10;
 const MAX_AWARDS = 5;
 
-// ─── Activity card ────────────────────────────────────────────────────────────
+// ─── Saved activity summary card ─────────────────────────────────────────────
 
-function ActivityCard({
+function SavedActivityCard({
   activity,
-  index,
-  onChange,
-  onRemove,
+  onEdit,
+  onDelete,
 }: {
   activity: Activity;
-  index: number;
-  onChange: (
-    field: keyof Activity,
-    value: string | string[] | number | null,
-  ) => void;
-  onRemove: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const categoryLabel =
+    ACTIVITY_CATEGORIES.find((c) => c.value === activity.category)?.label ??
+    activity.category;
+
+  const gradesText =
+    activity.grades.length > 0
+      ? `Grade${activity.grades.length > 1 ? "s" : ""} ${activity.grades.join(", ")}`
+      : null;
+
+  return (
+    <div className="flex items-start justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+      <div className="min-w-0 space-y-1">
+        <p className="font-medium leading-snug">
+          {activity.name || "Untitled activity"}
+        </p>
+        <p className="text-sm text-muted-foreground">
+          {categoryLabel}
+          {gradesText ? ` · ${gradesText}` : ""}
+        </p>
+        {activity.leadershipRole && (
+          <p className="text-xs text-muted-foreground">
+            {activity.leadershipRole}
+          </p>
+        )}
+      </div>
+      <div className="flex shrink-0 gap-1">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Pencil className="size-3" />
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+        >
+          <Trash2 className="size-3" />
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Activity form ────────────────────────────────────────────────────────────
+
+function ActivityForm({
+  activity,
+  isEditing,
+  errors,
+  onChange,
+  onSave,
+  onCancel,
+}: {
+  activity: Activity;
+  isEditing: boolean;
+  errors: FormErrors;
+  onChange: (field: keyof Activity, value: string | string[] | number | null) => void;
+  onSave: () => void;
+  onCancel: () => void;
 }) {
   function toggleGrade(grade: string) {
     const next = activity.grades.includes(grade)
@@ -99,20 +166,9 @@ function ActivityCard({
 
   return (
     <div className="space-y-5 rounded-xl border border-border bg-card p-6 shadow-sm">
-      {/* Card header */}
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-muted-foreground">
-          Activity {index + 1}
-        </span>
-        <button
-          type="button"
-          onClick={onRemove}
-          className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
-        >
-          <Trash2 className="size-3.5" />
-          Remove
-        </button>
-      </div>
+      <p className="text-sm font-medium text-muted-foreground">
+        {isEditing ? "Edit activity" : "New activity"}
+      </p>
 
       {/* Name + Category */}
       <div className="grid gap-4 sm:grid-cols-2">
@@ -124,7 +180,12 @@ function ActivityCard({
             placeholder="e.g. Varsity Soccer, Debate Club"
             value={activity.name}
             onChange={(e) => onChange("name", e.target.value)}
+            aria-invalid={!!errors.name}
+            className={errors.name ? "border-destructive" : ""}
           />
+          {errors.name && (
+            <p className="text-xs text-destructive">{errors.name}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor={`category-${activity.id}`}>Category</Label>
@@ -132,7 +193,7 @@ function ActivityCard({
             id={`category-${activity.id}`}
             value={activity.category}
             onChange={(e) => onChange("category", e.target.value)}
-            className={SELECT_CLASS}
+            className={errors.category ? SELECT_ERROR_CLASS : SELECT_CLASS}
           >
             {ACTIVITY_CATEGORIES.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -140,6 +201,9 @@ function ActivityCard({
               </option>
             ))}
           </select>
+          {errors.category && (
+            <p className="text-xs text-destructive">{errors.category}</p>
+          )}
         </div>
       </div>
 
@@ -198,9 +262,7 @@ function ActivityCard({
       {/* Hours + Weeks */}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <div className="flex items-baseline gap-2">
-            <Label htmlFor={`hours-${activity.id}`}>Hours per week</Label>
-          </div>
+          <Label htmlFor={`hours-${activity.id}`}>Hours per week</Label>
           <Input
             id={`hours-${activity.id}`}
             type="number"
@@ -238,10 +300,7 @@ function ActivityCard({
               key={n}
               type="button"
               onClick={() =>
-                onChange(
-                  "meaningfulness",
-                  activity.meaningfulness === n ? null : n,
-                )
+                onChange("meaningfulness", activity.meaningfulness === n ? null : n)
               }
               className={[
                 "flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium transition-colors",
@@ -259,6 +318,16 @@ function ActivityCard({
             {MEANINGFULNESS_LABELS[activity.meaningfulness]}
           </p>
         )}
+      </div>
+
+      {/* Form actions */}
+      <div className="flex items-center justify-end gap-2 border-t border-border pt-4">
+        <Button variant="ghost" size="sm" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button size="sm" onClick={onSave}>
+          Save activity
+        </Button>
       </div>
     </div>
   );
@@ -338,7 +407,7 @@ function AwardRow({
   );
 }
 
-// ─── Page ────────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function makeActivity(id: string): Activity {
   return {
@@ -358,31 +427,87 @@ function makeAward(id: string): Award {
   return { id, name: "", level: "", grade: "" };
 }
 
+// ─── Page ────────────────────────────────────────────────────────────────────
+
 export default function ActivitiesPage() {
   const activityCounter = useRef(1);
   const awardCounter = useRef(1);
 
-  const [activities, setActivities] = useState<Activity[]>([]);
+  // saved: committed entries shown as summary cards
+  const [saved, setSaved] = useState<Activity[]>([]);
+  // draft: the single open form; null when no form is open
+  const [draft, setDraft] = useState<Activity | null>(null);
+  // editingId: id of the saved entry currently being edited (null = new entry)
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+
   const [awards, setAwards] = useState<Award[]>([]);
 
-  function addActivity() {
-    if (activities.length >= MAX_ACTIVITIES) return;
+  function openNewForm() {
+    if (draft !== null || saved.length >= MAX_ACTIVITIES) return;
     const id = String(activityCounter.current++);
-    setActivities((prev) => [...prev, makeActivity(id)]);
+    setDraft(makeActivity(id));
+    setEditingId(null);
+    setFormErrors({});
   }
 
-  function removeActivity(id: string) {
-    setActivities((prev) => prev.filter((a) => a.id !== id));
-  }
-
-  function updateActivity(
-    id: string,
+  function updateDraft(
     field: keyof Activity,
     value: string | string[] | number | null,
   ) {
-    setActivities((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)),
-    );
+    setDraft((prev) => (prev ? { ...prev, [field]: value } : prev));
+    // clear the error for the field being edited
+    if (field === "name" || field === "category") {
+      setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
+  }
+
+  function saveDraft() {
+    if (!draft) return;
+
+    const errors: FormErrors = {};
+    if (!draft.name.trim()) errors.name = "Activity name is required.";
+    if (!draft.category) errors.category = "Please select a category.";
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    if (editingId !== null) {
+      // replace in-place
+      setSaved((prev) =>
+        prev.map((a) => (a.id === editingId ? draft : a)),
+      );
+    } else {
+      setSaved((prev) => [...prev, draft]);
+    }
+
+    setDraft(null);
+    setEditingId(null);
+    setFormErrors({});
+  }
+
+  function cancelDraft() {
+    setDraft(null);
+    setEditingId(null);
+    setFormErrors({});
+  }
+
+  function editSaved(id: string) {
+    const activity = saved.find((a) => a.id === id);
+    if (!activity) return;
+    setDraft({ ...activity });
+    setEditingId(id);
+    setFormErrors({});
+  }
+
+  function deleteSaved(id: string) {
+    setSaved((prev) => prev.filter((a) => a.id !== id));
+    if (editingId === id) {
+      setDraft(null);
+      setEditingId(null);
+      setFormErrors({});
+    }
   }
 
   function addAward() {
@@ -400,6 +525,10 @@ export default function ActivitiesPage() {
       prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)),
     );
   }
+
+  const visibleSaved = saved.filter((a) => a.id !== editingId);
+  const totalSaved = saved.length;
+  const canAddMore = draft === null && totalSaved < MAX_ACTIVITIES;
 
   return (
     <main className="px-6 py-16">
@@ -420,37 +549,57 @@ export default function ActivitiesPage() {
         </div>
 
         {/* Activities section */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-semibold">Activities</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
-                Up to {MAX_ACTIVITIES} activities.{" "}
-                {activities.length > 0 && (
-                  <span>
-                    {activities.length} of {MAX_ACTIVITIES} added.
-                  </span>
-                )}
+                {totalSaved === 0
+                  ? `Up to ${MAX_ACTIVITIES} activities.`
+                  : `${totalSaved} of ${MAX_ACTIVITIES} saved.`}
               </p>
             </div>
-            {activities.length < MAX_ACTIVITIES && (
-              <Button variant="outline" size="sm" onClick={addActivity}>
+            {canAddMore && (
+              <Button variant="outline" size="sm" onClick={openNewForm}>
                 <Plus />
                 Add activity
               </Button>
             )}
           </div>
 
-          {activities.length === 0 && (
+          {/* Saved summary cards */}
+          {visibleSaved.map((activity) => (
+            <SavedActivityCard
+              key={activity.id}
+              activity={activity}
+              onEdit={() => editSaved(activity.id)}
+              onDelete={() => deleteSaved(activity.id)}
+            />
+          ))}
+
+          {/* Open form */}
+          {draft !== null && (
+            <ActivityForm
+              activity={draft}
+              isEditing={editingId !== null}
+              errors={formErrors}
+              onChange={updateDraft}
+              onSave={saveDraft}
+              onCancel={cancelDraft}
+            />
+          )}
+
+          {/* Empty state — no saved entries and no open form */}
+          {totalSaved === 0 && draft === null && (
             <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-14 text-center">
               <p className="text-sm font-medium">No activities added yet</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Click &quot;Add activity&quot; to get started.
+                Add each activity one at a time and save it to your list.
               </p>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={addActivity}
+                onClick={openNewForm}
                 className="mt-4"
               >
                 <Plus />
@@ -459,19 +608,7 @@ export default function ActivitiesPage() {
             </div>
           )}
 
-          {activities.map((activity, index) => (
-            <ActivityCard
-              key={activity.id}
-              activity={activity}
-              index={index}
-              onChange={(field, value) =>
-                updateActivity(activity.id, field, value)
-              }
-              onRemove={() => removeActivity(activity.id)}
-            />
-          ))}
-
-          {activities.length >= MAX_ACTIVITIES && (
+          {totalSaved >= MAX_ACTIVITIES && draft === null && (
             <p className="text-center text-xs text-muted-foreground">
               Maximum of {MAX_ACTIVITIES} activities reached.
             </p>
