@@ -130,7 +130,9 @@ export default function CareerDirectionPage() {
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
             Step 2 of 4
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">Career direction</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Career direction
+          </h1>
           <p className="leading-relaxed text-muted-foreground">
             Help AppGap understand where you&apos;re aiming and what field
             you&apos;re interested in pursuing. This shapes how your profile is

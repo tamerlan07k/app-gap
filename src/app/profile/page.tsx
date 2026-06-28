@@ -153,7 +153,9 @@ export default function ProfilePage() {
                 id="grade-level"
                 value={info.gradeLevel}
                 onChange={(e) => setAcademic("gradeLevel", e.target.value)}
-                className={errors.gradeLevel ? SELECT_ERROR_CLASS : SELECT_CLASS}
+                className={
+                  errors.gradeLevel ? SELECT_ERROR_CLASS : SELECT_CLASS
+                }
               >
                 {GRADE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>

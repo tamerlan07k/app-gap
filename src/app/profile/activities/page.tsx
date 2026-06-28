@@ -153,7 +153,10 @@ function ActivityForm({
   activity: Activity;
   isEditing: boolean;
   errors: FormErrors;
-  onChange: (field: keyof Activity, value: string | string[] | number | null) => void;
+  onChange: (
+    field: keyof Activity,
+    value: string | string[] | number | null,
+  ) => void;
   onSave: () => void;
   onCancel: () => void;
 }) {
@@ -300,7 +303,10 @@ function ActivityForm({
               key={n}
               type="button"
               onClick={() =>
-                onChange("meaningfulness", activity.meaningfulness === n ? null : n)
+                onChange(
+                  "meaningfulness",
+                  activity.meaningfulness === n ? null : n,
+                )
               }
               className={[
                 "flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium transition-colors",
@@ -475,9 +481,7 @@ export default function ActivitiesPage() {
 
     if (editingId !== null) {
       // replace in-place
-      setSaved((prev) =>
-        prev.map((a) => (a.id === editingId ? draft : a)),
-      );
+      setSaved((prev) => prev.map((a) => (a.id === editingId ? draft : a)));
     } else {
       setSaved((prev) => [...prev, draft]);
     }
