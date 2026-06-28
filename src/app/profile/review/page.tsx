@@ -8,7 +8,7 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 5 of 5
+            Step 4 of 4
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Review &amp; generate
@@ -25,7 +25,7 @@ export default function ReviewPage() {
 
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
-            <Link href="/profile/college-preferences">
+            <Link href="/profile/activities">
               <ArrowLeft />
               Back
             </Link>

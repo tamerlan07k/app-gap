@@ -84,7 +84,10 @@ function ActivityCard({
 }: {
   activity: Activity;
   index: number;
-  onChange: (field: keyof Activity, value: string | string[] | number | null) => void;
+  onChange: (
+    field: keyof Activity,
+    value: string | string[] | number | null,
+  ) => void;
   onRemove: () => void;
 }) {
   function toggleGrade(grade: string) {
@@ -235,7 +238,10 @@ function ActivityCard({
               key={n}
               type="button"
               onClick={() =>
-                onChange("meaningfulness", activity.meaningfulness === n ? null : n)
+                onChange(
+                  "meaningfulness",
+                  activity.meaningfulness === n ? null : n,
+                )
               }
               className={[
                 "flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium transition-colors",
@@ -274,7 +280,9 @@ function AwardRow({
   return (
     <div className="grid items-end gap-3 sm:grid-cols-[1fr_160px_100px_auto]">
       <div className="space-y-2">
-        {index === 0 && <Label htmlFor={`award-name-${award.id}`}>Award / honor</Label>}
+        {index === 0 && (
+          <Label htmlFor={`award-name-${award.id}`}>Award / honor</Label>
+        )}
         <Input
           id={`award-name-${award.id}`}
           type="text"
@@ -284,7 +292,9 @@ function AwardRow({
         />
       </div>
       <div className="space-y-2">
-        {index === 0 && <Label htmlFor={`award-level-${award.id}`}>Level</Label>}
+        {index === 0 && (
+          <Label htmlFor={`award-level-${award.id}`}>Level</Label>
+        )}
         <select
           id={`award-level-${award.id}`}
           value={award.level}
@@ -299,7 +309,9 @@ function AwardRow({
         </select>
       </div>
       <div className="space-y-2">
-        {index === 0 && <Label htmlFor={`award-grade-${award.id}`}>Grade</Label>}
+        {index === 0 && (
+          <Label htmlFor={`award-grade-${award.id}`}>Grade</Label>
+        )}
         <select
           id={`award-grade-${award.id}`}
           value={award.grade}
@@ -395,7 +407,7 @@ export default function ActivitiesPage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 3 of 5
+            Step 3 of 4
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Activities &amp; impact
@@ -534,7 +546,7 @@ export default function ActivitiesPage() {
             </Link>
           </Button>
           <Button asChild>
-            <Link href="/profile/college-preferences">
+            <Link href="/profile/review">
               Continue
               <ArrowRight />
             </Link>

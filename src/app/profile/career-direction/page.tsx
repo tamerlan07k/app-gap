@@ -91,9 +91,11 @@ export default function CareerDirectionPage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 2 of 5
+            Step 2 of 4
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">Career direction</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Career direction
+          </h1>
           <p className="leading-relaxed text-muted-foreground">
             Help AppGap understand where you&apos;re aiming and what field
             you&apos;re interested in pursuing. This shapes how your profile is
@@ -112,7 +114,10 @@ export default function CareerDirectionPage() {
           </div>
 
           <div className="space-y-5">
-            <Field id="major-category" label="Academic interest / intended major">
+            <Field
+              id="major-category"
+              label="Academic interest / intended major"
+            >
               <select
                 id="major-category"
                 value={direction.majorCategory}
@@ -176,8 +181,8 @@ export default function CareerDirectionPage() {
           <div className="space-y-1">
             <h2 className="font-semibold">College goals</h2>
             <p className="text-sm text-muted-foreground">
-              What kind of schools are you targeting? This helps calibrate
-              where your profile currently stands relative to your goals.
+              What kind of schools are you targeting? This helps calibrate where
+              your profile currently stands relative to your goals.
             </p>
           </div>
 

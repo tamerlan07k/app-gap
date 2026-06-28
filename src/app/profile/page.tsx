@@ -87,7 +87,7 @@ export default function ProfilePage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 1 of 5
+            Step 1 of 4
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile
