@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -16,10 +16,18 @@ interface AcademicInfo {
   actScore: string;
 }
 
+interface FormErrors {
+  gradeLevel?: string;
+  unweightedGpa?: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
+
+const SELECT_ERROR_CLASS =
+  "h-9 w-full rounded-md border border-destructive bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
 
 const GRADE_OPTIONS = [
   { value: "", label: "Select grade level" },
@@ -49,11 +57,13 @@ function Field({
   id,
   label,
   hint,
+  error,
   children,
 }: {
   id: string;
   label: string;
   hint?: string;
+  error?: string;
   children: ReactNode;
 }) {
   return (
@@ -63,6 +73,7 @@ function Field({
         {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -70,6 +81,8 @@ function Field({
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ProfilePage() {
+  const router = useRouter();
+
   const [info, setInfo] = useState<AcademicInfo>({
     gradeLevel: "",
     unweightedGpa: "",
@@ -77,9 +90,30 @@ export default function ProfilePage() {
     actScore: "",
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
+
   function setAcademic(field: keyof AcademicInfo, value: string) {
     setInfo((prev) => ({ ...prev, [field]: value }));
+    if (field === "gradeLevel" || field === "unweightedGpa") {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   }
+
+  function handleContinue() {
+    const next: FormErrors = {};
+    if (!info.gradeLevel) next.gradeLevel = "Please select your grade level.";
+    if (!info.unweightedGpa.trim())
+      next.unweightedGpa = "Please enter your GPA.";
+
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
+      return;
+    }
+
+    router.push("/profile/career-direction");
+  }
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <main className="px-6 py-16">
@@ -110,12 +144,16 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-5">
-            <Field id="grade-level" label="Grade level">
+            <Field
+              id="grade-level"
+              label="Grade level"
+              error={errors.gradeLevel}
+            >
               <select
                 id="grade-level"
                 value={info.gradeLevel}
                 onChange={(e) => setAcademic("gradeLevel", e.target.value)}
-                className={SELECT_CLASS}
+                className={errors.gradeLevel ? SELECT_ERROR_CLASS : SELECT_CLASS}
               >
                 {GRADE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -125,7 +163,12 @@ export default function ProfilePage() {
               </select>
             </Field>
 
-            <Field id="unweighted-gpa" label="Unweighted GPA" hint="out of 4.0">
+            <Field
+              id="unweighted-gpa"
+              label="Unweighted GPA"
+              hint="out of 4.0"
+              error={errors.unweightedGpa}
+            >
               <Input
                 id="unweighted-gpa"
                 type="number"
@@ -140,6 +183,7 @@ export default function ProfilePage() {
                   if (e.target.value)
                     setAcademic("unweightedGpa", clamp(e.target.value, 0, 4));
                 }}
+                className={errors.unweightedGpa ? "border-destructive" : ""}
               />
             </Field>
 
@@ -185,12 +229,15 @@ export default function ProfilePage() {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-end">
-          <Button asChild>
-            <Link href="/profile/career-direction">
-              Continue
-              <ArrowRight />
-            </Link>
+        <div className="flex items-center justify-end gap-4">
+          {hasErrors && (
+            <p className="text-sm text-muted-foreground">
+              Please fill in the required fields above.
+            </p>
+          )}
+          <Button onClick={handleContinue}>
+            Continue
+            <ArrowRight />
           </Button>
         </div>
       </div>

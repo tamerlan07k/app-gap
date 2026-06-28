@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -16,10 +17,18 @@ interface CareerDirection {
   selectivity: string;
 }
 
+interface FormErrors {
+  majorCategory?: string;
+  selectivity?: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
+
+const SELECT_ERROR_CLASS =
+  "h-9 w-full rounded-md border border-destructive bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
 
 const MAJOR_CATEGORIES = [
   { value: "", label: "Select a category" },
@@ -53,11 +62,13 @@ function Field({
   id,
   label,
   hint,
+  error,
   children,
 }: {
   id: string;
   label: string;
   hint?: string;
+  error?: string;
   children: ReactNode;
 }) {
   return (
@@ -67,6 +78,7 @@ function Field({
         {hint && <span className="text-xs text-muted-foreground">{hint}</span>}
       </div>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
@@ -74,6 +86,8 @@ function Field({
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function CareerDirectionPage() {
+  const router = useRouter();
+
   const [direction, setDirection] = useState<CareerDirection>({
     majorCategory: "",
     specificMajor: "",
@@ -81,9 +95,32 @@ export default function CareerDirectionPage() {
     selectivity: "",
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
+
   function setDir(field: keyof CareerDirection, value: string) {
     setDirection((prev) => ({ ...prev, [field]: value }));
+    if (field === "majorCategory" || field === "selectivity") {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   }
+
+  function handleContinue() {
+    const next: FormErrors = {};
+    if (!direction.majorCategory)
+      next.majorCategory =
+        "Please select an academic interest or intended major.";
+    if (!direction.selectivity)
+      next.selectivity = "Please select your college goals.";
+
+    if (Object.keys(next).length > 0) {
+      setErrors(next);
+      return;
+    }
+
+    router.push("/profile/activities");
+  }
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <main className="px-6 py-16">
@@ -93,9 +130,7 @@ export default function CareerDirectionPage() {
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
             Step 2 of 4
           </p>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Career direction
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Career direction</h1>
           <p className="leading-relaxed text-muted-foreground">
             Help AppGap understand where you&apos;re aiming and what field
             you&apos;re interested in pursuing. This shapes how your profile is
@@ -117,12 +152,15 @@ export default function CareerDirectionPage() {
             <Field
               id="major-category"
               label="Academic interest / intended major"
+              error={errors.majorCategory}
             >
               <select
                 id="major-category"
                 value={direction.majorCategory}
                 onChange={(e) => setDir("majorCategory", e.target.value)}
-                className={SELECT_CLASS}
+                className={
+                  errors.majorCategory ? SELECT_ERROR_CLASS : SELECT_CLASS
+                }
               >
                 {MAJOR_CATEGORIES.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -187,12 +225,18 @@ export default function CareerDirectionPage() {
           </div>
 
           <div className="space-y-5">
-            <Field id="selectivity" label="College goals / selectivity">
+            <Field
+              id="selectivity"
+              label="College goals / selectivity"
+              error={errors.selectivity}
+            >
               <select
                 id="selectivity"
                 value={direction.selectivity}
                 onChange={(e) => setDir("selectivity", e.target.value)}
-                className={SELECT_CLASS}
+                className={
+                  errors.selectivity ? SELECT_ERROR_CLASS : SELECT_CLASS
+                }
               >
                 {SELECTIVITY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -212,12 +256,17 @@ export default function CareerDirectionPage() {
               Back
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/profile/activities">
+          <div className="flex items-center gap-4">
+            {hasErrors && (
+              <p className="text-sm text-muted-foreground">
+                Please fill in the required fields above.
+              </p>
+            )}
+            <Button onClick={handleContinue}>
               Continue
               <ArrowRight />
-            </Link>
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
     </main>
