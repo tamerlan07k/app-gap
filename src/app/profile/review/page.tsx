@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   type CareerDirection,
-  type Step1Data,
-  type Step3Data,
   loadStep1,
   loadStep2,
   loadStep3,
+  type Step1Data,
+  type Step3Data,
 } from "~/lib/profile-storage";
 
 // ─── Label maps ───────────────────────────────────────────────────────────────
