@@ -2,32 +2,22 @@
 
 import { ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  type AcademicInfo,
+  type Course,
+  loadStep1,
+  saveStep1,
+} from "~/lib/profile-storage";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface AcademicInfo {
-  gradeLevel: string;
-  unweightedGpa: string;
-  satScore: string;
-  actScore: string;
-}
 
 interface FormErrors {
   gradeLevel?: string;
   unweightedGpa?: string;
-}
-
-interface Course {
-  id: string;
-  name: string;
-  type: string;
-  status: string;
-  gradeLevel: string;
-  apExamScore: string;
 }
 
 interface CourseFormErrors {
@@ -351,6 +341,25 @@ export default function ProfilePage() {
   const [courseFormErrors, setCourseFormErrors] = useState<CourseFormErrors>(
     {},
   );
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const data = loadStep1();
+    if (data) {
+      setInfo(data.info);
+      setSavedCourses(data.courses);
+      if (data.courses.length > 0) {
+        courseCounter.current =
+          Math.max(...data.courses.map((c) => parseInt(c.id, 10) || 0)) + 1;
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    saveStep1(info, savedCourses);
+  }, [info, savedCourses, isLoaded]);
 
   function setAcademic(field: keyof AcademicInfo, value: string) {
     setInfo((prev) => ({ ...prev, [field]: value }));

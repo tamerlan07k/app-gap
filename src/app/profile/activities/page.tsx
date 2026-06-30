@@ -2,31 +2,18 @@
 
 import { ArrowLeft, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  type Activity,
+  type Award,
+  loadStep3,
+  saveStep3,
+} from "~/lib/profile-storage";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface Activity {
-  id: string;
-  name: string;
-  category: string;
-  grades: string[];
-  leadershipRole: string;
-  description: string;
-  hoursPerWeek: string;
-  weeksPerYear: string;
-  meaningfulness: number | null;
-}
-
-interface Award {
-  id: string;
-  name: string;
-  level: string;
-  grade: string;
-}
 
 interface FormErrors {
   name?: string;
@@ -448,6 +435,29 @@ export default function ActivitiesPage() {
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
   const [awards, setAwards] = useState<Award[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const data = loadStep3();
+    if (data) {
+      setSaved(data.activities);
+      setAwards(data.awards);
+      if (data.activities.length > 0) {
+        activityCounter.current =
+          Math.max(...data.activities.map((a) => parseInt(a.id, 10) || 0)) + 1;
+      }
+      if (data.awards.length > 0) {
+        awardCounter.current =
+          Math.max(...data.awards.map((a) => parseInt(a.id, 10) || 0)) + 1;
+      }
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    saveStep3(saved, awards);
+  }, [saved, awards, isLoaded]);
 
   function openNewForm() {
     if (draft !== null || saved.length >= MAX_ACTIVITIES) return;

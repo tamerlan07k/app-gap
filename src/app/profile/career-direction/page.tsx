@@ -3,19 +3,17 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import {
+  type CareerDirection,
+  loadStep2,
+  saveStep2,
+} from "~/lib/profile-storage";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-
-interface CareerDirection {
-  majorCategory: string;
-  specificMajor: string;
-  careerInterest: string;
-  selectivity: string;
-}
 
 interface FormErrors {
   majorCategory?: string;
@@ -96,6 +94,18 @@ export default function CareerDirectionPage() {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const data = loadStep2();
+    if (data) setDirection(data);
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    saveStep2(direction);
+  }, [direction, isLoaded]);
 
   function setDir(field: keyof CareerDirection, value: string) {
     setDirection((prev) => ({ ...prev, [field]: value }));
