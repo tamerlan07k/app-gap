@@ -141,8 +141,7 @@ export default function ReviewPage() {
     setIsLoaded(true);
   }, []);
 
-  const step1Complete =
-    !!step1?.info.gradeLevel && !!step1?.info.unweightedGpa;
+  const step1Complete = !!step1?.info.gradeLevel && !!step1?.info.unweightedGpa;
   const step2Complete = !!step2?.majorCategory && !!step2?.selectivity;
   const allComplete = step1Complete && step2Complete;
 
@@ -260,10 +259,10 @@ export default function ReviewPage() {
           {(step1?.courses?.length ?? 0) > 0 && (
             <div className="border-t border-border pt-4">
               <p className="mb-3 text-sm font-medium">
-                Coursework ({step1!.courses.length})
+                Coursework ({step1?.courses.length})
               </p>
               <div className="space-y-2">
-                {step1!.courses.map((course) => {
+                {step1?.courses.map((course) => {
                   const typeStr =
                     COURSE_TYPE_LABELS[course.type] ?? course.type;
                   const statusStr =
@@ -334,7 +333,7 @@ export default function ReviewPage() {
             <p className="text-sm font-medium">
               Activities
               {(step3?.activities?.length ?? 0) > 0
-                ? ` (${step3!.activities.length})`
+                ? ` (${step3?.activities.length})`
                 : ""}
             </p>
             {(step3?.activities?.length ?? 0) === 0 ? (
@@ -343,7 +342,7 @@ export default function ReviewPage() {
               </p>
             ) : (
               <div className="space-y-2">
-                {step3!.activities.map((activity) => {
+                {step3?.activities.map((activity) => {
                   const categoryStr =
                     CATEGORY_LABELS[activity.category] ?? activity.category;
                   const gradesStr =
@@ -367,7 +366,9 @@ export default function ReviewPage() {
                           </span>
                         )}
                         {meta && (
-                          <p className="text-xs text-muted-foreground">{meta}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {meta}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -381,14 +382,14 @@ export default function ReviewPage() {
             <p className="text-sm font-medium">
               Awards &amp; honors
               {(step3?.awards?.length ?? 0) > 0
-                ? ` (${step3!.awards.length})`
+                ? ` (${step3?.awards.length})`
                 : ""}
             </p>
             {(step3?.awards?.length ?? 0) === 0 ? (
               <p className="text-sm text-muted-foreground">No awards added.</p>
             ) : (
               <div className="space-y-2">
-                {step3!.awards.map((award) => {
+                {step3?.awards.map((award) => {
                   const levelStr =
                     AWARD_LEVEL_LABELS[award.level] ?? award.level;
                   const gradeStr = award.grade ? `Grade ${award.grade}` : "";
