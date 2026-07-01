@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { loadStep2FromDb, saveStep2ToDb } from "~/lib/profile-db";
 import {
   type CareerDirection,
   loadStep2,
@@ -95,11 +96,17 @@ export default function CareerDirectionPage() {
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = loadStep2();
-    if (data) setDirection(data);
-    setIsLoaded(true);
+    async function load() {
+      const dbData = await loadStep2FromDb();
+      const data = dbData ?? loadStep2();
+      if (data) setDirection(data);
+      setIsLoaded(true);
+    }
+    load();
   }, []);
 
   useEffect(() => {
@@ -114,7 +121,7 @@ export default function CareerDirectionPage() {
     }
   }
 
-  function handleContinue() {
+  async function handleContinue() {
     const next: FormErrors = {};
     if (!direction.majorCategory)
       next.majorCategory =
@@ -127,10 +134,32 @@ export default function CareerDirectionPage() {
       return;
     }
 
-    router.push("/profile/activities");
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      await saveStep2ToDb(direction);
+      router.push("/profile/activities");
+    } catch {
+      setSaveError(
+        "Couldn't save your progress. Please check your connection and try again.",
+      );
+      setIsSaving(false);
+    }
   }
 
   const hasErrors = Object.keys(errors).length > 0;
+
+  if (!isLoaded) {
+    return (
+      <main className="px-6 py-16">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex justify-center py-20">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="px-6 py-16">
@@ -274,7 +303,11 @@ export default function CareerDirectionPage() {
                 Please fill in the required fields above.
               </p>
             )}
-            <Button onClick={handleContinue}>
+            {saveError && (
+              <p className="text-sm text-destructive">{saveError}</p>
+            )}
+            <Button onClick={handleContinue} disabled={isSaving}>
+              {isSaving && <Loader2 className="animate-spin" />}
               Continue
               <ArrowRight />
             </Button>

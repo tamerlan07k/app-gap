@@ -1,11 +1,20 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { loadStep3FromDb, saveStep3ToDb } from "~/lib/profile-db";
 import {
   type Activity,
   type Award,
@@ -423,6 +432,7 @@ function makeAward(id: string): Award {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ActivitiesPage() {
+  const router = useRouter();
   const activityCounter = useRef(1);
   const awardCounter = useRef(1);
 
@@ -436,22 +446,29 @@ export default function ActivitiesPage() {
 
   const [awards, setAwards] = useState<Award[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = loadStep3();
-    if (data) {
-      setSaved(data.activities);
-      setAwards(data.awards);
-      if (data.activities.length > 0) {
-        activityCounter.current =
-          Math.max(...data.activities.map((a) => parseInt(a.id, 10) || 0)) + 1;
+    async function load() {
+      const dbData = await loadStep3FromDb();
+      const data = dbData ?? loadStep3();
+      if (data) {
+        setSaved(data.activities);
+        setAwards(data.awards);
+        if (data.activities.length > 0) {
+          activityCounter.current =
+            Math.max(...data.activities.map((a) => parseInt(a.id, 10) || 0)) +
+            1;
+        }
+        if (data.awards.length > 0) {
+          awardCounter.current =
+            Math.max(...data.awards.map((a) => parseInt(a.id, 10) || 0)) + 1;
+        }
       }
-      if (data.awards.length > 0) {
-        awardCounter.current =
-          Math.max(...data.awards.map((a) => parseInt(a.id, 10) || 0)) + 1;
-      }
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
+    load();
   }, []);
 
   useEffect(() => {
@@ -540,9 +557,35 @@ export default function ActivitiesPage() {
     );
   }
 
+  async function handleContinue() {
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      await saveStep3ToDb(saved, awards);
+      router.push("/profile/review");
+    } catch {
+      setSaveError(
+        "Couldn't save your progress. Please check your connection and try again.",
+      );
+      setIsSaving(false);
+    }
+  }
+
   const visibleSaved = saved.filter((a) => a.id !== editingId);
   const totalSaved = saved.length;
   const canAddMore = draft === null && totalSaved < MAX_ACTIVITIES;
+
+  if (!isLoaded) {
+    return (
+      <main className="px-6 py-16">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex justify-center py-20">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="px-6 py-16">
@@ -696,12 +739,16 @@ export default function ActivitiesPage() {
               Back
             </Link>
           </Button>
-          <Button asChild>
-            <Link href="/profile/review">
+          <div className="flex items-center gap-4">
+            {saveError && (
+              <p className="text-sm text-destructive">{saveError}</p>
+            )}
+            <Button onClick={handleContinue} disabled={isSaving}>
+              {isSaving && <Loader2 className="animate-spin" />}
               Continue
               <ArrowRight />
-            </Link>
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
     </main>

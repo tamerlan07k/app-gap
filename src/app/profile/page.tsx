@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowRight, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowRight, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { loadStep1FromDb, saveStep1ToDb } from "~/lib/profile-db";
 import {
   type AcademicInfo,
   type Course,
@@ -342,18 +343,24 @@ export default function ProfilePage() {
     {},
   );
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
-    const data = loadStep1();
-    if (data) {
-      setInfo(data.info);
-      setSavedCourses(data.courses);
-      if (data.courses.length > 0) {
-        courseCounter.current =
-          Math.max(...data.courses.map((c) => parseInt(c.id, 10) || 0)) + 1;
+    async function load() {
+      const dbData = await loadStep1FromDb();
+      const data = dbData ?? loadStep1();
+      if (data) {
+        setInfo(data.info);
+        setSavedCourses(data.courses);
+        if (data.courses.length > 0) {
+          courseCounter.current =
+            Math.max(...data.courses.map((c) => parseInt(c.id, 10) || 0)) + 1;
+        }
       }
+      setIsLoaded(true);
     }
-    setIsLoaded(true);
+    load();
   }, []);
 
   useEffect(() => {
@@ -368,7 +375,7 @@ export default function ProfilePage() {
     }
   }
 
-  function handleContinue() {
+  async function handleContinue() {
     const next: FormErrors = {};
     if (!info.gradeLevel) next.gradeLevel = "Please select your grade level.";
     if (!info.unweightedGpa.trim())
@@ -379,7 +386,17 @@ export default function ProfilePage() {
       return;
     }
 
-    router.push("/profile/career-direction");
+    setSaveError(null);
+    setIsSaving(true);
+    try {
+      await saveStep1ToDb(info, savedCourses);
+      router.push("/profile/career-direction");
+    } catch {
+      setSaveError(
+        "Couldn't save your progress. Please check your connection and try again.",
+      );
+      setIsSaving(false);
+    }
   }
 
   // ── Course handlers ──
@@ -480,6 +497,18 @@ export default function ProfilePage() {
   const canAddCourse =
     courseDraft === null && savedCourses.length < MAX_COURSES;
   const hasErrors = Object.keys(errors).length > 0;
+
+  if (!isLoaded) {
+    return (
+      <main className="px-6 py-16">
+        <div className="mx-auto max-w-2xl">
+          <div className="flex justify-center py-20">
+            <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="px-6 py-16">
@@ -670,7 +699,9 @@ export default function ProfilePage() {
               Please fill in the required fields above.
             </p>
           )}
-          <Button onClick={handleContinue}>
+          {saveError && <p className="text-sm text-destructive">{saveError}</p>}
+          <Button onClick={handleContinue} disabled={isSaving}>
+            {isSaving && <Loader2 className="animate-spin" />}
             Continue
             <ArrowRight />
           </Button>

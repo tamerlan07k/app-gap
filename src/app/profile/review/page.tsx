@@ -2,8 +2,14 @@
 
 import { AlertCircle, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
+import {
+  loadStep1FromDb,
+  loadStep2FromDb,
+  loadStep3FromDb,
+} from "~/lib/profile-db";
 import {
   type CareerDirection,
   loadStep1,
@@ -127,18 +133,26 @@ function Row({ label, value }: { label: string; value: string }) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function ReviewPage() {
+  const router = useRouter();
   const [step1, setStep1] = useState<Step1Data | null>(null);
   const [step2, setStep2] = useState<CareerDirection | null>(null);
   const [step3, setStep3] = useState<Step3Data | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generated, setGenerated] = useState(false);
 
   useEffect(() => {
-    setStep1(loadStep1());
-    setStep2(loadStep2());
-    setStep3(loadStep3());
-    setIsLoaded(true);
+    async function load() {
+      const [dbStep1, dbStep2, dbStep3] = await Promise.all([
+        loadStep1FromDb(),
+        loadStep2FromDb(),
+        loadStep3FromDb(),
+      ]);
+      setStep1(dbStep1 ?? loadStep1());
+      setStep2(dbStep2 ?? loadStep2());
+      setStep3(dbStep3 ?? loadStep3());
+      setIsLoaded(true);
+    }
+    load();
   }, []);
 
   const step1Complete = !!step1?.info.gradeLevel && !!step1?.info.unweightedGpa;
@@ -156,15 +170,7 @@ export default function ReviewPage() {
   async function handleGenerate() {
     if (!allComplete || isGenerating) return;
     setIsGenerating(true);
-    // Replace with the real AI call when the engine is ready:
-    // const result = await fetch("/api/generate", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ step1, step2, step3 }),
-    // });
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-    setIsGenerating(false);
-    setGenerated(true);
+    router.push("/dashboard?saved=1");
   }
 
   if (!isLoaded) {
@@ -415,48 +421,35 @@ export default function ReviewPage() {
         </div>
 
         {/* Generate section */}
-        {!generated ? (
-          <div className="space-y-4 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
-            <div className="space-y-2">
-              <h2 className="font-semibold">Ready to see where you stand?</h2>
-              <p className="text-sm text-muted-foreground">
-                AppGap will analyze your academic profile, activities, and goals
-                to identify gaps and build your personalized roadmap.
-              </p>
-            </div>
-            <Button
-              size="lg"
-              onClick={handleGenerate}
-              disabled={!allComplete || isGenerating}
-              className="w-full sm:w-auto"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Analyzing your profile...
-                </>
-              ) : (
-                "Generate My AppGap Roadmap"
-              )}
-            </Button>
-            {!allComplete && !isGenerating && (
-              <p className="text-xs text-muted-foreground">
-                Complete all required fields above to unlock analysis.
-              </p>
+        <div className="space-y-4 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
+          <div className="space-y-2">
+            <h2 className="font-semibold">Ready to see where you stand?</h2>
+            <p className="text-sm text-muted-foreground">
+              AppGap will analyze your academic profile, activities, and goals
+              to identify gaps and build your personalized roadmap.
+            </p>
+          </div>
+          <Button
+            size="lg"
+            onClick={handleGenerate}
+            disabled={!allComplete || isGenerating}
+            className="w-full sm:w-auto"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Saving your profile...
+              </>
+            ) : (
+              "Generate My AppGap Roadmap"
             )}
-          </div>
-        ) : (
-          <div className="space-y-4 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
-            <CheckCircle2 className="mx-auto size-8 text-green-600 dark:text-green-500" />
-            <div className="space-y-2">
-              <h2 className="font-semibold">Analysis complete</h2>
-              <p className="text-sm text-muted-foreground">
-                Your personalized AppGap roadmap will appear here. AI
-                recommendations are coming soon.
-              </p>
-            </div>
-          </div>
-        )}
+          </Button>
+          {!allComplete && !isGenerating && (
+            <p className="text-xs text-muted-foreground">
+              Complete all required fields above to unlock analysis.
+            </p>
+          )}
+        </div>
 
         {/* Navigation */}
         <div className="flex items-center justify-between">
@@ -465,6 +458,9 @@ export default function ReviewPage() {
               <ArrowLeft />
               Back
             </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard">Back to Dashboard</Link>
           </Button>
         </div>
       </div>

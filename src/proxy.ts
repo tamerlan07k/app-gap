@@ -26,8 +26,17 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // Refresh the auth token
-  await supabase.auth.getUser();
+  // Refresh the auth token and get the current user
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Protect /dashboard — redirect unauthenticated users to sign in
+  if (!user && request.nextUrl.pathname.startsWith("/dashboard")) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/auth/login";
+    return NextResponse.redirect(loginUrl);
+  }
 
   return response;
 }
