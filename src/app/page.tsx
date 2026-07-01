@@ -20,7 +20,7 @@ function Hero() {
         </p>
         <div className="pt-2">
           <Button size="lg" asChild>
-            <Link href="/profile">
+            <Link href="/dashboard">
               Try AppGap
               <ArrowRight />
             </Link>
@@ -177,10 +177,10 @@ function FinalCTA() {
           Ready to see where you stand?
         </h2>
         <p className="text-muted-foreground">
-          Takes a few minutes. No account needed.
+          Takes a few minutes. Free to get started.
         </p>
         <Button size="lg" asChild>
-          <Link href="/profile">
+          <Link href="/dashboard">
             Try AppGap
             <ArrowRight />
           </Link>
