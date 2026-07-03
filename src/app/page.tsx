@@ -190,6 +190,65 @@ function FinalCTA() {
   );
 }
 
+// ─── Footer ──────────────────────────────────────────────────────────────────
+
+function Footer() {
+  return (
+    <footer className="border-t border-border bg-muted px-6 pb-10 pt-16">
+      <div className="mx-auto max-w-5xl space-y-12">
+        <div className="max-w-xl space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Student-Led Project
+          </p>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            AppGap is an independent student-led project created to help
+            students navigate the college admissions process. While we strive to
+            provide helpful guidance and AI-powered recommendations, AppGap is
+            not a substitute for a professional college counselor or official
+            admissions advice. Students should always verify important
+            information directly with colleges and scholarship providers.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-border bg-background px-5 py-4">
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            <span className="font-medium text-foreground">Disclaimer: </span>
+            AI-generated recommendations are intended for guidance only and
+            should not be considered official admissions decisions or
+            guarantees.
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
+          <p className="text-xs text-muted-foreground">
+            © 2026 AppGap. All rights reserved.
+          </p>
+          <div className="flex gap-6">
+            <Link
+              href="/privacy"
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Terms of Service
+            </Link>
+            <Link
+              href="/contact"
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -200,6 +259,7 @@ export default function Home() {
       <WhatItHelps />
       <WhoItsFor />
       <FinalCTA />
+      <Footer />
     </main>
   );
 }
