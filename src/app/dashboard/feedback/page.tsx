@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, MessageSquare } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -58,15 +58,19 @@ export default function FeedbackPage() {
             Share your thoughts, bugs, or feature ideas.
           </p>
         </div>
-        <div className="rounded-xl border border-border bg-card p-8 text-center shadow-sm">
-          <MessageSquare className="mx-auto mb-3 size-7 text-muted-foreground" />
-          <p className="font-medium">Thanks for your feedback!</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            We read every submission and use it to improve AppGap.
-          </p>
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-10 text-center shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-teal/10">
+            <CheckCircle2 className="size-6 text-brand-teal" />
+          </div>
+          <div>
+            <p className="font-semibold">Thanks for your feedback!</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              We read every submission and use it to improve AppGap.
+            </p>
+          </div>
           <Button
             variant="outline"
-            className="mt-5"
+            size="sm"
             onClick={() => {
               setSubject("");
               setMessage("");
@@ -91,7 +95,7 @@ export default function FeedbackPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-5 rounded-xl border border-border bg-card p-6 shadow-sm"
+        className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm"
       >
         <div className="space-y-2">
           <Label htmlFor="subject">Subject</Label>

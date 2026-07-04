@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2, Mail, Timer } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -53,56 +54,73 @@ export default function ContactPage() {
     <main className="px-6 py-20">
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Get in touch
           </p>
           <h1 className="text-4xl font-bold tracking-tight">Contact</h1>
           <p className="leading-relaxed text-muted-foreground">
-            We'd love to hear your feedback, suggestions, bug reports, or
+            We&apos;d love to hear your feedback, suggestions, bug reports, or
             partnership inquiries. If you have any questions about AppGap, feel
-            free to reach out and we'll do our best to respond as soon as
+            free to reach out and we&apos;ll do our best to respond as soon as
             possible.
           </p>
         </div>
 
-        <div className="grid gap-12 sm:grid-cols-5">
+        <div className="grid gap-10 sm:grid-cols-5">
+          {/* Contact info */}
           <div className="space-y-6 sm:col-span-2">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Email us directly
-              </p>
-              <a
-                href="mailto:appgap2009@gmail.com"
-                className="text-sm text-foreground underline-offset-4 hover:underline"
-              >
-                appgap2009@gmail.com
-              </a>
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-teal/10">
+                <Mail className="size-4 text-brand-teal" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Email us
+                </p>
+                <a
+                  href="mailto:appgap2009@gmail.com"
+                  className="text-sm font-medium text-foreground underline-offset-4 hover:underline"
+                >
+                  appgap2009@gmail.com
+                </a>
+              </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Response time
-              </p>
-              <p className="text-sm text-muted-foreground">
-                We typically respond within 1–3 business days.
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-teal/10">
+                <Timer className="size-4 text-brand-teal" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Response time
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  We typically respond within 1–3 business days.
+                </p>
+              </div>
             </div>
           </div>
 
+          {/* Form */}
           <div className="sm:col-span-3">
             {submitted ? (
-              <div className="space-y-3 rounded-lg border border-border bg-muted px-6 py-8 text-center">
-                <p className="font-semibold">Message sent</p>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  Thanks for reaching out. We'll review your message and get
-                  back to you at the email you provided.
-                </p>
+              <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card px-6 py-12 text-center shadow-sm">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-teal/10">
+                  <CheckCircle2 className="size-6 text-brand-teal" />
+                </div>
+                <div>
+                  <p className="font-semibold">Message sent</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    Thanks for reaching out. We&apos;ll review your message and
+                    get back to you at the email you provided.
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     setSubmitted(false);
                     setForm({ name: "", email: "", subject: "", message: "" });
                   }}
-                  className="mt-2 text-xs text-muted-foreground underline-offset-4 hover:underline"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
                 >
                   Send another message
                 </button>
@@ -168,7 +186,7 @@ export default function ContactPage() {
                   className="w-full sm:w-auto"
                   disabled={loading}
                 >
-                  {loading ? "Sending…" : "Send Email"}
+                  {loading ? "Sending…" : "Send message"}
                 </Button>
               </form>
             )}

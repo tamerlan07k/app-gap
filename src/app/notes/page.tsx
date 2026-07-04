@@ -1,6 +1,8 @@
 "use client";
 
+import { Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "~/components/ui/button";
 
 interface Note {
   id: string;
@@ -84,24 +86,26 @@ export default function NotesPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-3xl flex-col gap-6 p-6">
+    <div className="mx-auto flex min-h-[calc(100vh-3.5rem)] max-w-4xl flex-col gap-6 px-6 py-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Notes</h1>
-        <button
-          type="button"
-          onClick={createNote}
-          className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          New Note
-        </button>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Notes</h1>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            {notes.length} {notes.length === 1 ? "note" : "notes"}
+          </p>
+        </div>
+        <Button size="sm" onClick={createNote}>
+          <Plus />
+          New note
+        </Button>
       </div>
 
-      <div className="grid flex-1 grid-cols-[240px_1fr] gap-4 overflow-hidden rounded-lg border border-border">
+      <div className="grid flex-1 grid-cols-[220px_1fr] gap-0 overflow-hidden rounded-2xl border border-border shadow-sm">
         {/* Sidebar */}
-        <div className="flex flex-col gap-1 overflow-y-auto border-r border-border p-2">
+        <div className="flex flex-col gap-0.5 overflow-y-auto border-r border-border bg-muted/30 p-2">
           {notes.length === 0 && (
-            <p className="p-3 text-sm text-muted-foreground">
-              No notes yet. Create one to get started.
+            <p className="px-3 py-4 text-sm text-muted-foreground">
+              No notes yet.
             </p>
           )}
           {notes.map((note) => (
@@ -109,11 +113,12 @@ export default function NotesPage() {
               type="button"
               key={note.id}
               onClick={() => selectNote(note)}
-              className={`rounded-md px-3 py-2 text-left text-sm transition-colors ${
+              className={[
+                "rounded-lg px-3 py-2.5 text-left text-sm transition-colors",
                 note.id === selectedId
-                  ? "bg-accent text-accent-foreground"
-                  : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-              }`}
+                  ? "bg-brand-teal/10 text-brand-teal"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              ].join(" ")}
             >
               <span className="block truncate font-medium">{note.title}</span>
               <span className="block truncate text-xs opacity-60">
@@ -124,7 +129,7 @@ export default function NotesPage() {
         </div>
 
         {/* Editor */}
-        <div className="flex flex-col gap-3 p-4">
+        <div className="flex flex-col gap-3 bg-card p-5">
           {selected ? (
             <>
               <input
@@ -135,6 +140,7 @@ export default function NotesPage() {
                 placeholder="Note title"
                 className="bg-transparent text-lg font-semibold outline-none placeholder:text-muted-foreground"
               />
+              <div className="h-px bg-border" />
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -142,14 +148,16 @@ export default function NotesPage() {
                 placeholder="Start writing..."
                 className="flex-1 resize-none bg-transparent text-sm leading-relaxed outline-none placeholder:text-muted-foreground"
               />
-              <div className="flex justify-end">
-                <button
-                  type="button"
+              <div className="flex justify-end border-t border-border pt-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={deleteNote}
-                  className="rounded-md px-3 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 >
-                  Delete
-                </button>
+                  <Trash2 className="size-3.5" />
+                  Delete note
+                </Button>
               </div>
             </>
           ) : (

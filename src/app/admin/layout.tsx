@@ -19,9 +19,16 @@ export default async function AdminLayout({
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
-      <div className="mb-6 flex items-center gap-3">
-        <h1 className="text-lg font-semibold">Admin</h1>
-        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+      <div className="mb-8 flex items-center gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
+            Admin Console
+          </p>
+          <h1 className="mt-0.5 text-xl font-bold tracking-tight">
+            AppGap Admin
+          </h1>
+        </div>
+        <span className="ml-auto rounded-full bg-brand-dark px-3 py-1 text-xs font-medium text-white/80">
           {user.email}
         </span>
       </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signOut } from "~/app/auth/actions";
+import { AppGapLogo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { createClient } from "~/lib/supabase/server";
 import { getFirstName } from "~/lib/user";
@@ -13,11 +14,13 @@ export async function Navbar() {
   const firstName = user ? getFirstName(user) : null;
 
   return (
-    <nav className="border-b border-border bg-background">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
-        <Link href="/" className="text-lg font-bold tracking-tight">
-          AppGap
+        <Link href="/" className="flex items-center gap-2.5">
+          <AppGapLogo className="h-7 w-auto" />
+          <span className="text-base font-bold tracking-tight">AppGap</span>
         </Link>
+
         <div className="flex items-center gap-2">
           {user ? (
             <>
@@ -35,7 +38,7 @@ export async function Navbar() {
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/auth/login">Sign in</Link>
               </Button>
-              <Button variant="outline" size="sm" asChild>
+              <Button size="sm" asChild>
                 <Link href="/auth/signup">Sign up</Link>
               </Button>
             </>

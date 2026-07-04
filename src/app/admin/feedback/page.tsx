@@ -35,17 +35,17 @@ export default async function AdminFeedbackPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-semibold">Feedback submissions</h2>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            {rows.length} submission{rows.length !== 1 ? "s" : ""}
-          </p>
-        </div>
+      <div>
+        <h2 className="text-xl font-bold tracking-tight">
+          Feedback submissions
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {rows.length} submission{rows.length !== 1 ? "s" : ""}
+        </p>
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-xl border border-border bg-card p-10 text-center text-sm text-muted-foreground shadow-sm">
+        <div className="rounded-2xl border border-dashed border-border py-16 text-center text-sm text-muted-foreground">
           No feedback submitted yet.
         </div>
       ) : (
@@ -53,11 +53,11 @@ export default async function AdminFeedbackPage() {
           {rows.map((row) => (
             <div
               key={row.id}
-              className="rounded-xl border border-border bg-card p-5 shadow-sm"
+              className="rounded-2xl border border-border bg-card p-5 shadow-sm"
             >
               <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
                 <div>
-                  <p className="text-sm font-medium">
+                  <p className="font-semibold">
                     {row.subject || "(no subject)"}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
@@ -65,7 +65,7 @@ export default async function AdminFeedbackPage() {
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-foreground/80 whitespace-pre-wrap">
+              <p className="whitespace-pre-wrap text-sm text-foreground/80">
                 {row.message}
               </p>
             </div>
