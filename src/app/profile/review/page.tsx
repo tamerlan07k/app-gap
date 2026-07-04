@@ -139,6 +139,7 @@ export default function ReviewPage() {
   const [step3, setStep3] = useState<Step3Data | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -170,7 +171,32 @@ export default function ReviewPage() {
   async function handleGenerate() {
     if (!allComplete || isGenerating) return;
     setIsGenerating(true);
-    router.push("/dashboard?saved=1");
+    setGenerateError(null);
+
+    try {
+      const res = await fetch("/api/analyze-profile", { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(
+          (body as { error?: string }).error ??
+            "Analysis failed. Please try again.",
+        );
+      }
+      const body = (await res.json().catch(() => ({}))) as { id?: string };
+      const analysisId = body.id;
+      router.push(
+        analysisId
+          ? `/dashboard/roadmap/${analysisId}`
+          : "/dashboard?analyzed=1",
+      );
+    } catch (err) {
+      setGenerateError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
+      setIsGenerating(false);
+    }
   }
 
   if (!isLoaded) {
@@ -444,12 +470,21 @@ export default function ReviewPage() {
             {isGenerating ? (
               <>
                 <Loader2 className="animate-spin" />
-                Saving your profile...
+                Analyzing your profile...
               </>
             ) : (
               "Generate My AppGap Roadmap"
             )}
           </Button>
+          {isGenerating && (
+            <p className="text-xs text-muted-foreground">
+              This usually takes 10–20 seconds. Please don&apos;t close this
+              page.
+            </p>
+          )}
+          {generateError && !isGenerating && (
+            <p className="text-sm text-destructive">{generateError}</p>
+          )}
           {!allComplete && !isGenerating && (
             <p className="text-xs text-muted-foreground">
               Complete all required fields above to unlock analysis.
