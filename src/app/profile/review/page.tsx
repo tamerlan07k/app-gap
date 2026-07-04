@@ -190,7 +190,13 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          {/* Step progress bar — all 4 filled */}
+          <div className="flex items-center gap-1.5">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="h-1 flex-1 rounded-full bg-brand-teal" />
+            ))}
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 4 of 4
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -214,7 +220,7 @@ export default function ReviewPage() {
             ).map(({ label, done }) => (
               <div key={label} className="flex items-center gap-3">
                 {done ? (
-                  <CheckCircle2 className="size-4 shrink-0 text-green-600 dark:text-green-500" />
+                  <CheckCircle2 className="size-4 shrink-0 text-brand-teal" />
                 ) : (
                   <AlertCircle className="size-4 shrink-0 text-amber-500" />
                 )}
