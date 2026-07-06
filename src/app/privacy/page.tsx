@@ -105,7 +105,7 @@ export default function PrivacyPage() {
     <main className="px-6 py-20">
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Legal
           </p>
           <h1 className="text-4xl font-bold tracking-tight">Privacy Policy</h1>
@@ -119,13 +119,14 @@ export default function PrivacyPage() {
           </p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-10">
           {sections.map((section) => (
             <div key={section.title} className="space-y-4">
-              <h2 className="text-lg font-semibold tracking-tight">
+              <h2 className="flex items-center gap-3 text-base font-semibold tracking-tight">
+                <span className="inline-block h-4 w-0.5 rounded-full bg-brand-teal" />
                 {section.title}
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-4 pl-4">
                 {section.content.map((item) => (
                   <div key={item.subtitle} className="space-y-1">
                     <p className="text-sm font-medium">{item.subtitle}</p>

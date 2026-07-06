@@ -515,7 +515,19 @@ export default function ProfilePage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          {/* Step progress bar */}
+          <div className="flex items-center gap-1.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div
+                key={n}
+                className={[
+                  "h-1 flex-1 rounded-full transition-colors",
+                  n <= 1 ? "bg-brand-teal" : "bg-border",
+                ].join(" ")}
+              />
+            ))}
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 1 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">

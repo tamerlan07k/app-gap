@@ -53,7 +53,7 @@ export default function TermsPage() {
     <main className="px-6 py-20">
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Legal
           </p>
           <h1 className="text-4xl font-bold tracking-tight">
@@ -68,10 +68,13 @@ export default function TermsPage() {
           </p>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {sections.map((section) => (
-            <div key={section.title} className="space-y-2">
-              <h2 className="text-sm font-semibold">{section.title}</h2>
+            <div
+              key={section.title}
+              className="rounded-xl border border-border bg-card px-5 py-4 shadow-sm"
+            >
+              <h2 className="mb-2 text-sm font-semibold">{section.title}</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 {section.text}
               </p>

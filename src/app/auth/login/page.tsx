@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signIn, signInWithGoogle } from "~/app/auth/actions";
+import { AppGapLogo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -35,68 +36,87 @@ export default async function LoginPage({
   const { error } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="mb-2 text-2xl font-bold">Sign in</h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        Enter your email and password to access your account.
-      </p>
-
-      <form action={signInWithGoogle}>
-        <Button type="submit" variant="outline" className="w-full gap-2">
-          <GoogleIcon />
-          Continue with Google
-        </Button>
-      </form>
-
-      <div className="my-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">or</span>
-        <div className="h-px flex-1 bg-border" />
+    <main className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-6 py-16">
+      {/* Background blobs */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        <div className="absolute -right-64 -top-32 h-[440px] w-[440px] rounded-full bg-brand-teal/[0.07] blur-3xl" />
+        <div className="absolute -left-64 bottom-0 h-[360px] w-[360px] rounded-full bg-brand-teal/[0.05] blur-3xl" />
       </div>
 
-      <form action={signIn} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" required />
+      <div className="relative w-full max-w-sm">
+        {/* Brand mark */}
+        <div className="mb-8 flex flex-col items-center gap-2.5">
+          <AppGapLogo className="h-9 w-auto" />
+          <span className="text-sm font-bold tracking-tight">AppGap</span>
         </div>
 
-        {error && (
-          <p className="text-sm text-destructive">
-            You do not have an account yet, please{" "}
-            <Link
-              href="/auth/signup"
-              className="font-medium underline underline-offset-4"
-            >
-              sign up
-            </Link>
-            .
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <h1 className="mb-1 text-xl font-bold tracking-tight">Sign in</h1>
+          <p className="mb-6 text-sm text-muted-foreground">
+            Enter your email and password to access your account.
           </p>
-        )}
 
-        <Button type="submit" className="w-full">
-          Sign in
-        </Button>
-      </form>
+          <form action={signInWithGoogle}>
+            <Button type="submit" variant="outline" className="w-full gap-2">
+              <GoogleIcon />
+              Continue with Google
+            </Button>
+          </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link
-          href="/auth/signup"
-          className="underline underline-offset-4 hover:text-foreground"
-        >
-          Sign up
-        </Link>
-      </p>
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          <form action={signIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" name="password" type="password" required />
+            </div>
+
+            {error && (
+              <p className="text-sm text-destructive">
+                You do not have an account yet, please{" "}
+                <Link
+                  href="/auth/signup"
+                  className="font-medium underline underline-offset-4"
+                >
+                  sign up
+                </Link>
+                .
+              </p>
+            )}
+
+            <Button type="submit" className="w-full">
+              Sign in
+            </Button>
+          </form>
+        </div>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/auth/signup"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Sign up
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

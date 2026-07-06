@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signInWithGoogle, signUp } from "~/app/auth/actions";
+import { AppGapLogo } from "~/components/logo";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
@@ -35,75 +36,97 @@ export default async function SignUpPage({
   const { error } = await searchParams;
 
   return (
-    <main className="mx-auto max-w-sm px-6 py-16">
-      <h1 className="mb-2 text-2xl font-bold">Create an account</h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        Sign up to save your profile and track your application gap analysis.
-      </p>
-
-      <form action={signInWithGoogle}>
-        <Button type="submit" variant="outline" className="w-full gap-2">
-          <GoogleIcon />
-          Continue with Google
-        </Button>
-      </form>
-
-      <div className="my-6 flex items-center gap-3">
-        <div className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">or</span>
-        <div className="h-px flex-1 bg-border" />
+    <main className="relative flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-6 py-16">
+      {/* Background blobs */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
+        <div className="absolute -right-64 -top-32 h-[440px] w-[440px] rounded-full bg-brand-teal/[0.07] blur-3xl" />
+        <div className="absolute -left-64 bottom-0 h-[360px] w-[360px] rounded-full bg-brand-teal/[0.05] blur-3xl" />
       </div>
 
-      <form action={signUp} className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2">
-            <Label htmlFor="first_name">First name</Label>
-            <Input
-              id="first_name"
-              name="first_name"
-              placeholder="Alex"
-              required
-            />
+      <div className="relative w-full max-w-sm">
+        {/* Brand mark */}
+        <div className="mb-8 flex flex-col items-center gap-2.5">
+          <AppGapLogo className="h-9 w-auto" />
+          <span className="text-sm font-bold tracking-tight">AppGap</span>
+        </div>
+
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-sm">
+          <h1 className="mb-1 text-xl font-bold tracking-tight">
+            Create an account
+          </h1>
+          <p className="mb-6 text-sm text-muted-foreground">
+            Sign up to save your profile and track your application gap
+            analysis.
+          </p>
+
+          <form action={signInWithGoogle}>
+            <Button type="submit" variant="outline" className="w-full gap-2">
+              <GoogleIcon />
+              Continue with Google
+            </Button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-xs text-muted-foreground">or</span>
+            <div className="h-px flex-1 bg-border" />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="last_name">
-              Last name{" "}
-              <span className="text-muted-foreground">(optional)</span>
-            </Label>
-            <Input id="last_name" name="last_name" placeholder="Kim" />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" name="password" type="password" required />
+
+          <form action={signUp} className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="first_name">First name</Label>
+                <Input
+                  id="first_name"
+                  name="first_name"
+                  placeholder="Alex"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="last_name">
+                  Last name{" "}
+                  <span className="text-muted-foreground">(optional)</span>
+                </Label>
+                <Input id="last_name" name="last_name" placeholder="Kim" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" name="password" type="password" required />
+            </div>
+
+            {error && <p className="text-sm text-destructive">{error}</p>}
+
+            <Button type="submit" className="w-full">
+              Create account
+            </Button>
+          </form>
         </div>
 
-        {error && <p className="text-sm text-destructive">{error}</p>}
-
-        <Button type="submit" className="w-full">
-          Create account
-        </Button>
-      </form>
-
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link
-          href="/auth/login"
-          className="underline underline-offset-4 hover:text-foreground"
-        >
-          Sign in
-        </Link>
-      </p>
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/auth/login"
+            className="font-medium text-foreground underline-offset-4 hover:underline"
+          >
+            Sign in
+          </Link>
+        </p>
+      </div>
     </main>
   );
 }

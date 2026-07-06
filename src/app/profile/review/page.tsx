@@ -188,17 +188,26 @@ export default function ReviewPage() {
     setIsGenerating(true);
     setGenerateError(null);
     try {
-      const res = await fetch("/api/roadmap", { method: "POST" });
+      const res = await fetch("/api/analyze-profile", { method: "POST" });
       if (!res.ok) {
-        const body = (await res.json()) as { error?: string };
-        throw new Error(body.error ?? "Generation failed");
+        const body = await res.json().catch(() => ({}));
+        throw new Error(
+          (body as { error?: string }).error ??
+            "Analysis failed. Please try again.",
+        );
       }
-      router.push("/dashboard/roadmaps");
+      const body = (await res.json().catch(() => ({}))) as { id?: string };
+      const analysisId = body.id;
+      router.push(
+        analysisId
+          ? `/dashboard/roadmap/${analysisId}`
+          : "/dashboard?analyzed=1",
+      );
     } catch (err) {
       setGenerateError(
         err instanceof Error
           ? err.message
-          : "Failed to generate roadmap. Please try again.",
+          : "Something went wrong. Please try again.",
       );
       setIsGenerating(false);
     }
@@ -221,7 +230,13 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          {/* Step progress bar — all 5 filled */}
+          <div className="flex items-center gap-1.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <div key={n} className="h-1 flex-1 rounded-full bg-brand-teal" />
+            ))}
+          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 5 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -259,7 +274,7 @@ export default function ReviewPage() {
               }) => (
                 <div key={label} className="flex items-center gap-3">
                   {done ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-green-600 dark:text-green-500" />
+                    <CheckCircle2 className="size-4 shrink-0 text-brand-teal" />
                   ) : (
                     <AlertCircle className="size-4 shrink-0 text-amber-500" />
                   )}

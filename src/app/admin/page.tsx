@@ -41,8 +41,7 @@ const STATUS_STYLES: Record<OnboardingStatus, string> = {
   not_started: "bg-muted text-muted-foreground",
   in_progress:
     "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-  complete:
-    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+  complete: "bg-brand-teal/10 text-brand-teal",
 };
 
 const STATUS_LABELS: Record<OnboardingStatus, string> = {
@@ -103,17 +102,17 @@ export default async function AdminUsersPage() {
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="rounded-xl border border-border bg-card p-5 shadow-sm"
+            className="rounded-2xl border border-border bg-card p-5 shadow-sm"
           >
-            <p className="text-2xl font-bold">{value}</p>
+            <p className="text-2xl font-bold text-brand-teal">{value}</p>
             <p className="mt-1 text-sm text-muted-foreground">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Users table */}
-      <div className="rounded-xl border border-border bg-card shadow-sm">
-        <div className="border-b border-border px-6 py-4">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+        <div className="border-b border-border bg-muted/40 px-6 py-4">
           <h2 className="font-semibold">Registered users</h2>
         </div>
         <div className="overflow-x-auto">
@@ -133,14 +132,14 @@ export default async function AdminUsersPage() {
                 <tr>
                   <td
                     colSpan={6}
-                    className="px-6 py-10 text-center text-muted-foreground"
+                    className="px-6 py-12 text-center text-muted-foreground"
                   >
                     No users yet.
                   </td>
                 </tr>
               )}
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-muted/40 transition-colors">
+                <tr key={u.id} className="transition-colors hover:bg-muted/40">
                   <td className="px-6 py-4 font-medium">{u.name}</td>
                   <td className="px-6 py-4 text-muted-foreground">{u.email}</td>
                   <td className="px-6 py-4 text-muted-foreground">

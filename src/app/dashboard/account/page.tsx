@@ -23,24 +23,42 @@ export default async function AccountPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Account</h1>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Account</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Manage your personal information.
+        </p>
+      </div>
 
-      <dl className="max-w-sm divide-y divide-border">
-        {fields.map(({ label, value }) => (
-          <div key={label} className="py-4">
-            <dt className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {label}
-            </dt>
-            <dd className="mt-1 text-sm">{value}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="rounded-2xl border border-border bg-card shadow-sm">
+        <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
+            Profile
+          </p>
+        </div>
+        <dl className="divide-y divide-border px-6">
+          {fields.map(({ label, value }) => (
+            <div key={label} className="flex items-center gap-6 py-4">
+              <dt className="w-28 shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {label}
+              </dt>
+              <dd className="text-sm font-medium">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
 
-      <form action={signOut}>
-        <Button type="submit" variant="outline">
-          Sign out
-        </Button>
-      </form>
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <h2 className="mb-1 text-sm font-semibold">Sign out</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
+          You&apos;ll be redirected to the home page.
+        </p>
+        <form action={signOut}>
+          <Button type="submit" variant="outline">
+            Sign out
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
