@@ -526,7 +526,7 @@ export default function ReviewPage() {
             {isGenerating ? (
               <>
                 <Loader2 className="animate-spin" />
-                Analyzing your profile&hellip;
+                Analyzing your profile...
               </>
             ) : (
               "Generate My AppGap Roadmap"
@@ -534,8 +534,12 @@ export default function ReviewPage() {
           </Button>
           {isGenerating && (
             <p className="text-xs text-muted-foreground">
-              This usually takes 15–30 seconds.
+              This usually takes 10–20 seconds. Please don&apos;t close this
+              page.
             </p>
+          )}
+          {generateError && !isGenerating && (
+            <p className="text-sm text-destructive">{generateError}</p>
           )}
           {!allComplete && !isGenerating && (
             <p className="text-xs text-muted-foreground">
