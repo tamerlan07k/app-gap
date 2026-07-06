@@ -594,18 +594,18 @@ export default function ActivitiesPage() {
         <div className="space-y-3">
           {/* Step progress bar */}
           <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
+            {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
                 className={[
                   "h-1 flex-1 rounded-full transition-colors",
-                  n <= 3 ? "bg-brand-teal" : "bg-border",
+                  n <= 4 ? "bg-brand-teal" : "bg-border",
                 ].join(" ")}
               />
             ))}
           </div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 3 of 4
+            Step 4 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Activities &amp; impact

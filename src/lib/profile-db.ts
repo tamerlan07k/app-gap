@@ -4,6 +4,7 @@ import type {
   Award,
   CareerDirection,
   Course,
+  HighSchoolInfo,
   Step1Data,
   Step3Data,
 } from "~/lib/profile-storage";
@@ -170,6 +171,27 @@ export async function loadStep3FromDb(): Promise<Step3Data | null> {
   }
 }
 
+export async function loadSchoolTypeFromDb(): Promise<HighSchoolInfo | null> {
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("school_type")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!p?.school_type) return null;
+    return { schoolType: p.school_type as string };
+  } catch {
+    return null;
+  }
+}
+
 // ── Savers ────────────────────────────────────────────────────────────────────
 // Savers throw on any Supabase error so the calling page can surface a message.
 // The upsert on profiles only touches the columns relevant to each step, so
@@ -221,6 +243,24 @@ export async function saveStep1ToDb(
     );
     if (insertError) throw new Error(insertError.message);
   }
+}
+
+export async function saveSchoolTypeToDb(data: HighSchoolInfo): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      school_type: data.schoolType || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
+  );
+  if (error) throw new Error(error.message);
 }
 
 export async function saveStep2ToDb(data: CareerDirection): Promise<void> {

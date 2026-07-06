@@ -168,18 +168,18 @@ export default function CareerDirectionPage() {
         <div className="space-y-3">
           {/* Step progress bar */}
           <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
+            {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
                 className={[
                   "h-1 flex-1 rounded-full transition-colors",
-                  n <= 2 ? "bg-brand-teal" : "bg-border",
+                  n <= 3 ? "bg-brand-teal" : "bg-border",
                 ].join(" ")}
               />
             ))}
           </div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 2 of 4
+            Step 3 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Career direction
@@ -304,7 +304,7 @@ export default function CareerDirectionPage() {
         {/* Navigation */}
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
-            <Link href="/profile">
+            <Link href="/profile/school-type">
               <ArrowLeft />
               Back
             </Link>

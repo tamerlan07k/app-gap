@@ -48,6 +48,7 @@ export async function POST() {
     unweighted_gpa: number | null;
     sat_score: number | null;
     act_score: number | null;
+    school_type: string | null;
     major_category: string | null;
     specific_major: string | null;
     career_interest: string | null;
@@ -59,6 +60,7 @@ export async function POST() {
     unweightedGpa: p.unweighted_gpa ?? null,
     satScore: p.sat_score ?? null,
     actScore: p.act_score ?? null,
+    schoolType: p.school_type ?? null,
     courses: (coursesRes.data ?? []).map(
       (c: {
         name: string;

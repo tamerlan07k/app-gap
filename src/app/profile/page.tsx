@@ -390,7 +390,7 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       await saveStep1ToDb(info, savedCourses);
-      router.push("/profile/career-direction");
+      router.push("/profile/school-type");
     } catch {
       setSaveError(
         "Couldn't save your progress. Please check your connection and try again.",
@@ -517,7 +517,7 @@ export default function ProfilePage() {
         <div className="space-y-3">
           {/* Step progress bar */}
           <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
+            {[1, 2, 3, 4, 5].map((n) => (
               <div
                 key={n}
                 className={[
@@ -528,7 +528,7 @@ export default function ProfilePage() {
             ))}
           </div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 1 of 4
+            Step 1 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile
