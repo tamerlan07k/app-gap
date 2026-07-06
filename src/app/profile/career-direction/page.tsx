@@ -167,7 +167,7 @@ export default function CareerDirectionPage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 2 of 4
+            Step 3 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Career direction
@@ -292,7 +292,7 @@ export default function CareerDirectionPage() {
         {/* Navigation */}
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
-            <Link href="/profile">
+            <Link href="/profile/school-type">
               <ArrowLeft />
               Back
             </Link>

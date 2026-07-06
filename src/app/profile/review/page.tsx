@@ -6,12 +6,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
+  loadSchoolTypeFromDb,
   loadStep1FromDb,
   loadStep2FromDb,
   loadStep3FromDb,
 } from "~/lib/profile-db";
 import {
   type CareerDirection,
+  type HighSchoolInfo,
+  loadSchoolInfo,
   loadStep1,
   loadStep2,
   loadStep3,
@@ -27,6 +30,15 @@ const GRADE_LABELS: Record<string, string> = {
   "11": "11th grade",
   "12": "12th grade (senior)",
   gap: "Graduated / gap year",
+};
+
+const SCHOOL_TYPE_LABELS: Record<string, string> = {
+  public: "Public High School",
+  private: "Private High School",
+  "early-college": "Early College High School",
+  "magnet-stem": "Magnet / STEM School",
+  homeschool: "Homeschool",
+  other: "Other",
 };
 
 const MAJOR_LABELS: Record<string, string> = {
@@ -135,19 +147,23 @@ function Row({ label, value }: { label: string; value: string }) {
 export default function ReviewPage() {
   const router = useRouter();
   const [step1, setStep1] = useState<Step1Data | null>(null);
+  const [schoolInfo, setSchoolInfo] = useState<HighSchoolInfo | null>(null);
   const [step2, setStep2] = useState<CareerDirection | null>(null);
   const [step3, setStep3] = useState<Step3Data | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const [dbStep1, dbStep2, dbStep3] = await Promise.all([
+      const [dbStep1, dbSchool, dbStep2, dbStep3] = await Promise.all([
         loadStep1FromDb(),
+        loadSchoolTypeFromDb(),
         loadStep2FromDb(),
         loadStep3FromDb(),
       ]);
       setStep1(dbStep1 ?? loadStep1());
+      setSchoolInfo(dbSchool ?? loadSchoolInfo());
       setStep2(dbStep2 ?? loadStep2());
       setStep3(dbStep3 ?? loadStep3());
       setIsLoaded(true);
@@ -170,7 +186,22 @@ export default function ReviewPage() {
   async function handleGenerate() {
     if (!allComplete || isGenerating) return;
     setIsGenerating(true);
-    router.push("/dashboard?saved=1");
+    setGenerateError(null);
+    try {
+      const res = await fetch("/api/roadmap", { method: "POST" });
+      if (!res.ok) {
+        const body = (await res.json()) as { error?: string };
+        throw new Error(body.error ?? "Generation failed");
+      }
+      router.push("/dashboard/roadmaps");
+    } catch (err) {
+      setGenerateError(
+        err instanceof Error
+          ? err.message
+          : "Failed to generate roadmap. Please try again.",
+      );
+      setIsGenerating(false);
+    }
   }
 
   if (!isLoaded) {
@@ -191,7 +222,7 @@ export default function ReviewPage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 4 of 4
+            Step 5 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Review &amp; generate
@@ -208,19 +239,39 @@ export default function ReviewPage() {
             {(
               [
                 { label: "Academic Profile", done: step1Complete },
+                {
+                  label: "High School Type",
+                  done: true,
+                  note: schoolInfo?.schoolType ? undefined : "optional",
+                },
                 { label: "Career Direction", done: step2Complete },
                 { label: "Activities & Impact", done: true },
               ] as const
-            ).map(({ label, done }) => (
-              <div key={label} className="flex items-center gap-3">
-                {done ? (
-                  <CheckCircle2 className="size-4 shrink-0 text-green-600 dark:text-green-500" />
-                ) : (
-                  <AlertCircle className="size-4 shrink-0 text-amber-500" />
-                )}
-                <span className="text-sm">{label}</span>
-              </div>
-            ))}
+            ).map(
+              ({
+                label,
+                done,
+                note,
+              }: {
+                label: string;
+                done: boolean;
+                note?: string;
+              }) => (
+                <div key={label} className="flex items-center gap-3">
+                  {done ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-green-600 dark:text-green-500" />
+                  ) : (
+                    <AlertCircle className="size-4 shrink-0 text-amber-500" />
+                  )}
+                  <span className="text-sm">{label}</span>
+                  {note && (
+                    <span className="text-xs text-muted-foreground">
+                      ({note})
+                    </span>
+                  )}
+                </div>
+              ),
+            )}
           </div>
           <div className="mt-4 border-t border-border pt-4">
             {allComplete ? (
@@ -302,6 +353,25 @@ export default function ReviewPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Section: High School Type */}
+        <div className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <SectionHeader
+            title="High School Type"
+            editHref="/profile/school-type"
+          />
+          <div className="space-y-2.5">
+            <Row
+              label="School type"
+              value={
+                schoolInfo?.schoolType
+                  ? (SCHOOL_TYPE_LABELS[schoolInfo.schoolType] ??
+                    schoolInfo.schoolType)
+                  : "Not specified"
+              }
+            />
+          </div>
         </div>
 
         {/* Section: Career Direction */}
@@ -429,6 +499,9 @@ export default function ReviewPage() {
               to identify gaps and build your personalized roadmap.
             </p>
           </div>
+          {generateError && (
+            <p className="text-sm text-destructive">{generateError}</p>
+          )}
           <Button
             size="lg"
             onClick={handleGenerate}
@@ -438,12 +511,17 @@ export default function ReviewPage() {
             {isGenerating ? (
               <>
                 <Loader2 className="animate-spin" />
-                Saving your profile...
+                Analyzing your profile&hellip;
               </>
             ) : (
               "Generate My AppGap Roadmap"
             )}
           </Button>
+          {isGenerating && (
+            <p className="text-xs text-muted-foreground">
+              This usually takes 15–30 seconds.
+            </p>
+          )}
           {!allComplete && !isGenerating && (
             <p className="text-xs text-muted-foreground">
               Complete all required fields above to unlock analysis.

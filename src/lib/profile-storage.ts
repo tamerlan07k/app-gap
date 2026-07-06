@@ -48,6 +48,10 @@ export interface Step1Data {
   courses: Course[];
 }
 
+export interface HighSchoolInfo {
+  schoolType: string;
+}
+
 export interface Step3Data {
   activities: Activity[];
   awards: Award[];
@@ -56,6 +60,7 @@ export interface Step3Data {
 const KEY_STEP1 = "appgap:step1";
 const KEY_STEP2 = "appgap:step2";
 const KEY_STEP3 = "appgap:step3";
+const KEY_SCHOOL = "appgap:school";
 
 function safeParse<T>(key: string): T | null {
   try {
@@ -88,4 +93,12 @@ export function saveStep3(activities: Activity[], awards: Award[]): void {
 
 export function loadStep3(): Step3Data | null {
   return safeParse<Step3Data>(KEY_STEP3);
+}
+
+export function saveSchoolInfo(data: HighSchoolInfo): void {
+  localStorage.setItem(KEY_SCHOOL, JSON.stringify(data));
+}
+
+export function loadSchoolInfo(): HighSchoolInfo | null {
+  return safeParse<HighSchoolInfo>(KEY_SCHOOL);
 }

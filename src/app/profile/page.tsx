@@ -390,7 +390,7 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       await saveStep1ToDb(info, savedCourses);
-      router.push("/profile/career-direction");
+      router.push("/profile/school-type");
     } catch {
       setSaveError(
         "Couldn't save your progress. Please check your connection and try again.",
@@ -516,7 +516,7 @@ export default function ProfilePage() {
         {/* Page header */}
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Step 1 of 4
+            Step 1 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile

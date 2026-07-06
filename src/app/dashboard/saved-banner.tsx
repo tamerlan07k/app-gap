@@ -27,8 +27,7 @@ export function SavedBanner() {
       <div className="flex-1 space-y-0.5">
         <p className="text-sm font-medium">Profile saved successfully</p>
         <p className="text-sm text-green-700 dark:text-green-400">
-          Your profile has been saved. AI roadmap generation will be available
-          in a future update — check back soon.
+          Your profile has been saved.
         </p>
       </div>
       <button
