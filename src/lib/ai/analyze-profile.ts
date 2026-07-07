@@ -6,12 +6,16 @@ import { type Analysis, analysisSchema } from "./schema";
 
 export type { FullProfile };
 
-export async function analyzeProfile(profile: FullProfile): Promise<{
+export async function analyzeProfile(
+  profile: FullProfile,
+  modelOverride?: string,
+): Promise<{
   analysis: Analysis;
   promptTokens: number;
   completionTokens: number;
 }> {
-  const { model, temperature } = AI_FEATURES.profileAnalysis;
+  const { model: defaultModel, temperature } = AI_FEATURES.profileAnalysis;
+  const model = modelOverride ?? defaultModel;
 
   const result = await generateText({
     model: gateway(model),

@@ -44,34 +44,26 @@ export const AI_FEATURES = {
 } as const satisfies Record<FeatureKey, FeatureConfig>;
 
 // ─── Subscription tiers ───────────────────────────────────────────────────────
-// Not yet active — placeholder for the future payment system.
-// When billing launches, gate feature access and quota checks using this config
-// rather than adding new hardcoded limits across the codebase.
 
-export type TierKey = "free" | "starter" | "pro";
+export type TierKey = "free" | "pro";
 
 export type TierConfig = {
   label: string;
-  /** AI features accessible on this tier */
-  features: FeatureKey[];
-  /** Max AI generations per calendar month; null = unlimited */
-  generationsPerMonth: number | null;
+  /** Model override for this tier — overrides the feature-level default */
+  model: string;
+  /** Max AI generations per calendar month */
+  generationsPerMonth: number;
 };
 
 export const SUBSCRIPTION_TIERS = {
   free: {
     label: "Free",
-    features: ["profileAnalysis"],
-    generationsPerMonth: 3,
-  },
-  starter: {
-    label: "Starter",
-    features: ["profileAnalysis"],
-    generationsPerMonth: 10,
+    model: "openai/gpt-4o-mini",
+    generationsPerMonth: 1,
   },
   pro: {
     label: "Pro",
-    features: ["profileAnalysis"],
-    generationsPerMonth: null,
+    model: "openai/gpt-4o",
+    generationsPerMonth: 4,
   },
 } as const satisfies Record<TierKey, TierConfig>;

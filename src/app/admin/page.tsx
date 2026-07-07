@@ -9,6 +9,7 @@ interface ProfileRow {
   id: string;
   grade_level: string | null;
   major_category: string | null;
+  subscription_tier: string | null;
 }
 
 interface AdminUser {
@@ -18,6 +19,7 @@ interface AdminUser {
   joinedAt: string;
   lastSignIn: string | null;
   onboarding: OnboardingStatus;
+  subscriptionTier: "free" | "pro";
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -57,7 +59,9 @@ export default async function AdminUsersPage() {
 
   const [usersRes, profilesRes] = await Promise.all([
     admin.auth.admin.listUsers({ perPage: 1000 }),
-    admin.from("profiles").select("id, grade_level, major_category"),
+    admin
+      .from("profiles")
+      .select("id, grade_level, major_category, subscription_tier"),
   ]);
 
   const profileMap = new Map<string, ProfileRow>(
@@ -80,6 +84,8 @@ export default async function AdminUsersPage() {
         joinedAt: u.created_at,
         lastSignIn: u.last_sign_in_at ?? null,
         onboarding: onboardingStatus(profileMap.get(u.id)),
+        subscriptionTier:
+          profileMap.get(u.id)?.subscription_tier === "pro" ? "pro" : "free",
       };
     });
 
@@ -90,15 +96,17 @@ export default async function AdminUsersPage() {
     const diff = Date.now() - new Date(u.lastSignIn).getTime();
     return diff < 7 * 24 * 60 * 60 * 1000;
   }).length;
+  const proCount = users.filter((u) => u.subscriptionTier === "pro").length;
 
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
           { label: "Total users", value: totalUsers },
           { label: "Onboarding complete", value: completeCount },
           { label: "Active (7d)", value: recentlyActive },
+          { label: "Pro subscribers", value: proCount },
         ].map(({ label, value }) => (
           <div
             key={label}
@@ -124,6 +132,7 @@ export default async function AdminUsersPage() {
                 <th className="px-6 py-3">Joined</th>
                 <th className="px-6 py-3">Last login</th>
                 <th className="px-6 py-3">Onboarding</th>
+                <th className="px-6 py-3">Subscription</th>
                 <th className="px-6 py-3">Roadmap</th>
               </tr>
             </thead>
@@ -131,7 +140,7 @@ export default async function AdminUsersPage() {
               {users.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-6 py-12 text-center text-muted-foreground"
                   >
                     No users yet.
@@ -153,6 +162,17 @@ export default async function AdminUsersPage() {
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLES[u.onboarding]}`}
                     >
                       {STATUS_LABELS[u.onboarding]}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        u.subscriptionTier === "pro"
+                          ? "bg-brand-teal/10 text-brand-teal"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {u.subscriptionTier === "pro" ? "Pro" : "Free"}
                     </span>
                   </td>
                   <td className="px-6 py-4">
