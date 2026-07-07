@@ -9,6 +9,7 @@ const navItems = [
   { label: "My Roadmaps", href: "/dashboard/roadmaps" },
   { label: "Feedback", href: "/dashboard/feedback" },
   { label: "Account", href: "/dashboard/account" },
+  { label: "Billing", href: "/dashboard/billing" },
 ];
 
 export function DashboardNav({ isAdmin }: { isAdmin?: boolean }) {

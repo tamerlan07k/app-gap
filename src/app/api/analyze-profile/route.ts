@@ -1,5 +1,5 @@
 import { analyzeProfile, type FullProfile } from "~/lib/ai/analyze-profile";
-import { AI_FEATURES } from "~/lib/ai/config";
+import { SUBSCRIPTION_TIERS, type TierKey } from "~/lib/ai/config";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -40,6 +40,32 @@ export async function POST() {
           "Profile not found. Please complete your profile setup before generating an analysis.",
       },
       { status: 400 },
+    );
+  }
+
+  // Enforce generation limits based on subscription tier
+  const rawTier = (profileRes.data as { subscription_tier?: string })
+    .subscription_tier;
+  const tier: TierKey = rawTier === "pro" ? "pro" : "free";
+  const tierConfig = SUBSCRIPTION_TIERS[tier];
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const { count: usageCount } = await admin
+    .from("ai_analyses")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", startOfMonth.toISOString());
+
+  const used = usageCount ?? 0;
+  if (used >= tierConfig.generationsPerMonth) {
+    return Response.json(
+      {
+        error: `You've used all ${tierConfig.generationsPerMonth} roadmap generation${tierConfig.generationsPerMonth === 1 ? "" : "s"} for this month. ${tier === "free" ? "Upgrade to Pro for 4 generations per month." : "Your limit resets at the start of next month."}`,
+      },
+      { status: 429 },
     );
   }
 
@@ -111,8 +137,10 @@ export async function POST() {
   };
 
   try {
-    const { analysis, promptTokens, completionTokens } =
-      await analyzeProfile(profile);
+    const { analysis, promptTokens, completionTokens } = await analyzeProfile(
+      profile,
+      tierConfig.model,
+    );
 
     // Persist the analysis; errors here are non-fatal — we return the result either way
     const { data: insertData, error: insertError } = await admin
@@ -120,7 +148,7 @@ export async function POST() {
       .insert({
         user_id: user.id,
         analysis,
-        model: AI_FEATURES.profileAnalysis.model,
+        model: tierConfig.model,
         prompt_tokens: promptTokens,
         completion_tokens: completionTokens,
       })
