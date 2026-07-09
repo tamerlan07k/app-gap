@@ -27,10 +27,17 @@ export async function POST() {
     );
   }
 
-  const session = await stripe.billingPortal.sessions.create({
-    customer: profile.stripe_customer_id,
-    return_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
-  });
-
-  return Response.json({ url: session.url });
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: profile.stripe_customer_id,
+      return_url: `${env.NEXT_PUBLIC_APP_URL}/dashboard/billing`,
+    });
+    return Response.json({ url: session.url });
+  } catch (err) {
+    console.error("[billing/portal]", err);
+    return Response.json(
+      { error: "Failed to open billing portal. Please try again." },
+      { status: 500 },
+    );
+  }
 }
