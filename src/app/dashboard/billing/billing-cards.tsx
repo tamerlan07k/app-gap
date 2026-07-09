@@ -30,6 +30,7 @@ interface BillingCardsProps {
 
 export function BillingCards({ isPro, currentPeriodEnd }: BillingCardsProps) {
   const [loading, setLoading] = useState<"checkout" | "portal" | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const formattedDate = currentPeriodEnd
     ? new Date(currentPeriodEnd).toLocaleDateString("en-US", {
@@ -41,27 +42,47 @@ export function BillingCards({ isPro, currentPeriodEnd }: BillingCardsProps) {
 
   async function handleCheckout() {
     setLoading("checkout");
+    setError(null);
     try {
       const res = await fetch("/api/billing/checkout", { method: "POST" });
-      const { url } = await res.json();
-      window.location.href = url;
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        setLoading(null);
+        return;
+      }
+      window.location.href = data.url;
     } catch {
+      setError("Something went wrong. Please try again.");
       setLoading(null);
     }
   }
 
   async function handlePortal() {
     setLoading("portal");
+    setError(null);
     try {
       const res = await fetch("/api/billing/portal", { method: "POST" });
-      const { url } = await res.json();
-      window.location.href = url;
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        setLoading(null);
+        return;
+      }
+      window.location.href = data.url;
     } catch {
+      setError("Something went wrong. Please try again.");
       setLoading(null);
     }
   }
 
   return (
+    <div className="flex flex-col gap-6">
+    {error && (
+      <div className="rounded-xl border border-destructive/40 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+        {error}
+      </div>
+    )}
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Free Card */}
       <div className="flex flex-col rounded-2xl border border-border bg-card shadow-sm">
@@ -232,6 +253,7 @@ export function BillingCards({ isPro, currentPeriodEnd }: BillingCardsProps) {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 }
