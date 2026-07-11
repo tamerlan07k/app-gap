@@ -41,7 +41,7 @@ const GRADE_OPTIONS = [
   { value: "9", label: "9th grade" },
   { value: "10", label: "10th grade" },
   { value: "11", label: "11th grade" },
-  { value: "12", label: "12th grade (senior)" },
+  { value: "12", label: "12th grade" },
   { value: "gap", label: "Graduated / gap year" },
 ];
 

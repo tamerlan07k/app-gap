@@ -5,6 +5,7 @@ import { analysisSchema } from "~/lib/ai/schema";
 import { createClient } from "~/lib/supabase/server";
 import { cn } from "~/lib/utils";
 import { DeleteButton } from "./delete-button";
+import { LimitBanner } from "./limit-banner";
 
 function getScoreLabel(score: number): string {
   if (score >= 80) return "Excellent";
@@ -28,13 +29,20 @@ export default async function RoadmapsPage() {
 
   if (!user) return null;
 
-  const { data: rows } = await supabase
-    .from("ai_analyses")
-    .select("id, created_at, analysis")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const [analysesRes, profileRes] = await Promise.all([
+    supabase
+      .from("ai_analyses")
+      .select("id, created_at, analysis")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("profiles")
+      .select("subscription_tier")
+      .eq("id", user.id)
+      .maybeSingle(),
+  ]);
 
-  const roadmaps = (rows ?? []).flatMap((row) => {
+  const roadmaps = (analysesRes.data ?? []).flatMap((row) => {
     const parsed = analysisSchema.safeParse(row.analysis);
     if (!parsed.success) return [];
     return [
@@ -47,8 +55,32 @@ export default async function RoadmapsPage() {
     ];
   });
 
+  const tier =
+    (profileRes.data as { subscription_tier?: string } | null)
+      ?.subscription_tier === "pro"
+      ? "pro"
+      : "free";
+
+  // For free users: limit is 1 generation per month from the last generation date
+  let isLimitReached = false;
+  let nextAvailableDate: string | null = null;
+
+  if (tier === "free" && roadmaps.length > 0) {
+    const lastGenDate = new Date(roadmaps[0].createdAt);
+    const next = new Date(lastGenDate);
+    next.setMonth(next.getMonth() + 1);
+    if (new Date() < next) {
+      isLimitReached = true;
+      nextAvailableDate = next.toISOString();
+    }
+  }
+
   return (
     <div className="space-y-6">
+      {isLimitReached && nextAvailableDate && (
+        <LimitBanner nextAvailableDate={nextAvailableDate} />
+      )}
+
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">My Roadmaps</h1>
@@ -58,7 +90,7 @@ export default async function RoadmapsPage() {
               : "Your saved roadmaps will appear here once you generate them."}
           </p>
         </div>
-        {roadmaps.length > 0 && (
+        {roadmaps.length > 0 && !isLimitReached && (
           <Button size="sm" asChild>
             <Link href="/profile/review">
               Generate New

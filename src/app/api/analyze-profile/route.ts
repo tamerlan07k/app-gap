@@ -49,24 +49,54 @@ export async function POST() {
   const tier: TierKey = rawTier === "pro" ? "pro" : "free";
   const tierConfig = SUBSCRIPTION_TIERS[tier];
 
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
+  if (tier === "free") {
+    // Free users: 1 generation per rolling month from the date of their last generation
+    const { data: lastGen } = await admin
+      .from("ai_analyses")
+      .select("created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
-  const { count: usageCount } = await admin
-    .from("ai_analyses")
-    .select("*", { count: "exact", head: true })
-    .eq("user_id", user.id)
-    .gte("created_at", startOfMonth.toISOString());
+    if (lastGen) {
+      const next = new Date(lastGen.created_at as string);
+      next.setMonth(next.getMonth() + 1);
+      if (new Date() < next) {
+        const formatted = next.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+        return Response.json(
+          {
+            error: `You've used your 1 free roadmap generation. Your next generation will be available on ${formatted}. Upgrade to Pro for 4 generations per month.`,
+          },
+          { status: 429 },
+        );
+      }
+    }
+  } else {
+    // Pro users: up to 4 generations per calendar month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0, 0, 0, 0);
 
-  const used = usageCount ?? 0;
-  if (used >= tierConfig.generationsPerMonth) {
-    return Response.json(
-      {
-        error: `You've used all ${tierConfig.generationsPerMonth} roadmap generation${tierConfig.generationsPerMonth === 1 ? "" : "s"} for this month. ${tier === "free" ? "Upgrade to Pro for 4 generations per month." : "Your limit resets at the start of next month."}`,
-      },
-      { status: 429 },
-    );
+    const { count: usageCount } = await admin
+      .from("ai_analyses")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .gte("created_at", startOfMonth.toISOString());
+
+    const used = usageCount ?? 0;
+    if (used >= tierConfig.generationsPerMonth) {
+      return Response.json(
+        {
+          error: `You've used all ${tierConfig.generationsPerMonth} roadmap generations for this month. Your limit resets at the start of next month.`,
+        },
+        { status: 429 },
+      );
+    }
   }
 
   const p = profileRes.data as {
