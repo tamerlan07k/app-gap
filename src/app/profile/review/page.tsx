@@ -28,7 +28,7 @@ const GRADE_LABELS: Record<string, string> = {
   "9": "9th grade",
   "10": "10th grade",
   "11": "11th grade",
-  "12": "12th grade (senior)",
+  "12": "12th grade",
   gap: "Graduated / gap year",
 };
 
