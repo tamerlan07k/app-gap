@@ -171,6 +171,46 @@ export async function loadStep3FromDb(): Promise<Step3Data | null> {
   }
 }
 
+export async function loadAdditionalContextFromDb(): Promise<string | null> {
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("additional_context")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return p?.additional_context ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function saveAdditionalContextToDb(
+  context: string,
+): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      additional_context: context.trim() || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
+  );
+  if (error) throw new Error(error.message);
+}
+
 export async function loadSchoolTypeFromDb(): Promise<HighSchoolInfo | null> {
   try {
     const supabase = createClient();
