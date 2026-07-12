@@ -1,5 +1,6 @@
 import { analyzeProfile, type FullProfile } from "~/lib/ai/analyze-profile";
 import { SUBSCRIPTION_TIERS, type TierKey } from "~/lib/ai/config";
+import { PRO_SYSTEM_PROMPT } from "~/lib/ai/prompt";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -109,6 +110,7 @@ export async function POST() {
     specific_major: string | null;
     career_interest: string | null;
     selectivity: string | null;
+    additional_context: string | null;
   };
 
   const profile: FullProfile = {
@@ -136,6 +138,7 @@ export async function POST() {
     specificMajor: p.specific_major ?? "",
     careerInterest: p.career_interest ?? "",
     selectivity: p.selectivity ?? "",
+    additionalContext: p.additional_context ?? null,
     activities: (activitiesRes.data ?? []).map(
       (a: {
         name: string;
@@ -170,6 +173,7 @@ export async function POST() {
     const { analysis, promptTokens, completionTokens } = await analyzeProfile(
       profile,
       tierConfig.model,
+      tier === "pro" ? PRO_SYSTEM_PROMPT : undefined,
     );
 
     // Persist the analysis; errors here are non-fatal — we return the result either way

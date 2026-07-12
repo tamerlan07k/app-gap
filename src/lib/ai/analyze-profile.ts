@@ -9,6 +9,7 @@ export type { FullProfile };
 export async function analyzeProfile(
   profile: FullProfile,
   modelOverride?: string,
+  systemPromptOverride?: string,
 ): Promise<{
   analysis: Analysis;
   promptTokens: number;
@@ -19,7 +20,7 @@ export async function analyzeProfile(
 
   const result = await generateText({
     model: gateway(model),
-    system: SYSTEM_PROMPT,
+    system: systemPromptOverride ?? SYSTEM_PROMPT,
     prompt: buildProfilePrompt(profile),
     temperature,
   });

@@ -63,7 +63,7 @@ export const SUBSCRIPTION_TIERS = {
   },
   pro: {
     label: "Pro",
-    model: "openai/gpt-4o",
+    model: "google/gemini-2.5-pro",
     generationsPerMonth: 4,
   },
 } as const satisfies Record<TierKey, TierConfig>;

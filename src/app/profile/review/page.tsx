@@ -5,11 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
 import {
+  loadAdditionalContextFromDb,
   loadSchoolTypeFromDb,
   loadStep1FromDb,
   loadStep2FromDb,
   loadStep3FromDb,
+  saveAdditionalContextToDb,
 } from "~/lib/profile-db";
 import {
   type CareerDirection,
@@ -150,22 +153,26 @@ export default function ReviewPage() {
   const [schoolInfo, setSchoolInfo] = useState<HighSchoolInfo | null>(null);
   const [step2, setStep2] = useState<CareerDirection | null>(null);
   const [step3, setStep3] = useState<Step3Data | null>(null);
+  const [additionalContext, setAdditionalContext] = useState("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
-      const [dbStep1, dbSchool, dbStep2, dbStep3] = await Promise.all([
-        loadStep1FromDb(),
-        loadSchoolTypeFromDb(),
-        loadStep2FromDb(),
-        loadStep3FromDb(),
-      ]);
+      const [dbStep1, dbSchool, dbStep2, dbStep3, dbContext] =
+        await Promise.all([
+          loadStep1FromDb(),
+          loadSchoolTypeFromDb(),
+          loadStep2FromDb(),
+          loadStep3FromDb(),
+          loadAdditionalContextFromDb(),
+        ]);
       setStep1(dbStep1 ?? loadStep1());
       setSchoolInfo(dbSchool ?? loadSchoolInfo());
       setStep2(dbStep2 ?? loadStep2());
       setStep3(dbStep3 ?? loadStep3());
+      if (dbContext) setAdditionalContext(dbContext);
       setIsLoaded(true);
     }
     load();
@@ -188,6 +195,7 @@ export default function ReviewPage() {
     setIsGenerating(true);
     setGenerateError(null);
     try {
+      await saveAdditionalContextToDb(additionalContext).catch(() => {});
       const res = await fetch("/api/analyze-profile", { method: "POST" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
@@ -503,6 +511,32 @@ export default function ReviewPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Additional Context */}
+        <div className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="space-y-1">
+            <h2 className="font-semibold">Additional Context (Optional)</h2>
+            <p className="text-sm text-muted-foreground">
+              Share anything else that may help the AI better understand your
+              academic journey, school environment, personal circumstances,
+              goals, limitations, or unique experiences.
+            </p>
+          </div>
+          <Textarea
+            value={additionalContext}
+            onChange={(e) => setAdditionalContext(e.target.value)}
+            placeholder={
+              "Examples:\n• My school only offers 5 AP courses.\n• I work part-time to support my family.\n• I recently immigrated to the United States.\n• I started focusing on college admissions later than many students."
+            }
+            className="min-h-32 resize-y text-sm"
+            maxLength={2000}
+          />
+          {additionalContext.length > 0 && (
+            <p className="text-right text-xs text-muted-foreground">
+              {additionalContext.length}/2000
+            </p>
+          )}
         </div>
 
         {/* Generate section */}
