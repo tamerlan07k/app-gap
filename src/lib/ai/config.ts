@@ -58,7 +58,7 @@ export type TierConfig = {
 export const SUBSCRIPTION_TIERS = {
   free: {
     label: "Free",
-    model: "openai/gpt-4o-mini",
+    model: "google/gemini-2.5-flash",
     generationsPerMonth: 1,
   },
   pro: {

@@ -275,6 +275,8 @@ export const SYSTEM_PROMPT = `You are AppGap's senior admissions strategist — 
 
 **School context awareness.** Early College HS students earn college credits as primary advanced coursework — never penalize for fewer APs. Homeschool students: evaluate via dual enrollment, competitions, portfolio. Magnet/STEM: limited elective bandwidth is expected. Adjust your assessment — the profile will flag this explicitly.
 
+**Honor additional context.** If the profile includes an "Additional Context from Student" section, treat it as high-signal input — it reveals motivations, circumstances, or details not captured elsewhere in the structured data. Reference it directly where relevant and let it shape your recommendations, gap assessment, and advisorNote.
+
 **Timeline-gated recommendations.** A rising senior in July needs essay drafts, college list finalization, and recommendation letters. A sophomore needs extracurricular depth and junior-year course planning. If a student cannot act on advice in the next 6 months, deprioritize it. The profile includes the current date and admissions stage — use them.
 
 **Be honest.** If this student has a significant gap relative to their stated selectivity, say so clearly in gapScoreExplanation and topGaps. Then explain the path forward in nextSteps and roadmap. Vague encouragement wastes their time.
@@ -348,6 +350,10 @@ Professional, encouraging, honest, detailed, and confident. Sound like a trusted
 - Homeschool: evaluate via dual enrollment, competitions, and portfolio
 - Magnet/STEM: specialized curriculum limits AP breadth — evaluate technical depth instead
 - Always adjust your assessment for the student's actual school context
+
+## Additional context
+
+If the profile includes an "Additional Context from Student" section, treat it as high-signal input — it reveals motivations, circumstances, or details not captured elsewhere in the structured data. Reference it directly where relevant and let it shape your recommendations, gap assessment, and advisorNote.
 
 ## JSON output structure
 
@@ -437,6 +443,15 @@ export function buildProfilePrompt(profile: FullProfile): string {
   lines.push(
     `Application Season: ${isAppSeason ? "ACTIVE — applications are open right now" : "Not yet open for this student"}`,
   );
+
+  // Additional context — placed early so it informs all subsequent analysis
+  if (profile.additionalContext?.trim()) {
+    lines.push("\n## Additional Context from Student");
+    lines.push(
+      `IMPORTANT: The student provided this directly. Treat it as ground truth about their current situation. Do NOT recommend actions they state they have already completed or started. Incorporate this context throughout your analysis, recommendations, and advisorNote.`,
+    );
+    lines.push(profile.additionalContext.trim());
+  }
 
   // Pre-computed intelligence signals
   lines.push("\n## Admissions Intelligence Signals");
@@ -539,15 +554,6 @@ export function buildProfilePrompt(profile: FullProfile): string {
     }
   } else {
     lines.push("\n### Awards & Honors\nNone listed.");
-  }
-
-  // Additional context from student
-  if (profile.additionalContext?.trim()) {
-    lines.push("\n## Additional Context from Student");
-    lines.push(
-      `(Provided directly by the student — treat as high-signal context when evaluating their profile and personalizing recommendations)`,
-    );
-    lines.push(profile.additionalContext.trim());
   }
 
   lines.push(
