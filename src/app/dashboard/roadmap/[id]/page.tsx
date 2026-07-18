@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { analysisSchema } from "~/lib/ai/schema";
 import { createClient } from "~/lib/supabase/server";
 import { GapScoreCard } from "../../analysis/gap-score-card";
+import { NarrativeCard } from "../../analysis/narrative-card";
 import { NextStepsCard } from "../../analysis/next-steps-card";
 import { RoadmapPreviewCard } from "../../analysis/roadmap-preview-card";
 import { StrongestAreasCard } from "../../analysis/strongest-areas-card";
@@ -94,6 +95,10 @@ export default async function RoadmapResultPage({
         <StrongestAreasCard areas={analysis.strongestAreas} />
         <TopGapsCard gaps={analysis.topGaps} />
       </div>
+
+      {analysis.applicationNarrative && (
+        <NarrativeCard narrative={analysis.applicationNarrative} />
+      )}
 
       <NextStepsCard steps={analysis.nextSteps} />
 
