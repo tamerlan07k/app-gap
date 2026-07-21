@@ -6,6 +6,8 @@ import { cn } from "~/lib/utils";
 
 const navItems = [
   { label: "Users", href: "/admin" },
+  { label: "Analytics", href: "/admin/analytics" },
+  { label: "Billing Control", href: "/admin/billing" },
   { label: "Feedback", href: "/admin/feedback" },
 ];
 

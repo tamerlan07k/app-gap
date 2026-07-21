@@ -1,6 +1,11 @@
 import { analyzeProfile, type FullProfile } from "~/lib/ai/analyze-profile";
 import { SUBSCRIPTION_TIERS, type TierKey } from "~/lib/ai/config";
 import { PRO_SYSTEM_PROMPT } from "~/lib/ai/prompt";
+import {
+  type EntitlementProfile,
+  reconcileExpiredOverride,
+  resolveEntitlement,
+} from "~/lib/entitlement";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -44,10 +49,13 @@ export async function POST() {
     );
   }
 
-  // Enforce generation limits based on subscription tier
-  const rawTier = (profileRes.data as { subscription_tier?: string })
-    .subscription_tier;
-  const tier: TierKey = rawTier === "pro" ? "pro" : "free";
+  // Enforce generation limits based on the *effective* subscription tier.
+  // Reconcile any lapsed admin override first, then resolve entitlement with
+  // priority: active admin override > Stripe > free. An expired override is
+  // treated as inactive by the resolver even before reconciliation writes land.
+  await reconcileExpiredOverride(admin, profileRes.data as EntitlementProfile);
+  const entitlement = resolveEntitlement(profileRes.data as EntitlementProfile);
+  const tier: TierKey = entitlement.tier;
   const tierConfig = SUBSCRIPTION_TIERS[tier];
 
   if (tier === "free") {
