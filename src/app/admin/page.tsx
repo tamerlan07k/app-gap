@@ -1,3 +1,4 @@
+import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { getFirstName, getLastName } from "~/lib/user";
 
@@ -10,6 +11,9 @@ interface ProfileRow {
   grade_level: string | null;
   major_category: string | null;
   subscription_tier: string | null;
+  admin_override: boolean | null;
+  admin_override_tier: string | null;
+  admin_override_expires_at: string | null;
 }
 
 interface AdminUser {
@@ -61,7 +65,9 @@ export default async function AdminUsersPage() {
     admin.auth.admin.listUsers({ perPage: 1000 }),
     admin
       .from("profiles")
-      .select("id, grade_level, major_category, subscription_tier"),
+      .select(
+        "id, grade_level, major_category, subscription_tier, admin_override, admin_override_tier, admin_override_expires_at",
+      ),
   ]);
 
   const profileMap = new Map<string, ProfileRow>(
@@ -84,8 +90,9 @@ export default async function AdminUsersPage() {
         joinedAt: u.created_at,
         lastSignIn: u.last_sign_in_at ?? null,
         onboarding: onboardingStatus(profileMap.get(u.id)),
-        subscriptionTier:
-          profileMap.get(u.id)?.subscription_tier === "pro" ? "pro" : "free",
+        subscriptionTier: resolveEntitlement(
+          profileMap.get(u.id) as EntitlementProfile | undefined,
+        ).tier,
       };
     });
 

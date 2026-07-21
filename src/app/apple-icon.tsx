@@ -16,7 +16,14 @@ export default function AppleIcon() {
         borderRadius: 36,
       }}
     >
-      <svg viewBox="0 0 36 44" width={110} height={134} fill="none" role="img" aria-label="AppGap logo">
+      <svg
+        viewBox="0 0 36 44"
+        width={110}
+        height={134}
+        fill="none"
+        role="img"
+        aria-label="AppGap logo"
+      >
         <path
           d="M17 7 Q18 2 19 7 L34.5 43 L26 43 L19 27 Q18 24 17 27 L10 43 L1.5 43 Z"
           fill="#1e3a4a"
