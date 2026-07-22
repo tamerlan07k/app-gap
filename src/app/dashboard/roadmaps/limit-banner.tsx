@@ -7,9 +7,10 @@ import { Button } from "~/components/ui/button";
 
 interface LimitBannerProps {
   nextAvailableDate: string;
+  tier: "free" | "pro";
 }
 
-export function LimitBanner({ nextAvailableDate }: LimitBannerProps) {
+export function LimitBanner({ nextAvailableDate, tier }: LimitBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 
   if (dismissed) return null;
@@ -32,20 +33,22 @@ export function LimitBanner({ nextAvailableDate }: LimitBannerProps) {
       </button>
 
       <p className="pr-6 text-sm font-medium text-foreground">
-        You have reached your monthly roadmap limit. The next generation on your
-        tier will be on{" "}
+        You have reached your monthly roadmap limit. Your next generation will
+        be available on{" "}
         <span className="font-semibold text-brand-teal">{formatted}</span>.
       </p>
-      <p className="mt-2 text-sm text-muted-foreground">
-        To generate more roadmaps, you can{" "}
-        <Button
-          asChild
-          size="sm"
-          className="inline-flex h-auto bg-brand-teal px-3 py-1 text-xs font-semibold text-white hover:bg-brand-teal/90"
-        >
-          <Link href="/dashboard/billing">Upgrade to Pro</Link>
-        </Button>
-      </p>
+      {tier === "free" && (
+        <p className="mt-2 text-sm text-muted-foreground">
+          To generate more roadmaps, you can{" "}
+          <Button
+            asChild
+            size="sm"
+            className="inline-flex h-auto bg-brand-teal px-3 py-1 text-xs font-semibold text-white hover:bg-brand-teal/90"
+          >
+            <Link href="/dashboard/billing">Upgrade to Pro</Link>
+          </Button>
+        </p>
+      )}
     </div>
   );
 }

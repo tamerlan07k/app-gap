@@ -1,7 +1,13 @@
 import { ArrowRight, MapIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
+import { SUBSCRIPTION_TIERS } from "~/lib/ai/config";
 import { analysisSchema } from "~/lib/ai/schema";
+import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
+import {
+  billingMonthEnd,
+  countGenerationsThisMonth,
+} from "~/lib/roadmap-usage";
 import { createClient } from "~/lib/supabase/server";
 import { cn } from "~/lib/utils";
 import { DeleteButton } from "./delete-button";
@@ -29,7 +35,7 @@ export default async function RoadmapsPage() {
 
   if (!user) return null;
 
-  const [analysesRes, profileRes] = await Promise.all([
+  const [analysesRes, profileRes, generationsUsed] = await Promise.all([
     supabase
       .from("ai_analyses")
       .select("id, created_at, analysis")
@@ -37,9 +43,16 @@ export default async function RoadmapsPage() {
       .order("created_at", { ascending: false }),
     supabase
       .from("profiles")
-      .select("subscription_tier")
+      .select(
+        "subscription_tier, subscription_status, admin_override, admin_override_tier, admin_override_expires_at",
+      )
       .eq("id", user.id)
       .maybeSingle(),
+    countGenerationsThisMonth(supabase, user.id).catch((error) => {
+      // Fail closed: on error, treat as limit reached rather than unlimited.
+      console.error("[roadmaps] failed to count generations:", error);
+      return Number.POSITIVE_INFINITY;
+    }),
   ]);
 
   const roadmaps = (analysesRes.data ?? []).flatMap((row) => {
@@ -55,30 +68,24 @@ export default async function RoadmapsPage() {
     ];
   });
 
-  const tier =
-    (profileRes.data as { subscription_tier?: string } | null)
-      ?.subscription_tier === "pro"
-      ? "pro"
-      : "free";
+  // Resolve the *effective* tier (an active admin override outranks Stripe), then
+  // measure usage against the append-only generation ledger — not the roadmap
+  // rows above — so deleting a roadmap never restores the monthly allowance.
+  const entitlement = resolveEntitlement(
+    profileRes.data as EntitlementProfile | null,
+  );
+  const tier = entitlement.tier;
+  const limit = SUBSCRIPTION_TIERS[tier].generationsPerMonth;
 
-  // For free users: limit is 1 generation per month from the last generation date
-  let isLimitReached = false;
-  let nextAvailableDate: string | null = null;
-
-  if (tier === "free" && roadmaps.length > 0) {
-    const lastGenDate = new Date(roadmaps[0].createdAt);
-    const next = new Date(lastGenDate);
-    next.setMonth(next.getMonth() + 1);
-    if (new Date() < next) {
-      isLimitReached = true;
-      nextAvailableDate = next.toISOString();
-    }
-  }
+  const isLimitReached = generationsUsed >= limit;
+  const nextAvailableDate = isLimitReached
+    ? billingMonthEnd().toISOString()
+    : null;
 
   return (
     <div className="space-y-6">
       {isLimitReached && nextAvailableDate && (
-        <LimitBanner nextAvailableDate={nextAvailableDate} />
+        <LimitBanner nextAvailableDate={nextAvailableDate} tier={tier} />
       )}
 
       <div className="flex items-start justify-between gap-4">
@@ -108,15 +115,26 @@ export default async function RoadmapsPage() {
           <div>
             <p className="font-semibold">No roadmaps yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Complete your profile to generate your first personalized roadmap.
+              {isLimitReached
+                ? "You have already reached your roadmap generation limit for the month. You can check billing for more options."
+                : "Complete your profile to generate your first personalized roadmap."}
             </p>
           </div>
-          <Button size="sm" asChild>
-            <Link href="/profile">
-              Build My Roadmap
-              <ArrowRight />
-            </Link>
-          </Button>
+          {isLimitReached ? (
+            <Button size="sm" asChild>
+              <Link href="/dashboard/billing">
+                Check Billing
+                <ArrowRight />
+              </Link>
+            </Button>
+          ) : (
+            <Button size="sm" asChild>
+              <Link href="/profile">
+                Build My Roadmap
+                <ArrowRight />
+              </Link>
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
