@@ -6,6 +6,10 @@ import {
   reconcileExpiredOverride,
   resolveEntitlement,
 } from "~/lib/entitlement";
+import {
+  billingMonthEnd,
+  countGenerationsThisMonth,
+} from "~/lib/roadmap-usage";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -58,54 +62,34 @@ export async function POST() {
   const tier: TierKey = entitlement.tier;
   const tierConfig = SUBSCRIPTION_TIERS[tier];
 
-  if (tier === "free") {
-    // Free users: 1 generation per rolling month from the date of their last generation
-    const { data: lastGen } = await admin
-      .from("ai_analyses")
-      .select("created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (lastGen) {
-      const next = new Date(lastGen.created_at as string);
-      next.setMonth(next.getMonth() + 1);
-      if (new Date() < next) {
-        const formatted = next.toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        });
-        return Response.json(
-          {
-            error: `You've used your 1 free roadmap generation. Your next generation will be available on ${formatted}. Upgrade to Pro for 4 generations per month.`,
-          },
-          { status: 429 },
-        );
-      }
-    }
-  } else {
-    // Pro users: up to 4 generations per calendar month
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
-    const { count: usageCount } = await admin
-      .from("ai_analyses")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", user.id)
-      .gte("created_at", startOfMonth.toISOString());
-
-    const used = usageCount ?? 0;
-    if (used >= tierConfig.generationsPerMonth) {
-      return Response.json(
-        {
-          error: `You've used all ${tierConfig.generationsPerMonth} roadmap generations for this month. Your limit resets at the start of next month.`,
-        },
-        { status: 429 },
-      );
-    }
+  // Count generations from the append-only usage ledger — NOT from ai_analyses —
+  // so deleting a saved roadmap can never restore a user's monthly allowance.
+  // Both tiers use the same calendar-month window (resets on the 1st).
+  let used: number;
+  try {
+    used = await countGenerationsThisMonth(admin, user.id);
+  } catch (err) {
+    // Fail closed: if we can't verify usage we must NOT allow a free generation.
+    console.error(
+      "[API] Failed to verify generation usage:",
+      err instanceof Error ? err.message : String(err),
+    );
+    return Response.json(
+      { error: "Couldn't verify your generation limit. Please try again." },
+      { status: 503 },
+    );
+  }
+  if (used >= tierConfig.generationsPerMonth) {
+    const resets = billingMonthEnd().toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    const error =
+      tier === "free"
+        ? `You've used your 1 free roadmap generation this month. Your next generation will be available on ${resets}. Upgrade to Pro for 4 generations per month.`
+        : `You've used all ${tierConfig.generationsPerMonth} roadmap generations for this month. Your limit resets on ${resets}.`;
+    return Response.json({ error }, { status: 429 });
   }
 
   const p = profileRes.data as {
@@ -183,6 +167,21 @@ export async function POST() {
       tierConfig.model,
       tier === "pro" ? PRO_SYSTEM_PROMPT : undefined,
     );
+
+    // Record the consumed generation in the usage ledger FIRST. This is the
+    // authoritative monthly-limit record and is intentionally decoupled from the
+    // ai_analyses row: even if the analysis insert below fails, or the user later
+    // deletes the saved roadmap, this generation still counts against the month.
+    const { error: usageError } = await admin
+      .from("roadmap_generations")
+      .insert({ user_id: user.id, tier });
+
+    if (usageError) {
+      console.error(
+        "[API] Failed to record generation usage:",
+        usageError.message,
+      );
+    }
 
     // Persist the analysis; errors here are non-fatal — we return the result either way
     const { data: insertData, error: insertError } = await admin

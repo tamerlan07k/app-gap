@@ -1,7 +1,10 @@
 import { ArrowLeft, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { SUBSCRIPTION_TIERS } from "~/lib/ai/config";
 import { analysisSchema } from "~/lib/ai/schema";
+import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
+import { countGenerationsThisMonth } from "~/lib/roadmap-usage";
 import { createClient } from "~/lib/supabase/server";
 import { GapScoreCard } from "../../analysis/gap-score-card";
 import { NarrativeCard } from "../../analysis/narrative-card";
@@ -24,7 +27,7 @@ export default async function RoadmapResultPage({
 
   if (!user) return notFound();
 
-  const [analysisRes, profileRes, lastGenRes] = await Promise.all([
+  const [analysisRes, profileRes, generationsUsed] = await Promise.all([
     supabase
       .from("ai_analyses")
       .select("analysis, created_at")
@@ -33,16 +36,16 @@ export default async function RoadmapResultPage({
       .maybeSingle(),
     supabase
       .from("profiles")
-      .select("subscription_tier")
+      .select(
+        "subscription_tier, subscription_status, admin_override, admin_override_tier, admin_override_expires_at",
+      )
       .eq("id", user.id)
       .maybeSingle(),
-    supabase
-      .from("ai_analyses")
-      .select("created_at")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    countGenerationsThisMonth(supabase, user.id).catch((error) => {
+      // Fail closed: on error, treat as limit reached rather than unlimited.
+      console.error("[roadmap] failed to count generations:", error);
+      return Number.POSITIVE_INFINITY;
+    }),
   ]);
 
   const data = analysisRes.data;
@@ -59,18 +62,13 @@ export default async function RoadmapResultPage({
     { month: "long", day: "numeric", year: "numeric" },
   );
 
-  const tier =
-    (profileRes.data as { subscription_tier?: string } | null)
-      ?.subscription_tier === "pro"
-      ? "pro"
-      : "free";
-
-  let canGenerate = true;
-  if (tier === "free" && lastGenRes.data) {
-    const next = new Date(lastGenRes.data.created_at as string);
-    next.setMonth(next.getMonth() + 1);
-    if (new Date() < next) canGenerate = false;
-  }
+  // Effective tier honors an active admin override; remaining generations come
+  // from the usage ledger, so deleting roadmaps never re-enables regeneration.
+  const entitlement = resolveEntitlement(
+    profileRes.data as EntitlementProfile | null,
+  );
+  const limit = SUBSCRIPTION_TIERS[entitlement.tier].generationsPerMonth;
+  const canGenerate = generationsUsed < limit;
 
   return (
     <div className="space-y-6">
