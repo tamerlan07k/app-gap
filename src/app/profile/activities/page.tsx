@@ -11,14 +11,18 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { HistoryControls } from "~/components/history-controls";
+import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useHistory } from "~/hooks/use-history";
 import { loadStep3FromDb, saveStep3ToDb } from "~/lib/profile-db";
 import {
   type Activity,
   type Award,
   loadStep3,
+  type Step3Data,
   saveStep3,
 } from "~/lib/profile-storage";
 
@@ -436,15 +440,26 @@ export default function ActivitiesPage() {
   const activityCounter = useRef(1);
   const awardCounter = useRef(1);
 
-  // saved: committed entries shown as summary cards
-  const [saved, setSaved] = useState<Activity[]>([]);
+  // Committed activities + awards live in one history snapshot so undo/redo can
+  // step across adds, deletes, and award edits alike.
+  const {
+    state: committed,
+    set: setCommitted,
+    reset: resetCommitted,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useHistory<Step3Data>({ activities: [], awards: [] });
+  const saved = committed.activities;
+  const awards = committed.awards;
+
   // draft: the single open form; null when no form is open
   const [draft, setDraft] = useState<Activity | null>(null);
   // editingId: id of the saved entry currently being edited (null = new entry)
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
 
-  const [awards, setAwards] = useState<Award[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -454,8 +469,7 @@ export default function ActivitiesPage() {
       const dbData = await loadStep3FromDb();
       const data = dbData ?? loadStep3();
       if (data) {
-        setSaved(data.activities);
-        setAwards(data.awards);
+        resetCommitted({ activities: data.activities, awards: data.awards });
         if (data.activities.length > 0) {
           activityCounter.current =
             Math.max(...data.activities.map((a) => parseInt(a.id, 10) || 0)) +
@@ -469,12 +483,12 @@ export default function ActivitiesPage() {
       setIsLoaded(true);
     }
     load();
-  }, []);
+  }, [resetCommitted]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    saveStep3(saved, awards);
-  }, [saved, awards, isLoaded]);
+    saveStep3(committed.activities, committed.awards);
+  }, [committed, isLoaded]);
 
   function openNewForm() {
     if (draft !== null || saved.length >= MAX_ACTIVITIES) return;
@@ -508,9 +522,17 @@ export default function ActivitiesPage() {
 
     if (editingId !== null) {
       // replace in-place
-      setSaved((prev) => prev.map((a) => (a.id === editingId ? draft : a)));
+      setCommitted((prev) => ({
+        ...prev,
+        activities: prev.activities.map((a) =>
+          a.id === editingId ? draft : a,
+        ),
+      }));
     } else {
-      setSaved((prev) => [...prev, draft]);
+      setCommitted((prev) => ({
+        ...prev,
+        activities: [...prev.activities, draft],
+      }));
     }
 
     setDraft(null);
@@ -533,7 +555,10 @@ export default function ActivitiesPage() {
   }
 
   function deleteSaved(id: string) {
-    setSaved((prev) => prev.filter((a) => a.id !== id));
+    setCommitted((prev) => ({
+      ...prev,
+      activities: prev.activities.filter((a) => a.id !== id),
+    }));
     if (editingId === id) {
       setDraft(null);
       setEditingId(null);
@@ -544,16 +569,28 @@ export default function ActivitiesPage() {
   function addAward() {
     if (awards.length >= MAX_AWARDS) return;
     const id = String(awardCounter.current++);
-    setAwards((prev) => [...prev, makeAward(id)]);
+    setCommitted((prev) => ({
+      ...prev,
+      awards: [...prev.awards, makeAward(id)],
+    }));
   }
 
   function removeAward(id: string) {
-    setAwards((prev) => prev.filter((a) => a.id !== id));
+    setCommitted((prev) => ({
+      ...prev,
+      awards: prev.awards.filter((a) => a.id !== id),
+    }));
   }
 
   function updateAward(id: string, field: keyof Award, value: string) {
-    setAwards((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, [field]: value } : a)),
+    setCommitted(
+      (prev) => ({
+        ...prev,
+        awards: prev.awards.map((a) =>
+          a.id === id ? { ...a, [field]: value } : a,
+        ),
+      }),
+      { coalesceKey: `award.${id}.${field}` },
     );
   }
 
@@ -590,20 +627,16 @@ export default function ActivitiesPage() {
   return (
     <main className="px-6 py-16">
       <div className="mx-auto max-w-2xl space-y-8">
+        <HistoryControls
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+
         {/* Page header */}
         <div className="space-y-3">
-          {/* Step progress bar */}
-          <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div
-                key={n}
-                className={[
-                  "h-1 flex-1 rounded-full transition-colors",
-                  n <= 4 ? "bg-brand-teal" : "bg-border",
-                ].join(" ")}
-              />
-            ))}
-          </div>
+          <OnboardingStepper current={4} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 4 of 5
           </p>
@@ -656,6 +689,19 @@ export default function ActivitiesPage() {
               onSave={saveDraft}
               onCancel={cancelDraft}
             />
+          )}
+
+          {/* Inline add — mirrors the awards "Add another award" affordance so
+              users don't have to scroll back up to the header button */}
+          {totalSaved > 0 && canAddMore && (
+            <button
+              type="button"
+              onClick={openNewForm}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Plus className="size-3.5" />
+              Add another activity
+            </button>
           )}
 
           {/* Empty state — no saved entries and no open form */}

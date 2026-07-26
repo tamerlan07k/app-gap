@@ -3,14 +3,18 @@
 import { ArrowRight, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
+import { HistoryControls } from "~/components/history-controls";
+import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useHistory } from "~/hooks/use-history";
 import { loadStep1FromDb, saveStep1ToDb } from "~/lib/profile-db";
 import {
   type AcademicInfo,
   type Course,
   loadStep1,
+  type Step1Data,
   saveStep1,
 } from "~/lib/profile-storage";
 
@@ -326,17 +330,31 @@ export default function ProfilePage() {
   const router = useRouter();
   const courseCounter = useRef(1);
 
-  // ── Academic info state ──
-  const [info, setInfo] = useState<AcademicInfo>({
-    gradeLevel: "",
-    unweightedGpa: "",
-    satScore: "",
-    actScore: "",
+  // ── Academic info + coursework state ──
+  // Both live in one history snapshot so undo/redo covers field edits and
+  // course adds/deletes together.
+  const {
+    state: committed,
+    set: setCommitted,
+    reset: resetCommitted,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useHistory<Step1Data>({
+    info: {
+      gradeLevel: "",
+      unweightedGpa: "",
+      satScore: "",
+      actScore: "",
+    },
+    courses: [],
   });
+  const info = committed.info;
+  const savedCourses = committed.courses;
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // ── Coursework state ──
-  const [savedCourses, setSavedCourses] = useState<Course[]>([]);
+  // ── Course form (transient) state ──
   const [courseDraft, setCourseDraft] = useState<Course | null>(null);
   const [courseEditingId, setCourseEditingId] = useState<string | null>(null);
   const [courseFormErrors, setCourseFormErrors] = useState<CourseFormErrors>(
@@ -351,8 +369,7 @@ export default function ProfilePage() {
       const dbData = await loadStep1FromDb();
       const data = dbData ?? loadStep1();
       if (data) {
-        setInfo(data.info);
-        setSavedCourses(data.courses);
+        resetCommitted({ info: data.info, courses: data.courses });
         if (data.courses.length > 0) {
           courseCounter.current =
             Math.max(...data.courses.map((c) => parseInt(c.id, 10) || 0)) + 1;
@@ -361,15 +378,18 @@ export default function ProfilePage() {
       setIsLoaded(true);
     }
     load();
-  }, []);
+  }, [resetCommitted]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    saveStep1(info, savedCourses);
-  }, [info, savedCourses, isLoaded]);
+    saveStep1(committed.info, committed.courses);
+  }, [committed, isLoaded]);
 
   function setAcademic(field: keyof AcademicInfo, value: string) {
-    setInfo((prev) => ({ ...prev, [field]: value }));
+    setCommitted(
+      (prev) => ({ ...prev, info: { ...prev.info, [field]: value } }),
+      { coalesceKey: `info.${field}` },
+    );
     if (field === "gradeLevel" || field === "unweightedGpa") {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -458,11 +478,17 @@ export default function ProfilePage() {
     }
 
     if (courseEditingId !== null) {
-      setSavedCourses((prev) =>
-        prev.map((c) => (c.id === courseEditingId ? courseDraft : c)),
-      );
+      setCommitted((prev) => ({
+        ...prev,
+        courses: prev.courses.map((c) =>
+          c.id === courseEditingId ? courseDraft : c,
+        ),
+      }));
     } else {
-      setSavedCourses((prev) => [...prev, courseDraft]);
+      setCommitted((prev) => ({
+        ...prev,
+        courses: [...prev.courses, courseDraft],
+      }));
     }
 
     setCourseDraft(null);
@@ -485,7 +511,10 @@ export default function ProfilePage() {
   }
 
   function deleteSavedCourse(id: string) {
-    setSavedCourses((prev) => prev.filter((c) => c.id !== id));
+    setCommitted((prev) => ({
+      ...prev,
+      courses: prev.courses.filter((c) => c.id !== id),
+    }));
     if (courseEditingId === id) {
       setCourseDraft(null);
       setCourseEditingId(null);
@@ -513,20 +542,16 @@ export default function ProfilePage() {
   return (
     <main className="px-6 py-16">
       <div className="mx-auto max-w-2xl space-y-8">
+        <HistoryControls
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+
         {/* Page header */}
         <div className="space-y-3">
-          {/* Step progress bar */}
-          <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div
-                key={n}
-                className={[
-                  "h-1 flex-1 rounded-full transition-colors",
-                  n <= 1 ? "bg-brand-teal" : "bg-border",
-                ].join(" ")}
-              />
-            ))}
-          </div>
+          <OnboardingStepper current={1} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 1 of 5
           </p>

@@ -4,7 +4,10 @@ import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { HistoryControls } from "~/components/history-controls";
+import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
+import { useHistory } from "~/hooks/use-history";
 import { loadSchoolTypeFromDb, saveSchoolTypeToDb } from "~/lib/profile-db";
 import { loadSchoolInfo, saveSchoolInfo } from "~/lib/profile-storage";
 
@@ -46,7 +49,15 @@ const SCHOOL_OPTIONS: { value: string; label: string; description: string }[] =
 
 export default function SchoolTypePage() {
   const router = useRouter();
-  const [schoolType, setSchoolType] = useState("");
+  const {
+    state: schoolType,
+    set: setSchoolType,
+    reset: resetSchoolType,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useHistory("");
   const [isLoaded, setIsLoaded] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -55,11 +66,11 @@ export default function SchoolTypePage() {
     async function load() {
       const dbData = await loadSchoolTypeFromDb();
       const data = dbData ?? loadSchoolInfo();
-      if (data) setSchoolType(data.schoolType);
+      if (data) resetSchoolType(data.schoolType);
       setIsLoaded(true);
     }
     load();
-  }, []);
+  }, [resetSchoolType]);
 
   // Persist to localStorage on every change
   useEffect(() => {
@@ -97,9 +108,17 @@ export default function SchoolTypePage() {
   return (
     <main className="px-6 py-16">
       <div className="mx-auto max-w-2xl space-y-8">
+        <HistoryControls
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+
         {/* Page header */}
         <div className="space-y-3">
-          <p className="text-sm font-medium uppercase tracking-widest text-muted-foreground">
+          <OnboardingStepper current={2} />
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 2 of 5
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
