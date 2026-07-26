@@ -1,5 +1,8 @@
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminNav } from "~/components/admin-nav";
+import { Button } from "~/components/ui/button";
 import { isAdmin } from "~/lib/is-admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -19,6 +22,12 @@ export default async function AdminLayout({
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
+      <Button variant="ghost" size="sm" asChild className="mb-4 -ml-2">
+        <Link href="/dashboard">
+          <ArrowLeft />
+          Back to dashboard
+        </Link>
+      </Button>
       <div className="mb-8 flex items-center gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">

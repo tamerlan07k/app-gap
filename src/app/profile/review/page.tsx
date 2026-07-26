@@ -4,6 +4,7 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import {
@@ -238,12 +239,7 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          {/* Step progress bar — all 5 filled */}
-          <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div key={n} className="h-1 flex-1 rounded-full bg-brand-teal" />
-            ))}
-          </div>
+          <OnboardingStepper current={5} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 5 of 5
           </p>

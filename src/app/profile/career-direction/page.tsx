@@ -4,9 +4,12 @@ import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type ReactNode, useEffect, useState } from "react";
+import { HistoryControls } from "~/components/history-controls";
+import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useHistory } from "~/hooks/use-history";
 import { loadStep2FromDb, saveStep2ToDb } from "~/lib/profile-db";
 import {
   type CareerDirection,
@@ -87,7 +90,15 @@ function Field({
 export default function CareerDirectionPage() {
   const router = useRouter();
 
-  const [direction, setDirection] = useState<CareerDirection>({
+  const {
+    state: direction,
+    set: setDirection,
+    reset: resetDirection,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+  } = useHistory<CareerDirection>({
     majorCategory: "",
     specificMajor: "",
     careerInterest: "",
@@ -103,11 +114,11 @@ export default function CareerDirectionPage() {
     async function load() {
       const dbData = await loadStep2FromDb();
       const data = dbData ?? loadStep2();
-      if (data) setDirection(data);
+      if (data) resetDirection(data);
       setIsLoaded(true);
     }
     load();
-  }, []);
+  }, [resetDirection]);
 
   useEffect(() => {
     if (!isLoaded) return;
@@ -115,7 +126,9 @@ export default function CareerDirectionPage() {
   }, [direction, isLoaded]);
 
   function setDir(field: keyof CareerDirection, value: string) {
-    setDirection((prev) => ({ ...prev, [field]: value }));
+    setDirection((prev) => ({ ...prev, [field]: value }), {
+      coalesceKey: `direction.${field}`,
+    });
     if (field === "majorCategory" || field === "selectivity") {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -164,20 +177,16 @@ export default function CareerDirectionPage() {
   return (
     <main className="px-6 py-16">
       <div className="mx-auto max-w-2xl space-y-8">
+        <HistoryControls
+          undo={undo}
+          redo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+
         {/* Page header */}
         <div className="space-y-3">
-          {/* Step progress bar */}
-          <div className="flex items-center gap-1.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <div
-                key={n}
-                className={[
-                  "h-1 flex-1 rounded-full transition-colors",
-                  n <= 3 ? "bg-brand-teal" : "bg-border",
-                ].join(" ")}
-              />
-            ))}
-          </div>
+          <OnboardingStepper current={3} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
             Step 3 of 5
           </p>
