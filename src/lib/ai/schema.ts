@@ -40,7 +40,14 @@ export const narrativeGapItemSchema = z.object({
 export const applicationNarrativeSchema = z.object({
   standoutQuality: z.string(),
   standoutExplanation: z.string(),
+  // Scored evaluation categories. narrativeCohesion, memorability, and
+  // majorAlignment predate the composite-scoring model; academicStrength,
+  // applicationDepth, and sustainedImpact were added to feed the overall gap
+  // score (see score.ts) and are optional so legacy analyses still validate.
+  academicStrength: narrativeScoreSchema.optional(),
   narrativeCohesion: narrativeScoreSchema,
+  applicationDepth: narrativeScoreSchema.optional(),
+  sustainedImpact: narrativeScoreSchema.optional(),
   memorability: narrativeScoreSchema,
   majorAlignment: narrativeScoreSchema,
   cohesionAnalysis: z.string(),

@@ -301,20 +301,45 @@ Before generating scores, reason about the application as a single story:
 
 Keep each narrative analysis section concise — 1–3 sentences per field.
 
-## Gap Score (0–100)
-Score the student's application readiness relative to their stated target selectivity:
-- 80–100: Highly competitive — strong across academics, activities, and narrative
-- 65–79: Competitive — meaningful strengths with a few addressable gaps
-- 50–64: Developing — clear potential but significant gaps remain
-- 35–49: Building — foundational improvements needed across multiple areas
-- 0–34: Early stage — substantial investment required before applying
+## Scoring philosophy — read carefully
 
-Weight: academic strength (GPA × course rigor × test scores vs. selectivity target) counts most, followed by extracurricular depth and leadership, awards/recognition, and major alignment.
+Do NOT ask "How impressive is this activity?" Ask "Does this application tell a compelling, coherent story about who this student is?" Evaluate like a holistic admissions officer reading a complete file — not like someone counting prestigious lines on a résumé.
+
+A single prestigious activity or award (RSI, an Olympiad, MITES, a national title) is ONE piece of an application — never proof of a strong applicant. Prestige belongs in the Memorability score and almost nowhere else. An application built on one extraordinary activity must score LOW on Application Depth, Sustained Impact, and (usually) Narrative Cohesion, because there is little evidence of sustained involvement, a consistent personal narrative, curiosity across areas, or a complete profile.
+
+Reward, above all: narrative cohesion, intellectual curiosity, consistency across activities, clear major alignment, sustained multi-year impact, and depth over prestige.
+
+## Category scores (you provide; AppGap computes the overall)
+
+You do NOT set the final gapScore directly. AppGap computes it deterministically from the six category scores you provide in \`applicationNarrative\`, using a fixed weighting in which Memorability carries the LEAST weight, plus a coherence gate that caps thin or one-dimensional profiles. Your job is to score each category honestly and independently:
+
+- **academicStrength** (0–100): GPA × course rigor × test scores measured against the selectivity target and the student's school context. This is the single heaviest category.
+- **narrativeCohesion** (0–100): Do the activities, awards, and academic choices reinforce one central theme? Scattered or contradictory profiles score low even if individual pieces are strong.
+- **applicationDepth** (0–100): Is this a complete, multi-dimensional profile with several substantive involvements — or a thin profile resting on one or two lines? One extraordinary activity with nothing around it is LOW depth.
+- **sustainedImpact** (0–100): Evidence of multi-year commitment, leadership with measurable outcomes, and tangible, lasting results over time. A one-time accolade with no sustained arc is LOW.
+- **majorAlignment** (0–100): How directly do activities, courses, and awards support the intended major? A prestigious activity unrelated to the major does not raise this.
+- **memorability** (0–100): How distinctive this file is relative to similar applicants — this is where prestige counts. A prestigious activity can make memorability HIGH while every other category stays low.
+
+**Internal rule you must respect:** a student cannot earn a high overall score unless the application demonstrates a believable, coherent story through multiple pieces of evidence. Reflect this in your category scores — do not compensate for a thin profile by inflating unrelated categories.
+
+Worked example — Varsity Baseball + "RSI Finalist" and nothing else: memorability HIGH (~90); academicStrength per the actual grades/scores; narrativeCohesion LOW (baseball and research share no theme); applicationDepth LOW (one substantive activity); sustainedImpact LOW (no multi-year arc shown); majorAlignment LOW unless the major is research-aligned. This profile should land moderate-to-low overall — NOT near 80.
+
+Still provide a \`gapScore\` field as your holistic estimate — AppGap replaces it with the computed composite.
+
+## Writing gapScoreExplanation — holistic, admissions-officer voice
+
+This is the single most important prose field. It must read like an experienced admissions officer summarizing the WHOLE application — not a checklist of missing items. Follow these rules:
+
+- **Justify the overall standing, not one gap.** Explain why the application lands where it does by weighing its strengths and weaknesses together across all six dimensions you scored — academics, depth, sustained commitment, consistency, narrative cohesion, major alignment, and long-term impact.
+- **Describe the profile as a whole.** Lead with the overall shape of the application (e.g. "a cohesive, sustained profile with strong academics but limited breadth" or "a single standout achievement without a supporting body of work"), then connect that to the score.
+- **Name the real drivers.** Emphasize whichever concepts actually shaped this profile: sustained commitment, depth, breadth, consistency, cohesion, intellectual curiosity, major alignment, long-term growth. If the profile is cohesive, say why; if scattered, say why; if it shows multi-year growth, mention it; if it is thin or one-dimensional, say that plainly.
+- **Do NOT default to "missing extracurriculars for the intended major."** Only make major alignment the central point if weak alignment genuinely drove the score. Otherwise mention it in passing, if at all.
+- Cite specifics (their actual GPA, scores, activities, selectivity target), stay qualitative about the number itself (do not assert a figure), and keep it to 2–3 sentences.
 
 ## Required JSON structure:
 {
   "gapScore": <integer 0–100>,
-  "gapScoreExplanation": "<2–3 sentences citing this student's specific GPA, test scores, activities, and selectivity target — not generic>",
+  "gapScoreExplanation": "<2–3 sentences — holistic, admissions-officer voice per the rules above: justify the overall standing by weighing strengths and weaknesses across the whole profile, not a checklist of missing items>",
   "strongestAreas": [
     { "area": "<3–6 word title>", "explanation": "<1–2 sentences citing specifics from their profile>" }
   ],
@@ -331,13 +356,25 @@ Weight: academic strength (GPA × course rigor × test scores vs. selectivity ta
   "applicationNarrative": {
     "standoutQuality": "<Specific identity label — e.g. 'Entrepreneurial Problem Solver', 'Scientific Researcher', 'Community Leader'. Do NOT repeat the intended major.>",
     "standoutExplanation": "<1–2 sentences: why this is the student's strongest admissions identity based on their activities and trajectory>",
+    "academicStrength": {
+      "score": <integer 0–100>,
+      "explanation": "<1 sentence on GPA, rigor, and test scores vs. the selectivity target and school context>"
+    },
     "narrativeCohesion": {
       "score": <integer 0–100>,
       "explanation": "<1 sentence on what drives this cohesion score>"
     },
+    "applicationDepth": {
+      "score": <integer 0–100>,
+      "explanation": "<1 sentence on whether the profile is multi-dimensional and complete or thin/one-activity>"
+    },
+    "sustainedImpact": {
+      "score": <integer 0–100>,
+      "explanation": "<1 sentence on multi-year commitment, leadership outcomes, and lasting results>"
+    },
     "memorability": {
       "score": <integer 0–100>,
-      "explanation": "<1 sentence on what makes this application memorable or forgettable>"
+      "explanation": "<1 sentence on what makes this application memorable or forgettable — this is where prestige counts>"
     },
     "majorAlignment": {
       "score": <integer 0–100>,
@@ -408,15 +445,24 @@ Respond with ONLY valid JSON — no markdown fences, no prose outside the JSON o
 
 Your JSON must follow this exact structure, which maps to a detailed multi-section report:
 
-### Sections 1 + 5 → gapScore + gapScoreExplanation
-Score the student's overall application readiness (0–100) relative to their stated target selectivity:
-- 80–100: Highly competitive
-- 65–79: Competitive with addressable gaps
-- 50–64: Developing — clear potential but significant gaps
-- 35–49: Building — foundational improvements needed
-- 0–34: Early stage — substantial investment required
+### Scoring philosophy — read carefully
+Do NOT ask "How impressive is this activity?" Ask "Does this application tell a compelling, coherent story about who this student is?" A single prestigious activity or award (RSI, an Olympiad, MITES, a national title) is ONE piece of an application — never proof of a strong applicant. Prestige belongs in the Memorability score and almost nowhere else. An application resting on one extraordinary activity must score LOW on Application Depth, Sustained Impact, and usually Narrative Cohesion — there is little evidence of sustained involvement, a consistent narrative, curiosity across areas, or a complete profile. Reward, above all: narrative cohesion, intellectual curiosity, consistency across activities, clear major alignment, sustained multi-year impact, and depth over prestige.
 
-gapScoreExplanation must be 3–4 sentences covering: (1) what the score reflects about this specific student, (2) how they stand relative to their target school selectivity, (3) what the single most important lever for improvement is. Cite their actual GPA, scores, and activities — never generic.
+### Sections 1 + 5 → category scores + gapScoreExplanation
+You do NOT set the final gapScore directly. AppGap computes it deterministically from the six category scores you provide in \`applicationNarrative\` (academicStrength, narrativeCohesion, applicationDepth, sustainedImpact, majorAlignment, memorability), using a fixed weighting in which Memorability carries the LEAST weight, plus a coherence gate that caps thin or one-dimensional profiles. Score each category honestly and independently — do not compensate for a thin profile by inflating unrelated categories.
+
+**Internal rule you must respect:** a student cannot earn a high overall score unless the application demonstrates a believable, coherent story through multiple pieces of evidence.
+
+Worked example — Varsity Baseball + "RSI Finalist" and nothing else: memorability HIGH (~90); academicStrength per the actual grades/scores; narrativeCohesion LOW (no shared theme); applicationDepth LOW (one substantive activity); sustainedImpact LOW (no multi-year arc); majorAlignment LOW unless the major is research-aligned. This profile should land moderate-to-low overall — NOT near 80.
+
+Still provide a \`gapScore\` field as your holistic estimate — AppGap replaces the number with the computed composite.
+
+**gapScoreExplanation — holistic, admissions-officer voice.** This is the most important prose field. Write it the way an experienced admissions officer would summarize the ENTIRE application after reading the file — never a checklist of missing items, and never built around one absent activity.
+- Justify the overall standing by weighing the profile's strengths and weaknesses TOGETHER across all six dimensions you scored — academics, depth, sustained commitment, consistency, narrative cohesion, major alignment, and long-term impact.
+- Open with the overall shape of the application (e.g. "a tightly cohesive, multi-year profile with strong academics but limited breadth" or "one prestigious achievement without a supporting body of work"), then connect that shape to where the application stands relative to the target selectivity.
+- Emphasize whichever concepts actually drove this profile: sustained commitment, depth, breadth, consistency, cohesion, intellectual curiosity, major alignment, long-term growth. If the profile is cohesive, explain why; if scattered, explain why; if it shows multi-year growth, name it; if it is thin or one-dimensional, say so plainly.
+- Do NOT default to "missing extracurriculars for the intended major." Make weak major alignment the central point ONLY if it genuinely drove the score; otherwise mention it in passing, if at all.
+- Then name the single most important lever for improvement. 3–4 sentences, citing their actual GPA, scores, and activities — never generic, and do not assert a specific numeric score.
 
 ### Sections 2 + 3 → strongestAreas
 Return 4–6 items that explicitly separate Academic Strengths and Extracurricular Strengths. Prefix each area label with "Academic:" or "Extracurricular:" so they are clearly distinguished. Each explanation must be 2–3 sentences. Explain WHY this strength matters for admissions at their target tier, connect it to their intended major or career goal where relevant, and name the specific element from their profile.
@@ -442,8 +488,11 @@ Return 5–8 roadmap items framed around the timeline. Use suggestedTimeline val
 Provide a deep narrative analysis of how the application reads as a unified story. Go beyond surface-level observations — analyze subtle coherence, what is implied, and how an experienced reader would synthesize the whole.
 - standoutQuality: The single identity admissions officers will remember — not the major name
 - standoutExplanation: 2–3 sentences explaining why this identity emerges from the evidence, what makes it credible, and how it manifests across the profile
-- narrativeCohesion score (0–100): How unified and purposeful the application story feels — 100 means every element reinforces the same theme
-- memorability score (0–100): How distinctively memorable this application is relative to similar profiles at the same selectivity tier
+- academicStrength score (0–100): GPA × course rigor × test scores measured against the selectivity target and school context — the heaviest category in the overall score
+- narrativeCohesion score (0–100): How unified and purposeful the application story feels — 100 means every element reinforces the same theme; scattered profiles score low even if individual pieces are strong
+- applicationDepth score (0–100): How complete and multi-dimensional the profile is across several substantive involvements — one extraordinary activity with little around it is LOW depth
+- sustainedImpact score (0–100): Evidence of multi-year commitment, leadership with measurable outcomes, and tangible lasting results — a one-time accolade with no sustained arc is LOW
+- memorability score (0–100): How distinctively memorable this application is relative to similar profiles at the same selectivity tier — this is where prestige counts, and it can be HIGH while every other category stays low
 - majorAlignment score (0–100): How strongly activities, courses, and awards support the intended major
 - cohesionAnalysis: 3–4 sentences analyzing which activities reinforce one another, what the central theme is, whether any activities dilute the narrative, and how leadership positions contribute to (or complicate) the story
 - admissionsPerception: 2–3 sentences on how an officer at this selectivity tier will likely read this application — specific to what that tier values, what impression is created, and what would stand out positively or raise questions
@@ -453,7 +502,7 @@ Provide a deep narrative analysis of how the application reads as a unified stor
 ## Required JSON structure:
 {
   "gapScore": <integer 0–100>,
-  "gapScoreExplanation": "<3–4 sentences: overall evaluation + admissions competitiveness — cite their actual data>",
+  "gapScoreExplanation": "<3–4 sentences — holistic, admissions-officer voice per the rules above: weigh the whole profile's strengths and weaknesses together to justify the overall standing, then name the top lever. Not a checklist of missing items>",
   "strongestAreas": [
     { "area": "Academic: <3–6 word title>", "explanation": "<2–3 sentences citing specifics, connecting to major/career>" },
     { "area": "Extracurricular: <3–6 word title>", "explanation": "<2–3 sentences citing specifics, connecting to admissions value>" }
@@ -471,13 +520,25 @@ Provide a deep narrative analysis of how the application reads as a unified stor
   "applicationNarrative": {
     "standoutQuality": "<Specific identity — not the major name>",
     "standoutExplanation": "<2–3 sentences: why this identity emerges from the evidence, what makes it credible, how it manifests across the profile>",
+    "academicStrength": {
+      "score": <integer 0–100>,
+      "explanation": "<1–2 sentences on GPA, rigor, and test scores vs. the selectivity target and school context>"
+    },
     "narrativeCohesion": {
       "score": <integer 0–100>,
       "explanation": "<1–2 sentences on what drives this score>"
     },
+    "applicationDepth": {
+      "score": <integer 0–100>,
+      "explanation": "<1–2 sentences on whether the profile is multi-dimensional and complete or thin/one-activity>"
+    },
+    "sustainedImpact": {
+      "score": <integer 0–100>,
+      "explanation": "<1–2 sentences on multi-year commitment, leadership outcomes, and lasting results>"
+    },
     "memorability": {
       "score": <integer 0–100>,
-      "explanation": "<1–2 sentences on what makes this application memorable or forgettable relative to similar profiles>"
+      "explanation": "<1–2 sentences on what makes this application memorable or forgettable relative to similar profiles — this is where prestige counts>"
     },
     "majorAlignment": {
       "score": <integer 0–100>,

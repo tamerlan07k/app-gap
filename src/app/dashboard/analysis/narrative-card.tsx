@@ -78,20 +78,41 @@ export function NarrativeCard({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Narrative Scores
           </p>
+          {narrative.academicStrength && (
+            <ScoreMeter
+              score={narrative.academicStrength.score}
+              label="Academic Strength"
+              explanation={narrative.academicStrength.explanation}
+            />
+          )}
           <ScoreMeter
             score={narrative.narrativeCohesion.score}
             label="Narrative Cohesion"
             explanation={narrative.narrativeCohesion.explanation}
           />
-          <ScoreMeter
-            score={narrative.memorability.score}
-            label="Memorability"
-            explanation={narrative.memorability.explanation}
-          />
+          {narrative.applicationDepth && (
+            <ScoreMeter
+              score={narrative.applicationDepth.score}
+              label="Application Depth"
+              explanation={narrative.applicationDepth.explanation}
+            />
+          )}
+          {narrative.sustainedImpact && (
+            <ScoreMeter
+              score={narrative.sustainedImpact.score}
+              label="Sustained Impact"
+              explanation={narrative.sustainedImpact.explanation}
+            />
+          )}
           <ScoreMeter
             score={narrative.majorAlignment.score}
             label="Major Alignment"
             explanation={narrative.majorAlignment.explanation}
+          />
+          <ScoreMeter
+            score={narrative.memorability.score}
+            label="Memorability"
+            explanation={narrative.memorability.explanation}
           />
         </div>
 
