@@ -4,9 +4,8 @@
 
 // ─── Feature registry ────────────────────────────────────────────────────────
 
-export type FeatureKey = "profileAnalysis";
+export type FeatureKey = "profileAnalysis" | "applicationWriting";
 // Future features to add here:
-//   | "essayFeedback"
 //   | "scholarshipMatching"
 //   | "collegeRecommendations"
 
@@ -26,11 +25,12 @@ export const AI_FEATURES = {
     description:
       "Admissions gap analysis generated from a student's academic profile",
   },
-  // essayFeedback: {
-  //   model: "openai/gpt-4o",
-  //   temperature: 0.5,
-  //   description: "Detailed feedback on college application essays",
-  // },
+  applicationWriting: {
+    model: "openai/gpt-4o-mini",
+    temperature: 0.4,
+    description:
+      "Communication feedback on activity descriptions and Additional Information",
+  },
   // scholarshipMatching: {
   //   model: "openai/gpt-4o-mini",
   //   temperature: 0.2,
