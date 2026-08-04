@@ -1,4 +1,4 @@
-import { analyzeProfile, type FullProfile } from "~/lib/ai/analyze-profile";
+import { analyzeProfile } from "~/lib/ai/analyze-profile";
 import { SUBSCRIPTION_TIERS, type TierKey } from "~/lib/ai/config";
 import { PRO_SYSTEM_PROMPT } from "~/lib/ai/prompt";
 import {
@@ -6,6 +6,7 @@ import {
   reconcileExpiredOverride,
   resolveEntitlement,
 } from "~/lib/entitlement";
+import { loadFullProfile } from "~/lib/profile-full";
 import {
   billingMonthEnd,
   countGenerationsThisMonth,
@@ -28,22 +29,9 @@ export async function POST() {
   // and is more reliable for loading across all tables in one shot)
   const admin = createAdminClient();
 
-  const [profileRes, coursesRes, activitiesRes, awardsRes] = await Promise.all([
-    admin.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    admin
-      .from("courses")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("sort_order"),
-    admin
-      .from("activities")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("sort_order"),
-    admin.from("awards").select("*").eq("user_id", user.id).order("sort_order"),
-  ]);
+  const loaded = await loadFullProfile(admin, user.id);
 
-  if (!profileRes.data) {
+  if (!loaded) {
     return Response.json(
       {
         error:
@@ -53,12 +41,14 @@ export async function POST() {
     );
   }
 
+  const { profileRow, profile } = loaded;
+
   // Enforce generation limits based on the *effective* subscription tier.
   // Reconcile any lapsed admin override first, then resolve entitlement with
   // priority: active admin override > Stripe > free. An expired override is
   // treated as inactive by the resolver even before reconciliation writes land.
-  await reconcileExpiredOverride(admin, profileRes.data as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRes.data as EntitlementProfile);
+  await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
   const tier: TierKey = entitlement.tier;
   const tierConfig = SUBSCRIPTION_TIERS[tier];
 
@@ -91,75 +81,6 @@ export async function POST() {
         : `You've used all ${tierConfig.generationsPerMonth} roadmap generations for this month. Your limit resets on ${resets}.`;
     return Response.json({ error }, { status: 429 });
   }
-
-  const p = profileRes.data as {
-    grade_level: string | null;
-    unweighted_gpa: number | null;
-    sat_score: number | null;
-    act_score: number | null;
-    school_type: string | null;
-    major_category: string | null;
-    specific_major: string | null;
-    career_interest: string | null;
-    selectivity: string | null;
-    additional_context: string | null;
-  };
-
-  const profile: FullProfile = {
-    gradeLevel: p.grade_level ?? "",
-    unweightedGpa: p.unweighted_gpa ?? null,
-    satScore: p.sat_score ?? null,
-    actScore: p.act_score ?? null,
-    schoolType: p.school_type ?? null,
-    courses: (coursesRes.data ?? []).map(
-      (c: {
-        name: string;
-        type: string;
-        status: string;
-        grade_level: string;
-        ap_exam_score: string;
-      }) => ({
-        name: c.name,
-        type: c.type,
-        status: c.status,
-        gradeLevel: c.grade_level,
-        apExamScore: c.ap_exam_score,
-      }),
-    ),
-    majorCategory: p.major_category ?? "",
-    specificMajor: p.specific_major ?? "",
-    careerInterest: p.career_interest ?? "",
-    selectivity: p.selectivity ?? "",
-    additionalContext: p.additional_context ?? null,
-    activities: (activitiesRes.data ?? []).map(
-      (a: {
-        name: string;
-        category: string;
-        grades: string[];
-        leadership_role: string | null;
-        description: string | null;
-        hours_per_week: number | null;
-        weeks_per_year: number | null;
-        meaningfulness: number | null;
-      }) => ({
-        name: a.name,
-        category: a.category,
-        grades: a.grades ?? [],
-        leadershipRole: a.leadership_role ?? "",
-        description: a.description ?? "",
-        hoursPerWeek: a.hours_per_week ?? null,
-        weeksPerYear: a.weeks_per_year ?? null,
-        meaningfulness: a.meaningfulness ?? null,
-      }),
-    ),
-    awards: (awardsRes.data ?? []).map(
-      (aw: { name: string; level: string; grade: string }) => ({
-        name: aw.name,
-        level: aw.level,
-        grade: aw.grade,
-      }),
-    ),
-  };
 
   try {
     const { analysis, promptTokens, completionTokens } = await analyzeProfile(
