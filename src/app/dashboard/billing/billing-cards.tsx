@@ -28,12 +28,15 @@ interface BillingCardsProps {
   currentPeriodEnd: string | null;
   /** True when Pro access comes from an admin-granted complimentary override. */
   isAdminOverride?: boolean;
+  /** True when the Stripe subscription is scheduled to cancel at period end. */
+  cancelAtPeriodEnd?: boolean;
 }
 
 export function BillingCards({
   isPro,
   currentPeriodEnd,
   isAdminOverride = false,
+  cancelAtPeriodEnd = false,
 }: BillingCardsProps) {
   const [loading, setLoading] = useState<"checkout" | "portal" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -152,7 +155,9 @@ export function BillingCards({
               <p className="mt-2 text-xs text-muted-foreground">
                 {isAdminOverride
                   ? `Complimentary access · Expires ${formattedDate}`
-                  : `Renews ${formattedDate}`}
+                  : cancelAtPeriodEnd
+                    ? `Cancels ${formattedDate} · access continues until then`
+                    : `Renews ${formattedDate}`}
               </p>
             )}
           </div>
