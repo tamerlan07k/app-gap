@@ -1,17 +1,14 @@
-import { ArrowLeft, MessageSquare } from "lucide-react";
+import { ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SUBSCRIPTION_TIERS } from "~/lib/ai/config";
 import { analysisSchema } from "~/lib/ai/schema";
 import { writingAnalysisSchema } from "~/lib/ai/writing-schema";
 import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
-import { countGenerationsThisMonth } from "~/lib/roadmap-usage";
+import { checkFeatureAllowance } from "~/lib/feature-usage";
 import { createClient } from "~/lib/supabase/server";
 import { ApplicationWritingSection } from "../../analysis/application-writing/application-writing-section";
 import { GapScoreCard } from "../../analysis/gap-score-card";
 import { NarrativeCard } from "../../analysis/narrative-card";
-import { NextStepsCard } from "../../analysis/next-steps-card";
-import { RoadmapPreviewCard } from "../../analysis/roadmap-preview-card";
 import { StrongestAreasCard } from "../../analysis/strongest-areas-card";
 import { TopGapsCard } from "../../analysis/top-gaps-card";
 
@@ -29,7 +26,7 @@ export default async function RoadmapResultPage({
 
   if (!user) return notFound();
 
-  const [analysisRes, profileRes, generationsUsed, activitiesRes, writingRes] =
+  const [analysisRes, profileRes, activitiesRes, writingRes] =
     await Promise.all([
       supabase
         .from("ai_analyses")
@@ -44,11 +41,6 @@ export default async function RoadmapResultPage({
         )
         .eq("id", user.id)
         .maybeSingle(),
-      countGenerationsThisMonth(supabase, user.id).catch((error) => {
-        // Fail closed: on error, treat as limit reached rather than unlimited.
-        console.error("[roadmap] failed to count generations:", error);
-        return Number.POSITIVE_INFINITY;
-      }),
       // Live activity descriptions and the latest cached Application Writing
       // feedback — both read under the user's own RLS.
       supabase
@@ -79,13 +71,19 @@ export default async function RoadmapResultPage({
     { month: "long", day: "numeric", year: "numeric" },
   );
 
-  // Effective tier honors an active admin override; remaining generations come
-  // from the usage ledger, so deleting roadmaps never re-enables regeneration.
+  // Effective tier honors an active admin override; whether a new diagnostic is
+  // available comes from the feature-based entitlement (append-only usage ledger),
+  // so deleting an analysis never re-enables regeneration. Fail closed on error.
   const entitlement = resolveEntitlement(
     profileRes.data as EntitlementProfile | null,
   );
-  const limit = SUBSCRIPTION_TIERS[entitlement.tier].generationsPerMonth;
-  const canGenerate = generationsUsed < limit;
+  const allowance = await checkFeatureAllowance(
+    supabase,
+    user.id,
+    "profileAnalysis",
+    entitlement.tier,
+  ).catch(() => null);
+  const canGenerate = allowance?.allowed ?? false;
 
   // Application Writing inputs — live activity descriptions + Additional
   // Information, plus any cached writing feedback (validated defensively).
@@ -130,7 +128,7 @@ export default async function RoadmapResultPage({
           className="mb-2 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" />
-          My Roadmaps
+          My Analysis
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">AppGap Analysis</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -148,11 +146,6 @@ export default async function RoadmapResultPage({
       {analysis.applicationNarrative && (
         <NarrativeCard narrative={analysis.applicationNarrative} />
       )}
-
-      <NextStepsCard steps={analysis.nextSteps} />
-
-      {/* Full roadmap — show every item */}
-      <RoadmapPreviewCard roadmap={analysis.roadmap} showAll />
 
       {/* Advisor note */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
@@ -192,6 +185,20 @@ export default async function RoadmapResultPage({
         initialAnalysis={initialWritingAnalysis}
         initialAnalyzedAt={initialWritingAnalyzedAt}
       />
+
+      {/* Transition to the Workplace — next steps live there, not in the diagnostic */}
+      <Link
+        href="/dashboard/workspace"
+        className="group flex items-center justify-between gap-4 overflow-hidden rounded-2xl border border-brand-teal/30 bg-brand-teal/[0.04] p-6 transition-colors hover:bg-brand-teal/[0.08]"
+      >
+        <div className="space-y-1">
+          <p className="font-semibold">Your analysis shows where you stand.</p>
+          <p className="text-sm text-muted-foreground">
+            Your next steps are waiting in your Workplace.
+          </p>
+        </div>
+        <ArrowRight className="size-5 shrink-0 text-brand-teal transition-transform group-hover:translate-x-0.5" />
+      </Link>
     </div>
   );
 }

@@ -53,12 +53,25 @@ export const applicationNarrativeSchema = z.object({
   cohesionAnalysis: z.string(),
   admissionsPerception: z.string(),
   narrativeGaps: z.array(narrativeGapItemSchema).min(1).max(4),
-  schoolFitReasoning: z.string(),
+  // Retained for legacy analyses; the V2 diagnostic no longer surfaces School
+  // Fit (it returns with the future My Colleges system). Optional so new
+  // analyses that omit it still validate.
+  schoolFitReasoning: z.string().optional(),
+});
+
+// The three application-component scores that drive the V2 diagnostic score
+// (AppGap Score = 0.35·Academics + 0.45·Activities + 0.20·Awards, computed in
+// score.ts). Optional so legacy analyses generated before V2 still validate.
+export const componentScoresSchema = z.object({
+  academics: narrativeScoreSchema,
+  activities: narrativeScoreSchema,
+  awards: narrativeScoreSchema,
 });
 
 export const analysisSchema = z.object({
   gapScore: z.number().int().min(0).max(100),
   gapScoreExplanation: z.string(),
+  componentScores: componentScoresSchema.optional(),
   strongestAreas: z.array(strongestAreaSchema).min(1).max(5),
   topGaps: z.array(topGapSchema).min(1).max(5),
   nextSteps: z.array(nextStepSchema).min(1).max(6),
@@ -73,5 +86,6 @@ export type TopGap = z.infer<typeof topGapSchema>;
 export type NextStep = z.infer<typeof nextStepSchema>;
 export type RoadmapItem = z.infer<typeof roadmapItemSchema>;
 export type ApplicationNarrative = z.infer<typeof applicationNarrativeSchema>;
+export type ComponentScores = z.infer<typeof componentScoresSchema>;
 export type NarrativeScore = z.infer<typeof narrativeScoreSchema>;
 export type NarrativeGapItem = z.infer<typeof narrativeGapItemSchema>;

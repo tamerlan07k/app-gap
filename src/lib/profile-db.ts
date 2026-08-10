@@ -165,6 +165,15 @@ export async function loadStep3FromDb(): Promise<Step3Data | null> {
       }),
     );
 
+    // No activities/awards persisted to the DB yet — defer to localStorage so
+    // in-progress entries (saved locally on every change but only flushed to the
+    // DB on "Continue") aren't clobbered by an empty DB result when the user
+    // navigates back to this step via the stepper. Mirrors the "no data → null"
+    // guard in loadStep1FromDb / loadStep2FromDb.
+    if (activities.length === 0 && awards.length === 0) {
+      return null;
+    }
+
     return { activities, awards };
   } catch {
     return null;

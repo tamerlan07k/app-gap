@@ -1,4 +1,4 @@
-import { BookOpen, Eye, Lightbulb, Target, TriangleAlert } from "lucide-react";
+import { BookOpen, Eye, Lightbulb, TriangleAlert } from "lucide-react";
 import type { ApplicationNarrative } from "~/lib/ai/schema";
 import { cn } from "~/lib/utils";
 
@@ -78,13 +78,6 @@ export function NarrativeCard({
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             Narrative Scores
           </p>
-          {narrative.academicStrength && (
-            <ScoreMeter
-              score={narrative.academicStrength.score}
-              label="Academic Strength"
-              explanation={narrative.academicStrength.explanation}
-            />
-          )}
           <ScoreMeter
             score={narrative.narrativeCohesion.score}
             label="Narrative Cohesion"
@@ -95,13 +88,6 @@ export function NarrativeCard({
               score={narrative.applicationDepth.score}
               label="Application Depth"
               explanation={narrative.applicationDepth.explanation}
-            />
-          )}
-          {narrative.sustainedImpact && (
-            <ScoreMeter
-              score={narrative.sustainedImpact.score}
-              label="Sustained Impact"
-              explanation={narrative.sustainedImpact.explanation}
             />
           )}
           <ScoreMeter
@@ -167,21 +153,6 @@ export function NarrativeCard({
             </div>
           </div>
         )}
-
-        {/* School Fit */}
-        <div className="flex gap-4 p-6">
-          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-teal/10">
-            <Target className="size-5 text-brand-teal" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              School Fit
-            </p>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              {narrative.schoolFitReasoning}
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
