@@ -1,5 +1,7 @@
-import { DashboardNav } from "~/components/dashboard-nav";
+import { redirect } from "next/navigation";
+import { DashboardShell } from "~/components/dashboard-shell";
 import { isAdmin } from "~/lib/is-admin";
+import { isOnboardingComplete } from "~/lib/onboarding";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -33,16 +35,26 @@ export default async function DashboardLayout({
 
   if (user) {
     await recordSession(user.id);
+
+    // Gate the dashboard on onboarding completion: brand-new users (and anyone
+    // who never finished onboarding) are routed into the 5-step flow, while users
+    // who already completed it pass straight through and are never sent back.
+    // Completion is derived from required profile fields (see isOnboardingComplete),
+    // so existing users keep their access with no migration dependency.
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("grade_level, major_category")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!isOnboardingComplete(profile)) {
+      redirect("/profile");
+    }
   }
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-8">
-      <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-        <aside className="shrink-0 md:w-44">
-          <DashboardNav isAdmin={isAdmin(user?.email)} />
-        </aside>
-        <div className="min-w-0 flex-1">{children}</div>
-      </div>
+      <DashboardShell isAdmin={isAdmin(user?.email)}>{children}</DashboardShell>
     </div>
   );
 }

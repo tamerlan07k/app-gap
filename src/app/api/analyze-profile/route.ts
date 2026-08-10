@@ -6,10 +6,8 @@ import {
   reconcileExpiredOverride,
   resolveEntitlement,
 } from "~/lib/entitlement";
-import {
-  billingMonthEnd,
-  countGenerationsThisMonth,
-} from "~/lib/roadmap-usage";
+import { recordEvent } from "~/lib/events";
+import { checkFeatureAllowance, recordFeatureUsage } from "~/lib/feature-usage";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
@@ -53,44 +51,47 @@ export async function POST() {
     );
   }
 
-  // Enforce generation limits based on the *effective* subscription tier.
-  // Reconcile any lapsed admin override first, then resolve entitlement with
-  // priority: active admin override > Stripe > free. An expired override is
-  // treated as inactive by the resolver even before reconciliation writes land.
+  // Enforce entitlement based on the *effective* subscription tier. Reconcile any
+  // lapsed admin override first, then resolve with priority: active admin override
+  // > Stripe > free (an expired override is treated as inactive by the resolver).
   await reconcileExpiredOverride(admin, profileRes.data as EntitlementProfile);
   const entitlement = resolveEntitlement(profileRes.data as EntitlementProfile);
   const tier: TierKey = entitlement.tier;
-  const tierConfig = SUBSCRIPTION_TIERS[tier];
 
-  // Count generations from the append-only usage ledger — NOT from ai_analyses —
-  // so deleting a saved roadmap can never restore a user's monthly allowance.
-  // Both tiers use the same calendar-month window (resets on the 1st).
-  let used: number;
+  // Feature-based access check BEFORE any AI request. The diagnostic is a lifetime
+  // allowance for Free (1) and a bounded monthly allowance for Pro — both defined
+  // centrally in FEATURE_ACCESS and counted from the append-only feature_usage
+  // ledger, so deleting a saved analysis can never restore an allowance.
+  let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
   try {
-    used = await countGenerationsThisMonth(admin, user.id);
+    allowance = await checkFeatureAllowance(
+      admin,
+      user.id,
+      "profileAnalysis",
+      tier,
+    );
   } catch (err) {
     // Fail closed: if we can't verify usage we must NOT allow a free generation.
     console.error(
-      "[API] Failed to verify generation usage:",
+      "[API] Failed to verify entitlement usage:",
       err instanceof Error ? err.message : String(err),
     );
     return Response.json(
-      { error: "Couldn't verify your generation limit. Please try again." },
+      { error: "Couldn't verify your plan usage. Please try again." },
       { status: 503 },
     );
   }
-  if (used >= tierConfig.generationsPerMonth) {
-    const resets = billingMonthEnd().toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
+  if (!allowance.allowed) {
     const error =
       tier === "free"
-        ? `You've used your 1 free roadmap generation this month. Your next generation will be available on ${resets}. Upgrade to Pro for 4 generations per month.`
-        : `You've used all ${tierConfig.generationsPerMonth} roadmap generations for this month. Your limit resets on ${resets}.`;
+        ? "You've already used your free AppGap analysis. Upgrade to Pro to generate more."
+        : "You've reached your analysis limit for this month. It resets at the start of next month.";
     return Response.json({ error }, { status: 429 });
   }
+
+  // Model for this diagnostic — FEATURE_ACCESS is the source of truth; fall back to
+  // the tier default. Used for the AI call and stored on the analysis for audit.
+  const diagnosticModel = allowance.model ?? SUBSCRIPTION_TIERS[tier].model;
 
   const p = profileRes.data as {
     grade_level: string | null;
@@ -164,24 +165,15 @@ export async function POST() {
   try {
     const { analysis, promptTokens, completionTokens } = await analyzeProfile(
       profile,
-      tierConfig.model,
+      diagnosticModel,
       tier === "pro" ? PRO_SYSTEM_PROMPT : undefined,
     );
 
-    // Record the consumed generation in the usage ledger FIRST. This is the
-    // authoritative monthly-limit record and is intentionally decoupled from the
-    // ai_analyses row: even if the analysis insert below fails, or the user later
-    // deletes the saved roadmap, this generation still counts against the month.
-    const { error: usageError } = await admin
-      .from("roadmap_generations")
-      .insert({ user_id: user.id, tier });
-
-    if (usageError) {
-      console.error(
-        "[API] Failed to record generation usage:",
-        usageError.message,
-      );
-    }
+    // Record the consumed diagnostic in the append-only feature_usage ledger FIRST.
+    // This is the authoritative allowance record, decoupled from the ai_analyses
+    // row: even if the analysis insert below fails, or the user later deletes the
+    // saved analysis, this use still counts against their allowance.
+    await recordFeatureUsage(admin, user.id, "profileAnalysis", tier);
 
     // Persist the analysis; errors here are non-fatal — we return the result either way
     const { data: insertData, error: insertError } = await admin
@@ -189,7 +181,7 @@ export async function POST() {
       .insert({
         user_id: user.id,
         analysis,
-        model: tierConfig.model,
+        model: diagnosticModel,
         prompt_tokens: promptTokens,
         completion_tokens: completionTokens,
       })
@@ -200,10 +192,21 @@ export async function POST() {
       console.error("[API] Failed to store analysis:", insertError.message);
     }
 
+    const analysisId = (insertData as { id: string } | null)?.id ?? null;
+
+    // Record a "Jump In" activity event (best-effort; never blocks the response).
+    await recordEvent(
+      admin,
+      user.id,
+      "analysis_generated",
+      "AppGap Analysis generated",
+      { analysisId, score: analysis.gapScore },
+    );
+
     return Response.json({
       success: true,
       analysis,
-      id: (insertData as { id: string } | null)?.id ?? null,
+      id: analysisId,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

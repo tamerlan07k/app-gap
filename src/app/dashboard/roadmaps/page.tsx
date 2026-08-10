@@ -1,17 +1,12 @@
 import { ArrowRight, MapIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
-import { SUBSCRIPTION_TIERS } from "~/lib/ai/config";
 import { analysisSchema } from "~/lib/ai/schema";
 import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
-import {
-  billingMonthEnd,
-  countGenerationsThisMonth,
-} from "~/lib/roadmap-usage";
+import { checkFeatureAllowance } from "~/lib/feature-usage";
 import { createClient } from "~/lib/supabase/server";
 import { cn } from "~/lib/utils";
 import { DeleteButton } from "./delete-button";
-import { LimitBanner } from "./limit-banner";
 
 function getScoreLabel(score: number): string {
   if (score >= 80) return "Excellent";
@@ -35,7 +30,7 @@ export default async function RoadmapsPage() {
 
   if (!user) return null;
 
-  const [analysesRes, profileRes, generationsUsed] = await Promise.all([
+  const [analysesRes, profileRes] = await Promise.all([
     supabase
       .from("ai_analyses")
       .select("id, created_at, analysis")
@@ -48,11 +43,6 @@ export default async function RoadmapsPage() {
       )
       .eq("id", user.id)
       .maybeSingle(),
-    countGenerationsThisMonth(supabase, user.id).catch((error) => {
-      // Fail closed: on error, treat as limit reached rather than unlimited.
-      console.error("[roadmaps] failed to count generations:", error);
-      return Number.POSITIVE_INFINITY;
-    }),
   ]);
 
   const roadmaps = (analysesRes.data ?? []).flatMap((row) => {
@@ -63,48 +53,52 @@ export default async function RoadmapsPage() {
         id: row.id as string,
         createdAt: row.created_at as string,
         gapScore: parsed.data.gapScore,
-        roadmapCount: parsed.data.roadmap.length,
       },
     ];
   });
 
-  // Resolve the *effective* tier (an active admin override outranks Stripe), then
-  // measure usage against the append-only generation ledger — not the roadmap
-  // rows above — so deleting a roadmap never restores the monthly allowance.
+  // Effective tier (an active admin override outranks Stripe), then check whether a
+  // new diagnostic is available under the feature-based entitlement. Fail closed
+  // (hide the generate action) if usage can't be verified.
   const entitlement = resolveEntitlement(
     profileRes.data as EntitlementProfile | null,
   );
   const tier = entitlement.tier;
-  const limit = SUBSCRIPTION_TIERS[tier].generationsPerMonth;
-
-  const isLimitReached = generationsUsed >= limit;
-  const nextAvailableDate = isLimitReached
-    ? billingMonthEnd().toISOString()
-    : null;
+  const allowance = await checkFeatureAllowance(
+    supabase,
+    user.id,
+    "profileAnalysis",
+    tier,
+  ).catch(() => null);
+  const canGenerate = allowance?.allowed ?? false;
 
   return (
     <div className="space-y-6">
-      {isLimitReached && nextAvailableDate && (
-        <LimitBanner nextAvailableDate={nextAvailableDate} tier={tier} />
-      )}
-
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Roadmaps</h1>
+          <h1 className="text-2xl font-bold tracking-tight">My Analysis</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {roadmaps.length > 0
-              ? `${roadmaps.length} analysis${roadmaps.length !== 1 ? "es" : ""} generated`
-              : "Your saved roadmaps will appear here once you generate them."}
+              ? `${roadmaps.length} saved ${roadmaps.length === 1 ? "analysis" : "analyses"}`
+              : "Your saved analyses will appear here once you generate them."}
           </p>
         </div>
-        {roadmaps.length > 0 && !isLimitReached && (
-          <Button size="sm" asChild>
-            <Link href="/profile/review">
-              Generate New
-              <ArrowRight />
-            </Link>
-          </Button>
-        )}
+        {roadmaps.length > 0 &&
+          (canGenerate ? (
+            <Button size="sm" asChild>
+              <Link href="/profile/review">
+                Generate New
+                <ArrowRight />
+              </Link>
+            </Button>
+          ) : tier === "free" ? (
+            <Button size="sm" asChild>
+              <Link href="/dashboard/billing">
+                Upgrade to Pro
+                <ArrowRight />
+              </Link>
+            </Button>
+          ) : null)}
       </div>
 
       {roadmaps.length === 0 ? (
@@ -113,24 +107,26 @@ export default async function RoadmapsPage() {
             <MapIcon className="size-7 text-brand-teal" />
           </div>
           <div>
-            <p className="font-semibold">No roadmaps yet</p>
+            <p className="font-semibold">No analysis yet</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              {isLimitReached
-                ? "You have already reached your roadmap generation limit for the month. You can check billing for more options."
-                : "Complete your profile to generate your first personalized roadmap."}
+              {canGenerate
+                ? "Complete your profile to generate your first AppGap Analysis."
+                : tier === "free"
+                  ? "You've used your free AppGap analysis. Upgrade to Pro to generate more."
+                  : "You've reached your analysis limit for this month. Check billing for options."}
             </p>
           </div>
-          {isLimitReached ? (
+          {canGenerate ? (
             <Button size="sm" asChild>
-              <Link href="/dashboard/billing">
-                Check Billing
+              <Link href="/profile">
+                Generate my analysis
                 <ArrowRight />
               </Link>
             </Button>
           ) : (
             <Button size="sm" asChild>
-              <Link href="/profile">
-                Build My Roadmap
+              <Link href="/dashboard/billing">
+                {tier === "free" ? "Upgrade to Pro" : "Check Billing"}
                 <ArrowRight />
               </Link>
             </Button>
@@ -174,8 +170,7 @@ export default async function RoadmapsPage() {
                       )}
                     </div>
                     <p className="mt-0.5 text-sm text-muted-foreground">
-                      {date} · {r.roadmapCount} roadmap item
-                      {r.roadmapCount !== 1 ? "s" : ""}
+                      Analyzed {date}
                     </p>
                   </div>
 

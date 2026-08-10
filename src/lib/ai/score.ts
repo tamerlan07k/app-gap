@@ -1,15 +1,73 @@
-// Overall gap-score computation.
+// Overall AppGap score computation.
 //
-// AppGap's overall score is NOT the LLM's free-hand number. The model scores six
-// independent categories (0–100 each); this module combines them deterministically
-// so that no single category — especially prestige-driven Memorability — can inflate
-// the total, and applies a coherence gate that hard-caps thin or one-dimensional
-// profiles. A high overall score therefore requires a believable, coherent story
-// backed by multiple pieces of evidence, not one extraordinary activity.
+// The overall score is NOT the LLM's free-hand number. In the V2 model the LLM
+// scores three application components (Academics, Activities, Awards) 0–100 each,
+// and this module combines them with fixed, configurable weights
+// (0.35 / 0.45 / 0.20). The legacy six-category composite + coherence gate lower
+// in this file is retained so analyses generated before V2 still compute a
+// coherent overall.
 //
 // This runs identically for the free and pro tiers.
 
-import type { ApplicationNarrative } from "./schema";
+import type { ApplicationNarrative, ComponentScores } from "./schema";
+
+// ─── V2 component weights (must sum to 100) ──────────────────────────────────
+// The diagnostic score is a weighted average of three components the model scores
+// 0–100 each. Weights live here so the product baseline can be tuned in one place.
+//   AppGap Score = 0.35·Academics + 0.45·Activities + 0.20·Awards
+
+export const COMPONENT_WEIGHTS = {
+  academics: 35,
+  activities: 45,
+  awards: 20,
+} as const;
+
+export type ComponentKey = keyof typeof COMPONENT_WEIGHTS;
+
+/**
+ * Extract the three component scores from the model's componentScores block.
+ * Returns null if any is missing (e.g. legacy analyses), signalling the caller
+ * to fall back to the legacy category composite.
+ */
+export function extractComponentScores(
+  componentScores: ComponentScores | undefined,
+): Record<ComponentKey, number> | null {
+  if (!componentScores) return null;
+
+  const scores: Partial<Record<ComponentKey, number>> = {
+    academics: componentScores.academics?.score,
+    activities: componentScores.activities?.score,
+    awards: componentScores.awards?.score,
+  };
+
+  for (const key of Object.keys(COMPONENT_WEIGHTS) as ComponentKey[]) {
+    if (typeof scores[key] !== "number" || Number.isNaN(scores[key])) {
+      return null;
+    }
+  }
+
+  return scores as Record<ComponentKey, number>;
+}
+
+/**
+ * Compute the overall AppGap diagnostic score as the weighted average of the
+ * three component scores. The number reflects the quality of the student's actual
+ * application data (academics, activities, awards) — not task completion.
+ */
+export function computeComponentScore(
+  scores: Record<ComponentKey, number>,
+): number {
+  const clamp = (n: number) => Math.max(0, Math.min(100, n));
+  let weighted = 0;
+  for (const key of Object.keys(COMPONENT_WEIGHTS) as ComponentKey[]) {
+    weighted += clamp(scores[key]) * (COMPONENT_WEIGHTS[key] / 100);
+  }
+  return Math.round(weighted);
+}
+
+// ─── Legacy category composite (pre-V2 analyses) ─────────────────────────────
+// Retained so analyses generated before the V2 three-component model still
+// compute a coherent overall. New analyses use computeComponentScore above.
 
 // ─── Category weights (must sum to 100) ──────────────────────────────────────
 // Memorability is intentionally the smallest weight: prestige is one signal, not

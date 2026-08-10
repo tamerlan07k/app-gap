@@ -5,22 +5,18 @@ import { useState } from "react";
 import { cn } from "~/lib/utils";
 
 const FREE_FEATURES = [
-  "Full college profile evaluation",
-  "AI roadmap generation",
-  "Basic recommendations",
-  "1 roadmap generation per month",
-  "Standard AI models",
+  "1 free AppGap diagnostic analysis",
+  "Full AppGap Score — Academics, Activities & Awards",
+  "Strengths, key gaps & application narrative",
+  "Standard AI model",
 ];
 
 const PRO_FEATURES = [
   "Everything in Free, plus:",
-  "4 roadmap generations per month",
-  "Latest premium reasoning AI models",
-  "More detailed evaluations",
-  "Stronger strategic recommendations",
-  "Better essay & application guidance",
-  "Higher-quality personalized analysis",
-  "Early access to new AppGap features",
+  "Regenerate your analysis as your application grows",
+  "Premium AI models for deeper, more detailed analysis",
+  "Stronger, more strategic recommendations",
+  "Priority access to new AppGap tools as they launch",
 ];
 
 interface BillingCardsProps {

@@ -3,7 +3,12 @@ import { gateway } from "./client";
 import { AI_FEATURES } from "./config";
 import { buildProfilePrompt, type FullProfile, SYSTEM_PROMPT } from "./prompt";
 import { type Analysis, analysisSchema } from "./schema";
-import { computeOverallScore, extractCategoryScores } from "./score";
+import {
+  computeComponentScore,
+  computeOverallScore,
+  extractCategoryScores,
+  extractComponentScores,
+} from "./score";
 
 export type { FullProfile };
 
@@ -42,28 +47,26 @@ export async function analyzeProfile(
 
   const analysis = analysisSchema.parse(raw);
 
-  // Overall gap score is computed deterministically from the model's per-category
-  // scores — never taken as the model's free-hand number — so that prestige alone
-  // cannot inflate it and thin/one-dimensional profiles are capped. If the model
-  // omitted the category scores (e.g. an unexpected response shape), fall back to
-  // the model's own gapScore rather than failing the request.
-  const categoryScores = extractCategoryScores(analysis.applicationNarrative);
-  if (categoryScores) {
-    const { score, rawWeighted, appliedCap } = computeOverallScore(
-      categoryScores,
-      { activityCount: profile.activities.length },
-    );
-    if (appliedCap != null && appliedCap < rawWeighted) {
-      console.log(
-        `[AI] Coherence gate applied — weighted ${rawWeighted} capped to ${score} ` +
-          `(cap ${appliedCap}, activities: ${profile.activities.length})`,
+  // Overall AppGap score is computed deterministically — never the model's
+  // free-hand number. V2: the weighted average of the three application-component
+  // scores (Academics 35 / Activities 45 / Awards 20). Fall back to the legacy
+  // six-category composite (for older response shapes), then to the model's own
+  // gapScore, rather than failing the request.
+  const componentScores = extractComponentScores(analysis.componentScores);
+  if (componentScores) {
+    analysis.gapScore = computeComponentScore(componentScores);
+  } else {
+    const categoryScores = extractCategoryScores(analysis.applicationNarrative);
+    if (categoryScores) {
+      const { score } = computeOverallScore(categoryScores, {
+        activityCount: profile.activities.length,
+      });
+      analysis.gapScore = score;
+    } else {
+      console.warn(
+        "[AI] No component or category scores in analysis — using model gapScore as fallback",
       );
     }
-    analysis.gapScore = score;
-  } else {
-    console.warn(
-      "[AI] Category scores missing from analysis — using model gapScore as fallback",
-    );
   }
 
   // AI SDK v7 renamed tokens: inputTokens/outputTokens (previously promptTokens/completionTokens)

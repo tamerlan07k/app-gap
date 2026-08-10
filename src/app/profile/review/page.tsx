@@ -205,13 +205,9 @@ export default function ReviewPage() {
             "Analysis failed. Please try again.",
         );
       }
-      const body = (await res.json().catch(() => ({}))) as { id?: string };
-      const analysisId = body.id;
-      router.push(
-        analysisId
-          ? `/dashboard/roadmap/${analysisId}`
-          : "/dashboard?analyzed=1",
-      );
+      // Onboarding complete — send the student to their new Dashboard. The saved
+      // analysis lives in My Analysis; the dashboard surfaces the score + a link.
+      router.push("/dashboard?analyzed=1");
     } catch (err) {
       setGenerateError(
         err instanceof Error
