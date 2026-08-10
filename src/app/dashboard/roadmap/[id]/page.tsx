@@ -2,9 +2,11 @@ import { ArrowLeft, ArrowRight, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { analysisSchema } from "~/lib/ai/schema";
+import { writingAnalysisSchema } from "~/lib/ai/writing-schema";
 import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
 import { checkFeatureAllowance } from "~/lib/feature-usage";
 import { createClient } from "~/lib/supabase/server";
+import { ApplicationWritingSection } from "../../analysis/application-writing/application-writing-section";
 import { GapScoreCard } from "../../analysis/gap-score-card";
 import { NarrativeCard } from "../../analysis/narrative-card";
 import { StrongestAreasCard } from "../../analysis/strongest-areas-card";
@@ -24,21 +26,36 @@ export default async function RoadmapResultPage({
 
   if (!user) return notFound();
 
-  const [analysisRes, profileRes] = await Promise.all([
-    supabase
-      .from("ai_analyses")
-      .select("analysis, created_at")
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    supabase
-      .from("profiles")
-      .select(
-        "subscription_tier, subscription_status, admin_override, admin_override_tier, admin_override_expires_at",
-      )
-      .eq("id", user.id)
-      .maybeSingle(),
-  ]);
+  const [analysisRes, profileRes, activitiesRes, writingRes] =
+    await Promise.all([
+      supabase
+        .from("ai_analyses")
+        .select("analysis, created_at")
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select(
+          "subscription_tier, subscription_status, admin_override, admin_override_tier, admin_override_expires_at, additional_context",
+        )
+        .eq("id", user.id)
+        .maybeSingle(),
+      // Live activity descriptions and the latest cached Application Writing
+      // feedback — both read under the user's own RLS.
+      supabase
+        .from("activities")
+        .select("name, category, description")
+        .eq("user_id", user.id)
+        .order("sort_order"),
+      supabase
+        .from("writing_analyses")
+        .select("analysis, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
   const data = analysisRes.data;
 
@@ -67,6 +84,40 @@ export default async function RoadmapResultPage({
     entitlement.tier,
   ).catch(() => null);
   const canGenerate = allowance?.allowed ?? false;
+
+  // Application Writing inputs — live activity descriptions + Additional
+  // Information, plus any cached writing feedback (validated defensively).
+  const writingActivities = (
+    (activitiesRes.data ?? []) as Array<{
+      name: string;
+      category: string;
+      description: string | null;
+    }>
+  )
+    .filter((a) => a.description?.trim())
+    .map((a) => ({
+      name: a.name,
+      category: a.category,
+      description: a.description ?? "",
+    }));
+  const additionalInfo =
+    ((profileRes.data as { additional_context?: string | null } | null)
+      ?.additional_context ??
+      "") ||
+    "";
+
+  const writingRow = writingRes.data as {
+    analysis: unknown;
+    created_at: string;
+  } | null;
+  const writingParsed = writingRow
+    ? writingAnalysisSchema.safeParse(writingRow.analysis)
+    : null;
+  const initialWritingAnalysis = writingParsed?.success
+    ? writingParsed.data
+    : null;
+  const initialWritingAnalyzedAt =
+    writingParsed?.success && writingRow ? writingRow.created_at : null;
 
   return (
     <div className="space-y-6">
@@ -124,6 +175,16 @@ export default async function RoadmapResultPage({
           </div>
         </div>
       </div>
+
+      {/* Application Writing — communication feedback on the student's real
+          activity descriptions and Additional Information. Independent of the
+          gap score above. */}
+      <ApplicationWritingSection
+        activities={writingActivities}
+        additionalInfo={additionalInfo}
+        initialAnalysis={initialWritingAnalysis}
+        initialAnalyzedAt={initialWritingAnalyzedAt}
+      />
 
       {/* Transition to the Workplace — next steps live there, not in the diagnostic */}
       <Link

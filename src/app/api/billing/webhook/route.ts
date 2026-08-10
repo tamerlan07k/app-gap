@@ -45,6 +45,7 @@ export async function POST(request: Request) {
           stripe_subscription_id: session.subscription as string,
           subscription_tier: "pro",
           subscription_status: "active",
+          cancel_at_period_end: sub.cancel_at_period_end,
           current_period_end: periodEnd
             ? new Date(periodEnd * 1000).toISOString()
             : null,
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
         .update({
           subscription_status: sub.status,
           subscription_tier: sub.status === "active" ? "pro" : "free",
+          cancel_at_period_end: sub.cancel_at_period_end,
           current_period_end: sub.items.data[0]?.current_period_end
             ? new Date(
                 sub.items.data[0].current_period_end * 1000,
@@ -93,6 +95,7 @@ export async function POST(request: Request) {
         .update({
           subscription_tier: "free",
           subscription_status: "canceled",
+          cancel_at_period_end: false,
           stripe_subscription_id: null,
           current_period_end: null,
         })

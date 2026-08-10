@@ -33,6 +33,12 @@ export const AI_FEATURES = {
     description:
       "Admissions gap analysis generated from a student's academic profile",
   },
+  applicationWriting: {
+    model: "openai/gpt-4o-mini",
+    temperature: 0.4,
+    description:
+      "Communication feedback on activity descriptions and Additional Information",
+  },
 } satisfies Partial<Record<FeatureKey, FeatureConfig>>;
 
 // ─── Subscription tiers ───────────────────────────────────────────────────────

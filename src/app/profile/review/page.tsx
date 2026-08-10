@@ -25,6 +25,7 @@ import {
   type Step1Data,
   type Step3Data,
 } from "~/lib/profile-storage";
+import { ADDITIONAL_INFO_WORD_LIMIT, countWords } from "~/lib/writing/checks";
 
 // ─── Label maps ───────────────────────────────────────────────────────────────
 
@@ -522,12 +523,27 @@ export default function ReviewPage() {
               "Examples:\n• My school only offers 5 AP courses.\n• I work part-time to support my family.\n• I recently immigrated to the United States.\n• I started focusing on college admissions later than many students."
             }
             className="min-h-32 resize-y text-sm"
-            maxLength={2000}
+            maxLength={3000}
           />
-          {additionalContext.length > 0 && (
-            <p className="text-right text-xs text-muted-foreground">
-              {additionalContext.length}/2000
-            </p>
+          {additionalContext.trim().length > 0 && (
+            <div className="space-y-1">
+              <p
+                className={`text-right text-xs tabular-nums ${
+                  countWords(additionalContext) > ADDITIONAL_INFO_WORD_LIMIT
+                    ? "font-medium text-red-500 dark:text-red-400"
+                    : "text-muted-foreground"
+                }`}
+              >
+                {countWords(additionalContext)} / {ADDITIONAL_INFO_WORD_LIMIT}{" "}
+                words
+              </p>
+              {countWords(additionalContext) > ADDITIONAL_INFO_WORD_LIMIT && (
+                <p className="text-right text-xs text-red-500 dark:text-red-400">
+                  Over the {ADDITIONAL_INFO_WORD_LIMIT}-word Common App limit.
+                  You can still continue, but consider trimming it down.
+                </p>
+              )}
+            </div>
           )}
         </div>
 

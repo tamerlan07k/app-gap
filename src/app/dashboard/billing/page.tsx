@@ -27,7 +27,7 @@ export default async function BillingPage() {
   const { data: profile } = await admin
     .from("profiles")
     .select(
-      "id, subscription_tier, subscription_status, current_period_end, stripe_subscription_id, admin_override, admin_override_tier, admin_override_start, admin_override_expires_at, admin_override_paused_stripe",
+      "id, subscription_tier, subscription_status, current_period_end, cancel_at_period_end, stripe_subscription_id, admin_override, admin_override_tier, admin_override_start, admin_override_expires_at, admin_override_paused_stripe",
     )
     .eq("id", user.id)
     .maybeSingle();
@@ -66,6 +66,7 @@ export default async function BillingPage() {
         isPro={isPro}
         currentPeriodEnd={entitlement.expiresAt}
         isAdminOverride={entitlement.isAdminOverride}
+        cancelAtPeriodEnd={entitlement.cancelAtPeriodEnd}
       />
     </div>
   );

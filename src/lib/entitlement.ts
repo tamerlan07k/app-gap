@@ -17,6 +17,7 @@ export interface EntitlementProfile {
   subscription_tier?: string | null;
   subscription_status?: string | null;
   current_period_end?: string | null;
+  cancel_at_period_end?: boolean | null;
   stripe_subscription_id?: string | null;
   admin_override?: boolean | null;
   admin_override_tier?: string | null;
@@ -36,6 +37,11 @@ export interface Entitlement {
   source: EntitlementSource;
   /** True when an active admin override is the reason for the tier. */
   isAdminOverride: boolean;
+  /**
+   * True when a Stripe subscription is scheduled to cancel at `expiresAt`
+   * instead of renewing. Always false for admin overrides.
+   */
+  cancelAtPeriodEnd: boolean;
 }
 
 function toTier(value: string | null | undefined): Tier {
@@ -70,6 +76,7 @@ export function resolveEntitlement(
       expiresAt: profile.admin_override_expires_at ?? null,
       source: "admin_override",
       isAdminOverride: true,
+      cancelAtPeriodEnd: false,
     };
   }
 
@@ -79,6 +86,7 @@ export function resolveEntitlement(
     expiresAt: profile?.current_period_end ?? null,
     source: "stripe",
     isAdminOverride: false,
+    cancelAtPeriodEnd: profile?.cancel_at_period_end ?? false,
   };
 }
 
