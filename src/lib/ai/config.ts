@@ -94,19 +94,21 @@ export const FEATURE_ACCESS: Record<
   Record<TierKey, FeatureAccess>
 > = {
   // The AppGap diagnostic. This is the ONLY feature enforced today (see the
-  // analyze-profile route). Free = one analysis for the lifetime of the account;
-  // Pro = a bounded monthly allowance — generous, but deliberately NOT unlimited,
-  // to cap worst-case AI spend. Tune these numbers here to control cost.
+  // analyze-profile route), counted from the append-only feature_usage ledger.
+  //   Free = 2 analyses for the lifetime of the account (their first one at
+  //          sign-up + one more). After that: upgrade to Pro.
+  //   Pro  = 1 analysis per calendar month.
+  // Tune these numbers here to control cost.
   profileAnalysis: {
     free: {
       enabled: true,
-      limit: 1,
+      limit: 2,
       window: "lifetime",
       model: "google/gemini-2.5-flash",
     },
     pro: {
       enabled: true,
-      limit: 30,
+      limit: 1,
       window: "month",
       model: "google/gemini-2.5-pro",
     },

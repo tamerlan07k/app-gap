@@ -51,7 +51,7 @@ export async function POST() {
   const tier: TierKey = entitlement.tier;
 
   // Feature-based access check BEFORE any AI request. The diagnostic is a lifetime
-  // allowance for Free (1) and a bounded monthly allowance for Pro — both defined
+  // allowance for Free (2) and a monthly allowance for Pro (1) — both defined
   // centrally in FEATURE_ACCESS and counted from the append-only feature_usage
   // ledger, so deleting a saved analysis can never restore an allowance.
   let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
@@ -76,9 +76,14 @@ export async function POST() {
   if (!allowance.allowed) {
     const error =
       tier === "free"
-        ? "You've already used your free AppGap analysis. Upgrade to Pro to generate more."
+        ? "Max amount of generations reached. Upgrade to Pro to generate more."
         : "You've reached your analysis limit for this month. It resets at the start of next month.";
-    return Response.json({ error }, { status: 429 });
+    // `code` lets the client render the "upgrade / limit reached" state instead
+    // of a generic error.
+    return Response.json(
+      { error, code: "limit_reached", tier },
+      { status: 429 },
+    );
   }
 
   // Model for this diagnostic — FEATURE_ACCESS is the source of truth; fall back to
