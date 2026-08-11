@@ -17,7 +17,7 @@
 // add `deadline_date` / `decision_release_date` (ISO yyyy-mm-dd) to each round,
 // set the entry's `verified: true`, and re-run the loader.
 
-export const CYCLE_YEAR = "2025-2026"; // fall-2026 entry
+export const CYCLE_YEAR = "2026-2027"; // current cycle — fall-2027 entry (opens Aug 2026)
 
 // Definitional properties of each round type. These are what the round type
 // MEANS (ED is always binding; REA/SCEA is restrictive but non-binding; etc.) —
