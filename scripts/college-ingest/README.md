@@ -57,6 +57,13 @@ round in `rounds-data.mjs`, set the entry's `verified: true`, and re-run (the
 load is idempotent). The matching engine must consume **only** rows where
 `verified_at` is set, so the unverified seed is never trusted as fact.
 
+**`rounds-candidates.json`** holds WebFetch-derived candidate rounds/deadlines/
+decision-dates/test-policies for all 53 colleges, sourced from official
+admissions sites, with per-fact confidence and source. **Everything in it is
+`pending` (unverified)** — it is a human-verification worklist, not truth. It
+also flags where the seeded structure was wrong (`structure_match: false`) and
+where official pages conflicted or still showed the prior cycle.
+
 ## What each source fills
 
 | Layer | Source | This pipeline |
