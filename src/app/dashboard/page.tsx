@@ -1,4 +1,3 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { ArrowRight, MapIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -10,39 +9,12 @@ import { createClient } from "~/lib/supabase/server";
 import { getFirstName } from "~/lib/user";
 import { GapScoreCard } from "./analysis/gap-score-card";
 import {
-  EssaysCard,
   JumpInCard,
   MyAnalysisCard,
   MyCollegesCard,
   NextDeadlineCard,
 } from "./home/dashboard-cards";
 import { SavedBanner } from "./saved-banner";
-
-// Number of completed essay / application-writing items. Fail-soft: if the
-// profile_documents table isn't present yet (migration not applied) this returns
-// 0 rather than breaking the dashboard.
-async function getEssaysCompletedCount(
-  supabase: SupabaseClient,
-  userId: string,
-): Promise<number> {
-  try {
-    const { count, error } = await supabase
-      .from("profile_documents")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("status", "complete")
-      .in("doc_type", [
-        "personal_statement",
-        "supplemental",
-        "additional_info",
-        "activity_description",
-      ]);
-    if (error) return 0;
-    return count ?? 0;
-  } catch {
-    return 0;
-  }
-}
 
 function GenerateCta() {
   return (
@@ -90,11 +62,10 @@ export default async function DashboardPage() {
   let analysisId: string | null = null;
   let analyzedDate = "";
   let gradeLevel: string | null = null;
-  let essaysCount = 0;
   let latestEvent = null;
 
   if (user) {
-    const [analysisRes, profileRes, essays, event] = await Promise.all([
+    const [analysisRes, profileRes, event] = await Promise.all([
       supabase
         .from("ai_analyses")
         .select("id, analysis, created_at")
@@ -107,12 +78,10 @@ export default async function DashboardPage() {
         .select("grade_level")
         .eq("id", user.id)
         .maybeSingle(),
-      getEssaysCompletedCount(supabase, user.id),
       getLatestEvent(supabase, user.id),
     ]);
 
     gradeLevel = profileRes.data?.grade_level ?? null;
-    essaysCount = essays;
     latestEvent = event;
 
     if (analysisRes.data) {
@@ -162,10 +131,7 @@ export default async function DashboardPage() {
                 <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   My Progress
                 </h2>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <EssaysCard count={essaysCount} />
-                  <MyCollegesCard />
-                </div>
+                <MyCollegesCard />
               </section>
 
               <JumpInCard event={latestEvent} analysisId={analysisId} />

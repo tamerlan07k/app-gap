@@ -19,23 +19,44 @@ function getScoreLabelColor(score: number): string {
   return "text-red-500 dark:text-red-400";
 }
 
+// Single-color fallback used only for legacy analyses that carry no component
+// scores (the overall ring can't be segmented without them).
 function getArcColor(score: number): string {
   if (score >= 75) return "oklch(0.55 0.1 204)"; // brand-teal
   if (score >= 50) return "oklch(0.72 0.14 75)"; // amber
   return "oklch(0.62 0.22 27)"; // red
 }
 
-// Animated circular progress arc, sized by `size`. Used for both the overall
-// score (large) and each of the three components (small).
+// One color per diagnostic component, used consistently by the segmented overall
+// ring, its legend, and each component gauge — so a color always means the same
+// component across the card. Chosen for distinct hues that read in light + dark.
+const COMPONENT_COLORS: Record<ComponentKey, string> = {
+  academics: "oklch(0.58 0.11 200)", // teal
+  activities: "oklch(0.55 0.15 260)", // blue / indigo
+  awards: "oklch(0.75 0.14 75)", // amber
+};
+
+// The three visible diagnostic components, in weight order.
+const COMPONENT_META: { key: ComponentKey; label: string }[] = [
+  { key: "academics", label: "Academics" },
+  { key: "activities", label: "Activities" },
+  { key: "awards", label: "Awards" },
+];
+
+// Animated single-color circular progress arc. Used for the component gauges and
+// as the legacy fallback for the overall ring. `color` overrides the score-based
+// color (component gauges pass their component color).
 function ScoreArc({
   score,
   size,
   strokeWidth,
+  color,
   children,
 }: {
   score: number;
   size: number;
   strokeWidth: number;
+  color?: string;
   children: ReactNode;
 }) {
   const circleRef = useRef<SVGCircleElement>(null);
@@ -84,7 +105,7 @@ function ScoreArc({
           cy={center}
           r={radius}
           fill="none"
-          stroke={getArcColor(score)}
+          stroke={color ?? getArcColor(score)}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -99,31 +120,92 @@ function ScoreArc({
   );
 }
 
-// The three visible diagnostic components, in weight order.
-const COMPONENT_META: { key: ComponentKey; label: string }[] = [
-  { key: "academics", label: "Academics" },
-  { key: "activities", label: "Activities" },
-  { key: "awards", label: "Awards" },
-];
+// Overall AppGap ring segmented by component. The filled arc still equals the
+// score (it does NOT wrap the full circle) — it's just split into one colored
+// segment per component, each sized by that component's weighted contribution
+// (weight × score), so the three segments add up exactly to the overall score.
+function SegmentedScoreRing({
+  segments,
+  size,
+  strokeWidth,
+  children,
+}: {
+  segments: { key: ComponentKey; color: string; contribution: number }[];
+  size: number;
+  strokeWidth: number;
+  children: ReactNode;
+}) {
+  const center = size / 2;
+  const radius = center - strokeWidth;
+  const circumference = 2 * Math.PI * radius;
+
+  // Lay each segment end-to-end from the top (12 o'clock, after the -90 rotation)
+  // going clockwise. Contribution is in score points (0–100), so a fraction of
+  // the circumference. Their sum equals the overall score → the ring fills to it.
+  let cumulative = 0;
+  const arcs = segments.map((seg) => {
+    const len = (seg.contribution / 100) * circumference;
+    const start = (cumulative / 100) * circumference;
+    cumulative += seg.contribution;
+    return { key: seg.key, color: seg.color, len, start };
+  });
+
+  return (
+    <div
+      className="relative flex shrink-0 items-center justify-center"
+      style={{ width: size, height: size }}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+        aria-hidden={true}
+      >
+        <circle
+          cx={center}
+          cy={center}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-muted"
+        />
+        {arcs.map((arc) => (
+          <circle
+            key={arc.key}
+            cx={center}
+            cy={center}
+            r={radius}
+            fill="none"
+            stroke={arc.color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="butt"
+            strokeDasharray={`${arc.len} ${circumference - arc.len}`}
+            strokeDashoffset={-arc.start}
+          />
+        ))}
+      </svg>
+      <div className="absolute flex flex-col items-center">{children}</div>
+    </div>
+  );
+}
 
 function ComponentGauge({
   label,
-  weight,
   score,
+  color,
 }: {
   label: string;
-  weight: number;
   score: number;
+  color: string;
 }) {
   return (
     <div className="flex flex-col items-center gap-2 text-center">
-      <ScoreArc score={score} size={76} strokeWidth={8}>
+      <ScoreArc score={score} size={76} strokeWidth={8} color={color}>
         <span className="text-lg font-bold tabular-nums">{score}</span>
       </ScoreArc>
-      <div>
-        <p className="text-sm font-semibold">{label}</p>
-        <p className="text-xs text-muted-foreground">{weight}% weight</p>
-      </div>
+      <p className="text-sm font-semibold">{label}</p>
     </div>
   );
 }
@@ -139,6 +221,16 @@ export function GapScoreCard({
   const labelColor = getScoreLabelColor(analysis.gapScore);
   const components = analysis.componentScores;
 
+  // Weighted contribution per component (weight × score) — sums to the overall
+  // score. Null for legacy analyses, which fall back to a single-color ring.
+  const segments = components
+    ? COMPONENT_META.map(({ key }) => ({
+        key,
+        color: COMPONENT_COLORS[key],
+        contribution: (COMPONENT_WEIGHTS[key] / 100) * components[key].score,
+      }))
+    : null;
+
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
@@ -149,12 +241,21 @@ export function GapScoreCard({
       <div className="space-y-6 p-6">
         {/* Overall score */}
         <div className="flex flex-col items-center gap-6 sm:flex-row">
-          <ScoreArc score={analysis.gapScore} size={128} strokeWidth={12}>
-            <span className="text-3xl font-bold tabular-nums">
-              {analysis.gapScore}
-            </span>
-            <span className="text-xs text-muted-foreground">/ 100</span>
-          </ScoreArc>
+          {segments ? (
+            <SegmentedScoreRing segments={segments} size={128} strokeWidth={12}>
+              <span className="text-3xl font-bold tabular-nums">
+                {analysis.gapScore}
+              </span>
+              <span className="text-xs text-muted-foreground">/ 100</span>
+            </SegmentedScoreRing>
+          ) : (
+            <ScoreArc score={analysis.gapScore} size={128} strokeWidth={12}>
+              <span className="text-3xl font-bold tabular-nums">
+                {analysis.gapScore}
+              </span>
+              <span className="text-xs text-muted-foreground">/ 100</span>
+            </ScoreArc>
+          )}
           <div className="space-y-3 text-center sm:text-left">
             <div>
               <p
@@ -169,6 +270,24 @@ export function GapScoreCard({
             <p className="text-sm leading-relaxed text-muted-foreground">
               {analysis.gapScoreExplanation}
             </p>
+            {/* Legend — identifies which color in the ring is which component. */}
+            {segments && (
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 sm:justify-start">
+                {COMPONENT_META.map(({ key, label: componentLabel }) => (
+                  <span
+                    key={key}
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                  >
+                    <span
+                      className="size-2.5 rounded-full"
+                      style={{ backgroundColor: COMPONENT_COLORS[key] }}
+                      aria-hidden={true}
+                    />
+                    {componentLabel}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -181,7 +300,7 @@ export function GapScoreCard({
                 <ComponentGauge
                   key={key}
                   label={componentLabel}
-                  weight={COMPONENT_WEIGHTS[key]}
+                  color={COMPONENT_COLORS[key]}
                   score={components[key].score}
                 />
               ))}
