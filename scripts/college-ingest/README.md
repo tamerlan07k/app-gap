@@ -38,13 +38,32 @@ The dry run prints each resolved match (`unitid`, city/state, admit rate, SAT)
 and flags **ambiguous** matches and **no-match** seeds for manual resolution.
 Review that output before running live.
 
+### Current application rounds/deadlines (`ingest-rounds.mjs`)
+
+Loads the round **structure** (which rounds each college offers) from
+`rounds-data.mjs` into `application_cycles` + `application_rounds`.
+Binding/restrictive/rolling are **derived from the round type** (definitional),
+never stored per-college. **Deadlines are never invented** — they stay pending
+(null, `verified_at` null) until filled from the official source and verified.
+
+```bash
+node scripts/college-ingest/ingest-rounds.mjs --dry-run   # report structure + verification status
+node scripts/college-ingest/ingest-rounds.mjs             # live load (unverified seed)
+```
+
+To **verify** a college: open its official admissions page, confirm the offered
+rounds, add `deadline_date` / `decision_release_date` (ISO `yyyy-mm-dd`) to each
+round in `rounds-data.mjs`, set the entry's `verified: true`, and re-run (the
+load is idempotent). The matching engine must consume **only** rows where
+`verified_at` is set, so the unverified seed is never trusted as fact.
+
 ## What each source fills
 
 | Layer | Source | This pipeline |
 |---|---|---|
 | Admit rate, SAT/ACT ranges, enrollment, location, control | **Scorecard / IPEDS** | ✅ `ingest-scorecard.mjs` (automated) |
 | Historical admissions factors (CDS C7), GPA/rank distributions | **CDS** | ⏳ semi-automated + manual verification (not built yet) |
-| Current rounds, deadlines, decision dates, current test policy | **Official admissions sites** | ✍️ manual / scraper + **required human verification** (not built yet) |
+| Current rounds, deadlines, decision dates, current test policy | **Official admissions sites** | ⏳ structure loader built (`ingest-rounds.mjs`); deadlines + verification are manual |
 | Logos | official brand assets → self-hosted; monogram fallback | ✍️ manual verification (not built yet) |
 
 ## Notes
