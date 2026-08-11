@@ -159,6 +159,7 @@ export default function ReviewPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  const [limitReached, setLimitReached] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -201,6 +202,15 @@ export default function ReviewPage() {
       const res = await fetch("/api/analyze-profile", { method: "POST" });
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
+        // Out of generations → show the upgrade state instead of a raw error.
+        if (
+          res.status === 429 ||
+          (body as { code?: string }).code === "limit_reached"
+        ) {
+          setLimitReached(true);
+          setIsGenerating(false);
+          return;
+        }
         throw new Error(
           (body as { error?: string }).error ??
             "Analysis failed. Please try again.",
@@ -549,44 +559,63 @@ export default function ReviewPage() {
 
         {/* Generate section */}
         <div className="space-y-4 rounded-xl border border-border bg-card p-8 text-center shadow-sm">
-          <div className="space-y-2">
-            <h2 className="font-semibold">Ready to see where you stand?</h2>
-            <p className="text-sm text-muted-foreground">
-              AppGap will analyze your academic profile, activities, and goals
-              to identify gaps and build your personalized roadmap.
-            </p>
-          </div>
-          {generateError && (
-            <p className="text-sm text-destructive">{generateError}</p>
-          )}
-          <Button
-            size="lg"
-            onClick={handleGenerate}
-            disabled={!allComplete || isGenerating}
-            className="w-full sm:w-auto"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="animate-spin" />
-                Analyzing your profile...
-              </>
-            ) : (
-              "Generate My AppGap Roadmap"
-            )}
-          </Button>
-          {isGenerating && (
-            <p className="text-xs text-muted-foreground">
-              This usually takes 10–20 seconds. Please don&apos;t close this
-              page.
-            </p>
-          )}
-          {generateError && !isGenerating && (
-            <p className="text-sm text-destructive">{generateError}</p>
-          )}
-          {!allComplete && !isGenerating && (
-            <p className="text-xs text-muted-foreground">
-              Complete all required fields above to unlock analysis.
-            </p>
+          {limitReached ? (
+            <>
+              <div className="space-y-2">
+                <h2 className="font-semibold">
+                  Max amount of generations reached
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  You&apos;ve used all your free AppGap analyses. Upgrade to Pro
+                  to generate more.
+                </p>
+              </div>
+              <Button size="lg" asChild className="w-full sm:w-auto">
+                <Link href="/dashboard/billing">Upgrade to Pro</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <div className="space-y-2">
+                <h2 className="font-semibold">Ready to see where you stand?</h2>
+                <p className="text-sm text-muted-foreground">
+                  AppGap will analyze your academic profile, activities, and
+                  goals to identify gaps and build your personalized roadmap.
+                </p>
+              </div>
+              {generateError && (
+                <p className="text-sm text-destructive">{generateError}</p>
+              )}
+              <Button
+                size="lg"
+                onClick={handleGenerate}
+                disabled={!allComplete || isGenerating}
+                className="w-full sm:w-auto"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="animate-spin" />
+                    Analyzing your profile...
+                  </>
+                ) : (
+                  "Generate My AppGap Roadmap"
+                )}
+              </Button>
+              {isGenerating && (
+                <p className="text-xs text-muted-foreground">
+                  This usually takes 10–20 seconds. Please don&apos;t close this
+                  page.
+                </p>
+              )}
+              {generateError && !isGenerating && (
+                <p className="text-sm text-destructive">{generateError}</p>
+              )}
+              {!allComplete && !isGenerating && (
+                <p className="text-xs text-muted-foreground">
+                  Complete all required fields above to unlock analysis.
+                </p>
+              )}
+            </>
           )}
         </div>
 

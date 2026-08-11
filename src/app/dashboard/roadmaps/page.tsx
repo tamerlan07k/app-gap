@@ -112,7 +112,7 @@ export default async function RoadmapsPage() {
               {canGenerate
                 ? "Complete your profile to generate your first AppGap Analysis."
                 : tier === "free"
-                  ? "You've used your free AppGap analysis. Upgrade to Pro to generate more."
+                  ? "Max amount of generations reached. Upgrade to Pro to generate more."
                   : "You've reached your analysis limit for this month. Check billing for options."}
             </p>
           </div>
