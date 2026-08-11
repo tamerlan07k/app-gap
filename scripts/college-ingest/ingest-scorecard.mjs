@@ -57,6 +57,10 @@ const yearArg = args.find((a) => a.startsWith("--year"));
 const ACADEMIC_YEAR = yearArg
   ? (yearArg.split("=")[1] ?? args[args.indexOf(yearArg) + 1])
   : "scorecard_latest";
+const filterArg = args.find((a) => a.startsWith("--filter"));
+const FILTER = filterArg
+  ? (filterArg.split("=")[1] ?? args[args.indexOf(filterArg) + 1])
+  : null;
 
 function loadEnvLocal() {
   const env = {};
@@ -129,7 +133,7 @@ async function fetchCandidates(seed) {
     `${SCORECARD_URL}?api_key=${encodeURIComponent(SCORECARD_KEY)}` +
     `&school.name=${encodeURIComponent(seed.name)}` +
     (seed.state ? `&school.state=${encodeURIComponent(seed.state)}` : "") +
-    `&fields=${FIELDS}&per_page=5`;
+    `&fields=${FIELDS}&per_page=100`;
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(
@@ -140,17 +144,25 @@ async function fetchCandidates(seed) {
   return json.results ?? [];
 }
 
-// Pick the best candidate: exact (case-insensitive) name match wins, else the
-// first result. Returns { match, ambiguous }.
+function normalizeName(s) {
+  return (s ?? "").toLowerCase().replace(/\s+/g, " ").trim();
+}
+
+// Deterministic resolution: require an EXACT canonical-name + state match. We
+// never fall back to a "closest" result — a wrong guess (e.g. NYU → SUNY New
+// Paltz) is worse than a flagged no-match. Exactly one exact match → resolved;
+// more than one → ambiguous; none → no-match (surfaced for a seed-name fix).
 function pickMatch(seed, candidates) {
-  if (candidates.length === 0) return { match: null, ambiguous: false };
-  const exact = candidates.find(
-    (c) => (c["school.name"] ?? "").toLowerCase() === seed.name.toLowerCase(),
+  const target = normalizeName(seed.name);
+  const state = (seed.state ?? "").toUpperCase();
+  const exact = candidates.filter(
+    (c) =>
+      normalizeName(c["school.name"]) === target &&
+      (!state || (c["school.state"] ?? "").toUpperCase() === state),
   );
-  return {
-    match: exact ?? candidates[0],
-    ambiguous: candidates.length > 1 && !exact,
-  };
+  if (exact.length === 1) return { match: exact[0], ambiguous: false };
+  if (exact.length > 1) return { match: exact[0], ambiguous: true };
+  return { match: null, ambiguous: false };
 }
 
 // Map a Scorecard record → { college, stats }. Fields the source omits are left
@@ -294,7 +306,9 @@ async function persist(rec, mapped) {
 // ─── main ───────────────────────────────────────────────────────────────────
 
 async function main() {
-  const seeds = SEED_COLLEGES.slice(0, LIMIT);
+  const seeds = SEED_COLLEGES.filter(
+    (s) => !FILTER || s.name.toLowerCase().includes(FILTER.toLowerCase()),
+  ).slice(0, LIMIT);
   console.log(
     `${DRY_RUN ? "[DRY RUN] " : ""}Scorecard ingest — ${seeds.length} colleges, ` +
       `academic_year="${ACADEMIC_YEAR}"${SCORECARD_KEY === "DEMO_KEY" ? " (DEMO_KEY: low rate limit)" : ""}\n`,
