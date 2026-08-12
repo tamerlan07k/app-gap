@@ -91,28 +91,35 @@ export default async function DashboardPage() {
   let analyzedDate = "";
   let gradeLevel: string | null = null;
   let essaysCount = 0;
+  let collegesCount = 0;
   let latestEvent = null;
 
   if (user) {
-    const [analysisRes, profileRes, essays, event] = await Promise.all([
-      supabase
-        .from("ai_analyses")
-        .select("id, analysis, created_at")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      supabase
-        .from("profiles")
-        .select("grade_level")
-        .eq("id", user.id)
-        .maybeSingle(),
-      getEssaysCompletedCount(supabase, user.id),
-      getLatestEvent(supabase, user.id),
-    ]);
+    const [analysisRes, profileRes, essays, event, collegesRes] =
+      await Promise.all([
+        supabase
+          .from("ai_analyses")
+          .select("id, analysis, created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("grade_level")
+          .eq("id", user.id)
+          .maybeSingle(),
+        getEssaysCompletedCount(supabase, user.id),
+        getLatestEvent(supabase, user.id),
+        supabase
+          .from("user_colleges")
+          .select("id", { count: "exact", head: true })
+          .eq("user_id", user.id),
+      ]);
 
     gradeLevel = profileRes.data?.grade_level ?? null;
     essaysCount = essays;
+    collegesCount = collegesRes.count ?? 0;
     latestEvent = event;
 
     if (analysisRes.data) {
@@ -164,7 +171,7 @@ export default async function DashboardPage() {
                 </h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <EssaysCard count={essaysCount} />
-                  <MyCollegesCard />
+                  <MyCollegesCard count={collegesCount} />
                 </div>
               </section>
 
