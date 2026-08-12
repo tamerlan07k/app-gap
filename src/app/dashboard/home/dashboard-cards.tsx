@@ -3,7 +3,6 @@ import {
   CalendarClock,
   FileText,
   GraduationCap,
-  Lock,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -67,24 +66,28 @@ export function EssaysCard({ count }: { count: number }) {
   );
 }
 
-export function MyCollegesCard() {
+export function MyCollegesCard({ count }: { count: number }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <Link
+      href="/dashboard/colleges"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-brand-teal/30 hover:bg-brand-teal/[0.02]"
+    >
       <div className="flex items-start gap-4 p-6">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-          <GraduationCap className="size-5 text-muted-foreground" />
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand-teal/10">
+          <GraduationCap className="size-5 text-brand-teal" />
         </div>
-        <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-sm font-medium">
-            My Colleges
-            <Lock className="size-3 text-muted-foreground" aria-hidden={true} />
-          </p>
+        <div className="min-w-0 flex-1">
+          <p className="text-2xl font-bold tabular-nums">{count}</p>
+          <p className="text-sm font-medium">My Colleges</p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            Save colleges and track their deadlines. Coming soon.
+            {count === 0
+              ? "Build a balanced, matched list"
+              : `${count} saved ${count === 1 ? "college" : "colleges"}`}
           </p>
         </div>
+        <ArrowRight className="size-4 shrink-0 text-brand-teal transition-transform group-hover:translate-x-0.5" />
       </div>
-    </div>
+    </Link>
   );
 }
 
