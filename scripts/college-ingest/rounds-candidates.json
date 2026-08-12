@@ -4,13 +4,14 @@
     "cycle": "2026-2027",
     "cycle_meaning": "current cycle, fall-2027 entry (applications open Aug 2026)",
     "source_date": "2026-08-11",
-    "verification_status": "pending",
+    "verification_status": "partial — 4 colleges verified against official sources on 2026-08-12 (Columbia, Northwestern[ED only], Amherst, ASU); all others remain pending",
     "caveats": [
       "Most official pages show month/day without an explicit calendar year, so year assignment is often medium confidence.",
       "Colleges rarely publish exact decision-release dates (usually 'mid-December', 'late March'); decision_date is null unless an exact date was on the official page.",
       "Some official pages blocked direct fetch (HTTP 403/405) or rendered empty; those dates came from official-domain search snippets and are flagged for live re-verification.",
       "A few pages still displayed the prior cycle; those deadlines are null or low-confidence."
-    ]
+    ],
+    "verified_date": "2026-08-12"
   },
   "colleges": [
     {
@@ -18,7 +19,10 @@
       "structure_match": true,
       "seeded": ["REA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -41,7 +45,10 @@
       "structure_match": true,
       "seeded": ["REA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -64,7 +71,10 @@
       "structure_match": true,
       "seeded": ["REA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -90,33 +100,44 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
           "deadline": "2026-11-01",
           "decision_date": null,
-          "confidence": "medium"
+          "confidence": "high",
+          "verified": true
         },
         {
           "round_type": "RD",
           "deadline": "2027-01-01",
           "decision_date": null,
-          "confidence": "medium"
+          "confidence": "high",
+          "verified": true
         }
       ],
       "source": "undergrad.admissions.columbia.edu/apply/firstyear",
       "flags": [
-        "firstyear page 403 on direct fetch",
-        "2026-2027 is its LAST test-optional year (required next cycle)"
-      ]
+        "VERIFIED fall-2027 on official page ('First-year applications for Fall 2027 are now available')",
+        "2026-2027 is its LAST test-optional year (test required from 2027-2028)"
+      ],
+      "cycle_verified": true,
+      "verified_by": "official_site_recheck",
+      "verified_date": "2026-08-12"
     },
     {
       "college": "University of Pennsylvania",
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -142,7 +163,10 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -165,7 +189,10 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -188,7 +215,10 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -211,7 +241,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -234,7 +267,10 @@
       "structure_match": true,
       "seeded": ["REA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -257,7 +293,10 @@
       "structure_match": false,
       "seeded": ["EA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_blind", "confidence": "high" },
+      "test_policy": {
+        "value": "test_blind",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -283,7 +322,10 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -306,32 +348,44 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
           "deadline": "2026-11-01",
           "decision_date": null,
-          "confidence": "high"
+          "confidence": "high",
+          "verified": true
         },
         {
           "round_type": "RD",
           "deadline": "2027-01-04",
           "decision_date": null,
-          "confidence": "medium"
+          "confidence": "medium",
+          "verified": false
         }
       ],
       "source": "admissions.northwestern.edu/apply/application-deadlines.html",
       "flags": [
-        "CONFLICT on official page: RD shown as Jan 4 (table) vs Jan 2 (prose)"
-      ]
+        "VERIFIED fall-2027 cycle on official page; ED Nov 1 confirmed; test-optional confirmed",
+        "RD PENDING: official page self-conflicts (table Jan 4 vs prose Jan 2) — unresolved"
+      ],
+      "cycle_verified": true,
+      "verified_by": "official_site_recheck",
+      "verified_date": "2026-08-12"
     },
     {
       "college": "Johns Hopkins University",
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -362,7 +416,10 @@
       "structure_match": true,
       "seeded": ["EA", "ED", "ED_II", "RD"],
       "verified_structure": ["EA", "ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -397,7 +454,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -426,7 +486,10 @@
       "structure_match": false,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -458,7 +521,10 @@
       "structure_match": true,
       "seeded": ["REA", "RD"],
       "verified_structure": ["REA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "REA",
@@ -481,7 +547,10 @@
       "structure_match": false,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["EA", "ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -519,7 +588,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "low" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "low"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -550,7 +622,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -576,7 +651,10 @@
       "structure_match": false,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_flexible", "confidence": "high" },
+      "test_policy": {
+        "value": "test_flexible",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -603,7 +681,10 @@
       "structure_match": false,
       "seeded": ["EA", "RD"],
       "verified_structure": ["ED", "EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -635,7 +716,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_flexible", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_flexible",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -667,7 +751,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -696,7 +783,10 @@
       "structure_match": true,
       "seeded": ["RD"],
       "verified_structure": ["RD"],
-      "test_policy": { "value": "test_blind", "confidence": "high" },
+      "test_policy": {
+        "value": "test_blind",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "RD",
@@ -716,7 +806,10 @@
       "structure_match": true,
       "seeded": ["RD"],
       "verified_structure": ["RD"],
-      "test_policy": { "value": "test_blind", "confidence": "high" },
+      "test_policy": {
+        "value": "test_blind",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "RD",
@@ -737,7 +830,10 @@
       "structure_match": false,
       "seeded": ["EA", "RD"],
       "verified_structure": ["ED", "EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -769,7 +865,10 @@
       "structure_match": true,
       "seeded": ["EA", "ED", "RD"],
       "verified_structure": ["ED", "EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -801,7 +900,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_flexible", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_flexible",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -827,7 +929,10 @@
       "structure_match": false,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA (GA residents)", "EA (non-GA)", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -861,7 +966,10 @@
       "structure_match": false,
       "seeded": ["RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -888,7 +996,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -914,7 +1025,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -940,7 +1054,10 @@
       "structure_match": false,
       "seeded": ["RD"],
       "verified_structure": ["ED", "EA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -972,7 +1089,10 @@
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_required", "confidence": "high" },
+      "test_policy": {
+        "value": "test_required",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -998,7 +1118,10 @@
       "structure_match": true,
       "seeded": ["RD"],
       "verified_structure": ["RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "RD",
@@ -1019,7 +1142,10 @@
       "structure_match": false,
       "seeded": ["ROLLING"],
       "verified_structure": ["EA", "PRIORITY", "ROLLING"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -1050,7 +1176,10 @@
       "structure_match": false,
       "seeded": ["ROLLING"],
       "verified_structure": ["EA", "PRIORITY", "ROLLING"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -1082,7 +1211,10 @@
       "structure_match": true,
       "seeded": ["ROLLING"],
       "verified_structure": ["ROLLING", "PRIORITY"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ROLLING",
@@ -1108,7 +1240,10 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1131,33 +1266,44 @@
       "structure_match": true,
       "seeded": ["ED", "RD"],
       "verified_structure": ["ED", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
           "deadline": "2026-11-09",
           "decision_date": null,
-          "confidence": "medium"
+          "confidence": "high",
+          "verified": true
         },
         {
           "round_type": "RD",
           "deadline": "2027-01-05",
-          "decision_date": null,
-          "confidence": "medium"
+          "decision_date": "2027-03-20",
+          "confidence": "high",
+          "verified": true
         }
       ],
       "source": "amherst.edu/admission/apply/firstyear/calendar_deadlines",
       "flags": [
-        "deadlines page 405; dates from official snippets",
-        "ED is Nov 9"
-      ]
+        "VERIFIED fall-2027 on official page ('for enrollment in Fall 2027')",
+        "ED Nov 9 2026; RD Jan 5 2027; RD decisions Mar 20 2027"
+      ],
+      "cycle_verified": true,
+      "verified_by": "official_site_recheck",
+      "verified_date": "2026-08-12"
     },
     {
       "college": "Swarthmore College",
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1186,7 +1332,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1217,7 +1366,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1249,7 +1401,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1280,7 +1435,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1312,7 +1470,10 @@
       "structure_match": true,
       "seeded": ["EA", "ED", "ED_II", "RD"],
       "verified_structure": ["EA", "ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -1351,7 +1512,10 @@
       "structure_match": true,
       "seeded": ["ED", "ED_II", "RD"],
       "verified_structure": ["ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ED",
@@ -1383,7 +1547,10 @@
       "structure_match": false,
       "seeded": ["EA", "ED", "RD"],
       "verified_structure": ["EA", "ED", "ED_II", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -1422,33 +1589,44 @@
       "structure_match": true,
       "seeded": ["ROLLING"],
       "verified_structure": ["ROLLING", "PRIORITY"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "ROLLING",
-          "deadline": null,
+          "deadline": "2027-01-15",
           "decision_date": null,
-          "confidence": "high"
+          "confidence": "high",
+          "verified": true
         },
         {
           "round_type": "PRIORITY",
           "deadline": "2026-11-01",
           "decision_date": null,
-          "confidence": "high"
+          "confidence": "high",
+          "verified": true
         }
       ],
       "source": "admission.asu.edu/apply/first-year/admission",
       "flags": [
-        "CONFLICT on 'regular' date: Jan 15 vs Feb 1 across official pages (priority Nov 1 consistent)",
-        "'for fall 2027' confirmed"
-      ]
+        "VERIFIED fall-2027 on official page",
+        "Resolved: regular/final deadline Jan 15 (not Feb 1); priority Nov 1"
+      ],
+      "cycle_verified": true,
+      "verified_by": "official_site_recheck",
+      "verified_date": "2026-08-12"
     },
     {
       "college": "University of Massachusetts-Amherst",
       "structure_match": true,
       "seeded": ["EA", "RD"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "medium" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "medium"
+      },
       "rounds": [
         {
           "round_type": "EA",
@@ -1471,7 +1649,10 @@
       "structure_match": false,
       "seeded": ["ROLLING"],
       "verified_structure": ["EA", "RD"],
-      "test_policy": { "value": "test_optional", "confidence": "high" },
+      "test_policy": {
+        "value": "test_optional",
+        "confidence": "high"
+      },
       "rounds": [
         {
           "round_type": "EA",
