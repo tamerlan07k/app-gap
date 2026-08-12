@@ -41,21 +41,31 @@ Review that output before running live.
 ### Current application rounds/deadlines (`ingest-rounds.mjs`)
 
 Loads the round **structure** (which rounds each college offers) from
-`rounds-data.mjs` into `application_cycles` + `application_rounds`.
-Binding/restrictive/rolling are **derived from the round type** (definitional),
-never stored per-college. **Deadlines are never invented** — they stay pending
-(null, `verified_at` null) until filled from the official source and verified.
+`rounds-data.mjs` and enriches each round with the researched candidate
+deadlines/decision-dates/source/confidence from `rounds-candidates.json` into
+`application_cycles` + `application_rounds`. Binding/restrictive/rolling are
+**derived from the round type** (definitional), never stored per-college.
+**Deadlines are never invented** — the only dates written are the ones already
+in the researched candidate file, and every row is written with `verified_at`
+**null** (pending) regardless.
 
 ```bash
-node scripts/college-ingest/ingest-rounds.mjs --dry-run   # report structure + verification status
-node scripts/college-ingest/ingest-rounds.mjs             # live load (unverified seed)
+node scripts/college-ingest/ingest-rounds.mjs --dry-run   # per-college add/update/remove diff
+node scripts/college-ingest/ingest-rounds.mjs             # live load (all pending/unverified)
 ```
 
+The load is **idempotent and reconciling**: each cycle is brought to exactly the
+desired round set — new rounds inserted, existing updated, rounds no longer
+offered deleted — so re-running is a no-op. Same-type rounds are disambiguated
+by `name` (e.g. Georgia Tech's residency-split EA). Per-round confidence + notes
+go in `notes`; full per-college provenance (flags, conflicts, source) is written
+to `college_ingest_raw`.
+
 To **verify** a college: open its official admissions page, confirm the offered
-rounds, add `deadline_date` / `decision_release_date` (ISO `yyyy-mm-dd`) to each
-round in `rounds-data.mjs`, set the entry's `verified: true`, and re-run (the
-load is idempotent). The matching engine must consume **only** rows where
-`verified_at` is set, so the unverified seed is never trusted as fact.
+rounds + the candidate dates, set the entry's `verified: true` in
+`rounds-data.mjs`, and re-run. The matching engine must consume **only** rows
+where `verified_at` is set, so this whole unverified load is never trusted as
+fact.
 
 **`rounds-candidates.json`** holds WebFetch-derived candidate rounds/deadlines/
 decision-dates/test-policies for all 53 colleges, sourced from official
