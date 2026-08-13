@@ -1,0 +1,7 @@
+# Normalize line endings across every OS.
+#
+# `text=auto` lets git decide which files are text (binaries are left alone),
+# and `eol=lf` forces those text files to check out with LF everywhere —
+# including Windows. This ends the CRLF/LF churn that made files show as
+# "modified" and blocked `git pull` / `git checkout`.
+* text=auto eol=lf
