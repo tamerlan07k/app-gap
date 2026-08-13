@@ -9,23 +9,24 @@ import type {
 } from "~/lib/ai/writing-schema";
 import { ActivityWritingCard } from "./activity-writing-card";
 import { AdditionalInfoCard } from "./additional-info-card";
-import { ApplicationPreview } from "./application-preview";
 
-export type WritingActivityInput = {
+export type WorkspaceActivity = {
   name: string;
   category: string;
   description: string;
 };
 
-export function ApplicationWritingSection({
+// The Application Writing workspace: run the analysis, then review each activity
+// description as a scored card and the Additional Information response against
+// the Common App's own criteria. Mirrors the dashboard card styling exactly so
+// it feels native to My Profile.
+export function ApplicationWritingWorkspace({
   activities,
   additionalInfo,
   initialAnalysis,
   initialAnalyzedAt,
 }: {
-  /** Live activities that have a description. */
-  activities: WritingActivityInput[];
-  /** Live Additional Information response ("" if none). */
+  activities: WorkspaceActivity[];
   additionalInfo: string;
   initialAnalysis: WritingAnalysis | null;
   initialAnalyzedAt: string | null;
@@ -39,7 +40,7 @@ export function ApplicationWritingSection({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Match AI feedback to live activities by name.
+  // Match AI feedback back to live activities by name.
   const feedbackByName = useMemo(() => {
     const map = new Map<string, ActivityWritingFeedback>();
     for (const f of analysis?.activities ?? []) {
@@ -92,11 +93,12 @@ export function ApplicationWritingSection({
             </div>
             <div className="space-y-1">
               <h2 className="font-semibold tracking-tight">
-                Improve how your application communicates
+                Score and sharpen how your application reads
               </h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                AppGap finds opportunities to communicate your real experiences
-                more clearly — you stay the author. It never invents details.
+                AppGap scores each activity description out of 10 on its action
+                verb, specificity, and impact — then helps you communicate your
+                real experiences more clearly. It never invents details.
               </p>
               {analyzedDate && (
                 <p className="text-xs text-muted-foreground">
@@ -168,14 +170,6 @@ export function ApplicationWritingSection({
         <AdditionalInfoCard
           response={additionalInfo}
           feedback={analysis?.additionalInfo ?? null}
-        />
-      )}
-
-      {/* Application Preview */}
-      {hasContent && (
-        <ApplicationPreview
-          activities={activities}
-          additionalInfo={additionalInfo}
         />
       )}
     </section>
