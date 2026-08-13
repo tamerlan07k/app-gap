@@ -18,6 +18,12 @@ export const ACTIVITY_CHAR_LIMIT = 150;
  */
 export const ADDITIONAL_INFO_WORD_LIMIT = 300;
 
+/**
+ * Score above which an activity description is treated as already strong — we
+ * only offer a light "tweak a few things" polish note, never a full rewrite.
+ */
+export const ACTIVITY_STRONG_SCORE = 8;
+
 // ─── Counting ─────────────────────────────────────────────────────────────────
 
 /**
@@ -34,6 +40,44 @@ export function countWords(text: string): number {
   const trimmed = text.trim();
   if (!trimmed) return 0;
   return trimmed.split(/\s+/).length;
+}
+
+// ─── Activity writing score (code-computed overall) ───────────────────────────
+// The model rates three dimensions (0–10 each); the overall /10 is computed here
+// so the top-line number is deterministic and never left to the model. The mode
+// then decides what guidance the UI shows.
+
+/** How the UI should coach a given activity description. */
+export type ActivityWritingMode = "polish" | "rewrite" | "template";
+
+/** Average of the three criterion scores, rounded to a 0–10 integer. */
+export function computeActivityScore(criteria: {
+  actionVerb: { score: number };
+  specificity: { score: number };
+  impact: { score: number };
+}): number {
+  const mean =
+    (criteria.actionVerb.score +
+      criteria.specificity.score +
+      criteria.impact.score) /
+    3;
+  return Math.max(0, Math.min(10, Math.round(mean)));
+}
+
+/**
+ * Decide how to coach a description from its overall score and whether the
+ * profile has enough real detail to ground a truthful rewrite:
+ * - "polish"   — already strong (> 8/10): only a light tweak note.
+ * - "rewrite"  — improvable and groundable: show a truthful 10/10 rewrite.
+ * - "template" — improvable but too vague to improve without inventing facts:
+ *                show a fill-in-the-blank scaffold instead.
+ */
+export function activityWritingMode(
+  overall: number,
+  groundable: boolean,
+): ActivityWritingMode {
+  if (overall > ACTIVITY_STRONG_SCORE) return "polish";
+  return groundable ? "rewrite" : "template";
 }
 
 // ─── Objective issues ─────────────────────────────────────────────────────────

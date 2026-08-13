@@ -59,16 +59,22 @@ export async function POST() {
       tierConfig.model,
     );
 
-    // Cache the result; a failed insert is non-fatal — we still return the analysis.
+    // Cache the result as the user's single latest analysis (upsert in place on
+    // user_id — see migration 20260814000000). A failed write is non-fatal; we
+    // still return the analysis to the client.
     const { data: insertData, error: insertError } = await admin
       .from("writing_analyses")
-      .insert({
-        user_id: user.id,
-        analysis,
-        model: tierConfig.model,
-        prompt_tokens: promptTokens,
-        completion_tokens: completionTokens,
-      })
+      .upsert(
+        {
+          user_id: user.id,
+          analysis,
+          model: tierConfig.model,
+          prompt_tokens: promptTokens,
+          completion_tokens: completionTokens,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "user_id" },
+      )
       .select("id")
       .single();
 

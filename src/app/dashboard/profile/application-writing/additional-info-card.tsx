@@ -1,6 +1,13 @@
 "use client";
 
-import { Check, Pencil, Sparkles, TriangleAlert } from "lucide-react";
+import {
+  Check,
+  CircleCheck,
+  Pencil,
+  Sparkles,
+  Trash2,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
 import type { AdditionalInfoWritingFeedback } from "~/lib/ai/writing-schema";
 import { cn } from "~/lib/utils";
@@ -59,7 +66,7 @@ export function AdditionalInfoCard({
           </div>
         </div>
 
-        {/* Over-limit warning surfaced clearly, per spec */}
+        {/* Over-limit warning surfaced clearly */}
         {over && (
           <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
             <TriangleAlert className="mt-0.5 size-3.5 shrink-0" />
@@ -91,6 +98,54 @@ export function AdditionalInfoCard({
         {/* AI feedback */}
         {feedback ? (
           <div className="space-y-3 border-t border-border pt-4">
+            {/* Does it belong here? — the core Common App judgment */}
+            <div
+              className={cn(
+                "flex items-start gap-2 rounded-lg border p-3 text-sm",
+                feedback.belongs
+                  ? "border-brand-teal/20 bg-brand-teal/[0.04]"
+                  : "border-amber-300/50 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/20",
+              )}
+            >
+              {feedback.belongs ? (
+                <CircleCheck className="mt-0.5 size-4 shrink-0 text-brand-teal" />
+              ) : (
+                <TriangleAlert className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+              )}
+              <span className="leading-relaxed">
+                {feedback.belongs
+                  ? "This fits what the Additional Information section is for — context the rest of your application can't convey."
+                  : "Some of this doesn't fit what the Additional Information section is for. See what to remove below."}
+              </span>
+            </div>
+
+            {/* Consider removing — content that doesn't belong per Common App */}
+            {feedback.toRemove.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  Consider removing
+                </p>
+                <ul className="space-y-2">
+                  {feedback.toRemove.map((item) => (
+                    <li
+                      key={item.text}
+                      className="flex items-start gap-2 rounded-lg border border-border bg-muted/30 p-2.5"
+                    >
+                      <Trash2 className="mt-0.5 size-3.5 shrink-0 text-red-500" />
+                      <div className="space-y-0.5">
+                        <p className="text-sm leading-snug">
+                          &ldquo;{item.text}&rdquo;
+                        </p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">
+                          {item.reason}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {feedback.strengths.length > 0 && (
               <div className="space-y-1.5">
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">

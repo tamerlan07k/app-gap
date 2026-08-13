@@ -37,7 +37,7 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "application-writing",
     label: "Application Writing",
-    locked: true,
+    locked: false,
     description:
       "Get help writing your activity descriptions and the Additional Information section of the Common App.",
   },
