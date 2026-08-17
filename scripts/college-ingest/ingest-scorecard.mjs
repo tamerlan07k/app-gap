@@ -49,6 +49,10 @@ const FIELDS = [
 
 const args = process.argv.slice(2);
 const DRY_RUN = args.includes("--dry-run");
+// Skip seeds already present in the DB (by canonical name). Keeps re-runs cheap
+// and, crucially, avoids re-touching already-ingested colleges (no bumped
+// updated_at, no duplicate raw-provenance rows) when expanding the seed list.
+const SKIP_EXISTING = args.includes("--skip-existing");
 const limitArg = args.find((a) => a.startsWith("--limit"));
 const LIMIT = limitArg
   ? Number(limitArg.split("=")[1] ?? args[args.indexOf(limitArg) + 1])
@@ -306,11 +310,34 @@ async function persist(rec, mapped) {
 // ─── main ───────────────────────────────────────────────────────────────────
 
 async function main() {
-  const seeds = SEED_COLLEGES.filter(
+  let seeds = SEED_COLLEGES.filter(
     (s) => !FILTER || s.name.toLowerCase().includes(FILTER.toLowerCase()),
   ).slice(0, LIMIT);
+
+  // Optionally drop seeds already ingested (by canonical name) so an expansion
+  // run only writes the genuinely new colleges and leaves existing rows untouched.
+  let skipped = 0;
+  if (SKIP_EXISTING && db) {
+    const existing = new Set();
+    let from = 0;
+    for (;;) {
+      const { data, error } = await db
+        .from("colleges")
+        .select("canonical_name")
+        .range(from, from + 999);
+      if (error) throw new Error(`load existing colleges: ${error.message}`);
+      for (const r of data ?? []) existing.add(normalizeName(r.canonical_name));
+      if (!data || data.length < 1000) break;
+      from += 1000;
+    }
+    const before = seeds.length;
+    seeds = seeds.filter((s) => !existing.has(normalizeName(s.name)));
+    skipped = before - seeds.length;
+  }
+
   console.log(
-    `${DRY_RUN ? "[DRY RUN] " : ""}Scorecard ingest — ${seeds.length} colleges, ` +
+    `${DRY_RUN ? "[DRY RUN] " : ""}Scorecard ingest — ${seeds.length} colleges` +
+      `${skipped ? ` (${skipped} already in DB, skipped)` : ""}, ` +
       `academic_year="${ACADEMIC_YEAR}"${SCORECARD_KEY === "DEMO_KEY" ? " (DEMO_KEY: low rate limit)" : ""}\n`,
   );
 
