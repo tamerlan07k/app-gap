@@ -283,4 +283,506 @@ export const COLLEGE_ROUNDS = [
     verified: false,
     rounds: ["EA", "RD"],
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V2 expansion (+128). ROUND STRUCTURE ONLY, all `verified: false`. These reflect
+  // each school's well-known round offerings, but NO deadlines are attached here
+  // and these schools are intentionally NOT in rounds-candidates.json — so the
+  // loader writes each cycle + rounds with deadline_date = null and
+  // verified_at = null (pending). The matching engine ignores them until a human
+  // opens the official site, adds candidate dates, and sets `verified: true`.
+  // `name` MUST exactly equal colleges.canonical_name (the Scorecard name).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── UCs: single Nov filing window (modeled as RD, like the V1 UCs) ─────────
+  {
+    name: "University of California-San Diego",
+    verified: false,
+    rounds: ["RD"],
+  },
+  { name: "University of California-Davis", verified: false, rounds: ["RD"] },
+  { name: "University of California-Irvine", verified: false, rounds: ["RD"] },
+  {
+    name: "University of California-Santa Barbara",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "University of California-Santa Cruz",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "University of California-Riverside",
+    verified: false,
+    rounds: ["RD"],
+  },
+  { name: "University of California-Merced", verified: false, rounds: ["RD"] },
+
+  // ── Selective privates ─────────────────────────────────────────────────────
+  {
+    name: "Boston College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "William & Mary", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Wake Forest University",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  {
+    name: "University of Rochester",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Case Western Reserve University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Tulane University of Louisiana",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Brandeis University",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  { name: "Lehigh University", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Villanova University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "University of Miami",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+
+  // ── Public flagships (selective → moderate) ────────────────────────────────
+  { name: "University of Georgia", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "University of Maryland-College Park",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Purdue University-Main Campus",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "University of Minnesota-Twin Cities",
+    verified: false,
+    rounds: ["PRIORITY", "ROLLING"],
+  },
+  {
+    name: "Rutgers University-New Brunswick",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "Indiana University-Bloomington",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "University of Connecticut", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Virginia Polytechnic Institute and State University",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  {
+    name: "North Carolina State University at Raleigh",
+    verified: false,
+    rounds: ["ED", "RD"],
+  },
+  {
+    name: "Texas A&M University-College Station",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "University of Colorado Boulder",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "The University of Texas at Dallas",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "University of Iowa",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  { name: "Florida State University", verified: false, rounds: ["RD"] },
+  { name: "Clemson University", verified: false, rounds: ["EA", "RD"] },
+  { name: "University of Delaware", verified: false, rounds: ["EA", "RD"] },
+  { name: "Stony Brook University", verified: false, rounds: ["EA", "RD"] },
+
+  // ── CS / engineering specialists ───────────────────────────────────────────
+  {
+    name: "Rensselaer Polytechnic Institute",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Worcester Polytechnic Institute",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Rose-Hulman Institute of Technology",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  {
+    name: "Stevens Institute of Technology",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Illinois Institute of Technology",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Colorado School of Mines",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  {
+    name: "Missouri University of Science and Technology",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "New Jersey Institute of Technology",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Michigan Technological University",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "California Polytechnic State University-San Luis Obispo",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "Rochester Institute of Technology",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Drexel University", verified: false, rounds: ["EA", "ED", "RD"] },
+
+  // ── Business / economics ───────────────────────────────────────────────────
+  {
+    name: "Bentley University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Babson College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "University of Richmond",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Southern Methodist University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Texas Christian University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Baylor University", verified: false, rounds: ["EA", "ED", "RD"] },
+
+  // ── Liberal arts colleges ──────────────────────────────────────────────────
+  { name: "Carleton College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Davidson College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Colby College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  { name: "Bates College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  { name: "Hamilton College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Colgate University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Vassar College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  { name: "Grinnell College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  { name: "Haverford College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Bucknell University",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  {
+    name: "Colorado College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Oberlin College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Kenyon College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Macalester College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Barnard College", verified: false, rounds: ["ED", "RD"] },
+  {
+    name: "Smith College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Mount Holyoke College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Occidental College",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  {
+    name: "Dickinson College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Skidmore College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  { name: "Reed College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Whitman College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Furman University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Gettysburg College",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Franklin and Marshall College",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  { name: "Lafayette College", verified: false, rounds: ["ED", "ED_II", "RD"] },
+  {
+    name: "Wesleyan University",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  {
+    name: "Denison University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+
+  // ── National universities: humanities / social science / general ───────────
+  {
+    name: "George Washington University",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  {
+    name: "American University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Syracuse University", verified: false, rounds: ["ED", "RD"] },
+  {
+    name: "Pepperdine University",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  {
+    name: "Santa Clara University",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  {
+    name: "University of Denver",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Loyola Marymount University",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  { name: "Chapman University", verified: false, rounds: ["EA", "ED", "RD"] },
+
+  // ── Moderately selective / safety-option publics ───────────────────────────
+  { name: "San Diego State University", verified: false, rounds: ["RD"] },
+  { name: "University of Oregon", verified: false, rounds: ["EA", "RD"] },
+  { name: "Oregon State University", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Washington State University",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "University of Arizona",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  { name: "University of Utah", verified: false, rounds: ["PRIORITY", "RD"] },
+  {
+    name: "University of Kansas",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "University of Nebraska-Lincoln",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "University of Missouri-Columbia",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "University of Oklahoma-Norman Campus",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "University of Kentucky",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "The University of Tennessee-Knoxville",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "The University of Alabama",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  { name: "Auburn University", verified: false, rounds: ["PRIORITY", "RD"] },
+  {
+    name: "University of South Carolina-Columbia",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "University of Cincinnati-Main Campus",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "University of Houston",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "Texas Tech University",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  { name: "University of Central Florida", verified: false, rounds: ["RD"] },
+  {
+    name: "University of South Florida",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "Georgia State University",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "Iowa State University",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
+  {
+    name: "Colorado State University-Fort Collins",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "University of Vermont",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  {
+    name: "Miami University-Oxford",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+
+  // ── Regional / less-selective privates ─────────────────────────────────────
+  { name: "DePaul University", verified: false, rounds: ["EA", "ED", "RD"] },
+  { name: "Marquette University", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Loyola University Chicago",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  { name: "Gonzaga University", verified: false, rounds: ["EA", "ED", "RD"] },
+  {
+    name: "Elon University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  {
+    name: "Clark University",
+    verified: false,
+    rounds: ["EA", "ED", "ED_II", "RD"],
+  },
+  { name: "Hofstra University", verified: false, rounds: ["EA", "ED", "RD"] },
+  {
+    name: "University of San Diego",
+    verified: false,
+    rounds: ["EA", "ED", "RD"],
+  },
+  { name: "Seattle University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Creighton University", verified: false, rounds: ["EA", "RD"] },
+
+  // ── HBCUs / access-oriented ────────────────────────────────────────────────
+  { name: "Howard University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Spelman College", verified: false, rounds: ["EA", "ED", "RD"] },
+  { name: "Morehouse College", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Florida Agricultural and Mechanical University",
+    verified: false,
+    rounds: ["PRIORITY", "RD"],
+  },
+  {
+    name: "North Carolina A & T State University",
+    verified: false,
+    rounds: ["ROLLING", "PRIORITY"],
+  },
 ];

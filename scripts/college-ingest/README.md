@@ -30,6 +30,10 @@ node scripts/college-ingest/ingest-scorecard.mjs --dry-run --limit 5
 # stores the raw payload in college_ingest_raw. Idempotent (safe to re-run).
 node scripts/college-ingest/ingest-scorecard.mjs
 
+# Expansion run — only ingest seeds NOT already in the DB (by canonical name), so
+# existing rows are left untouched (no bumped updated_at, no duplicate raw rows).
+node scripts/college-ingest/ingest-scorecard.mjs --skip-existing
+
 # Optional: label the Scorecard vintage year explicitly (see note below).
 node scripts/college-ingest/ingest-scorecard.mjs --year 2022-2023
 ```
@@ -52,7 +56,16 @@ in the researched candidate file, and every row is written with `verified_at`
 ```bash
 node scripts/college-ingest/ingest-rounds.mjs --dry-run   # per-college add/update/remove diff
 node scripts/college-ingest/ingest-rounds.mjs             # live load (all pending/unverified)
+
+# Expansion run — only load colleges without a cycle for the current cycle_year,
+# leaving already-loaded cycles/rounds (and their verification) untouched.
+node scripts/college-ingest/ingest-rounds.mjs --skip-existing
 ```
+
+Colleges present in `rounds-data.mjs` but **absent from `rounds-candidates.json`**
+(e.g. the V2 expansion) load as **structure-only**: their cycle + rounds are
+written with `deadline_date = null` and `verified_at = null` (pending). No dates
+are invented — they are filled by a later verification pass.
 
 The load is **idempotent and reconciling**: each cycle is brought to exactly the
 desired round set — new rounds inserted, existing updated, rounds no longer
