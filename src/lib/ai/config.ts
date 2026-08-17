@@ -10,9 +10,10 @@
 export type FeatureKey =
   | "profileAnalysis" // the AppGap diagnostic / gap analysis
   | "applicationWriting" // activity descriptions + Additional Information help
+  | "activitiesAnalysis" // Activities workspace: analysis + verdicts + recommendations
   | "personalStatementCoach" // Personal Statement coaching (future)
   | "supplementalCoach" // supplemental-essay coaching (future)
-  | "opportunityFinder"; // internships / research / competitions finder (future)
+  | "opportunityFinder"; // internships / research / competitions finder (future, data-backed)
 
 export type FeatureConfig = {
   /** Provider/model ID for the AI gateway (format: "provider/model-name") */
@@ -38,6 +39,12 @@ export const AI_FEATURES = {
     temperature: 0.4,
     description:
       "Communication feedback on activity descriptions and Additional Information",
+  },
+  activitiesAnalysis: {
+    model: "openai/gpt-4o-mini",
+    temperature: 0.4,
+    description:
+      "Analyzes existing activities (strength, field alignment, continue/deepen verdicts) and generates realistic, timeline-aware activity recommendations",
   },
 } satisfies Partial<Record<FeatureKey, FeatureConfig>>;
 
@@ -124,6 +131,24 @@ export const FEATURE_ACCESS: Record<
     pro: {
       enabled: true,
       limit: 100,
+      window: "month",
+      model: "google/gemini-2.5-pro",
+    },
+  },
+  // Activities workspace analysis + recommendations. Iterative like Application
+  // Writing (a student re-runs it as their activities change), so the Free
+  // allowance is a weekly refresh rather than a one-shot lifetime cap, and Pro
+  // gets a bounded monthly allowance. Tune here to control AI cost.
+  activitiesAnalysis: {
+    free: {
+      enabled: true,
+      limit: 1,
+      window: "week",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 30,
       window: "month",
       model: "google/gemini-2.5-pro",
     },

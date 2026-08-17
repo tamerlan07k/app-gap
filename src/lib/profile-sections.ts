@@ -30,7 +30,7 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "activities",
     label: "Activities",
-    locked: true,
+    locked: false,
     description:
       "Manage your activities list — descriptions, hours, roles, and impact — as a living part of your application.",
   },
