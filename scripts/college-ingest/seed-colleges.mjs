@@ -1,4 +1,4 @@
-// College seed list (181 = V1 ~53 + V2 +128).
+// College seed list (281 = V1 ~53 + V2 +128 + V3 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -671,5 +671,477 @@ export const SEED_COLLEGES = [
     name: "North Carolina A & T State University",
     state: "NC",
     notes: "HBCU; public; engineering",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V3 expansion (+100). Chosen to de-skew the dataset away from elite schools:
+  // heavy on accessible public flagships, regional publics, and mid/less-
+  // selective privates so chancing produces realistic target/likely/safety
+  // options — plus geographic fill (every state that had 0 colleges: AK AR HI ID
+  // MT MS ND NM NV SD WV WY) and program breadth (CS, engineering, business,
+  // humanities/social science, liberal arts). Seeded by NAME + STATE only; the
+  // ingester resolves each to an IPEDS unitid via Scorecard and logs the match.
+  // Names below are best-effort Scorecard canonical names, corrected by the
+  // --dry-run no-match/ambiguous report before the live run.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Flagship / large publics in previously-uncovered states (geo fill) ─────
+  {
+    name: "University of Arkansas",
+    state: "AR",
+    notes: "flagship public; geo fill AR",
+  },
+  {
+    name: "University of Mississippi",
+    state: "MS",
+    notes: "flagship public; geo fill MS",
+  },
+  {
+    name: "Mississippi State University",
+    state: "MS",
+    notes: "public; engineering/ag",
+  },
+  {
+    name: "University of Hawaii at Manoa",
+    state: "HI",
+    notes: "flagship public; geo fill HI",
+  },
+  {
+    name: "University of Idaho",
+    state: "ID",
+    notes: "flagship public; geo fill ID",
+  },
+  { name: "Boise State University", state: "ID", notes: "public; CS/business" },
+  {
+    name: "Montana State University",
+    state: "MT",
+    notes: "public; engineering; geo fill MT",
+  },
+  {
+    name: "The University of Montana",
+    state: "MT",
+    notes: "public; humanities/forestry",
+  },
+  {
+    name: "University of Nevada-Las Vegas",
+    state: "NV",
+    notes: "public; geo fill NV; hospitality",
+  },
+  {
+    name: "University of Nevada-Reno",
+    state: "NV",
+    notes: "public; engineering/journalism",
+  },
+  {
+    name: "University of New Mexico-Main Campus",
+    state: "NM",
+    notes: "flagship public; geo fill NM",
+  },
+  {
+    name: "New Mexico State University-Main Campus",
+    state: "NM",
+    notes: "public; engineering/ag",
+  },
+  {
+    name: "North Dakota State University-Main Campus",
+    state: "ND",
+    notes: "public; engineering; geo fill ND",
+  },
+  {
+    name: "University of North Dakota",
+    state: "ND",
+    notes: "public; aviation/energy",
+  },
+  {
+    name: "South Dakota State University",
+    state: "SD",
+    notes: "public; ag/engineering; geo fill SD",
+  },
+  {
+    name: "University of South Dakota",
+    state: "SD",
+    notes: "public; business/health",
+  },
+  {
+    name: "West Virginia University",
+    state: "WV",
+    notes: "flagship public; geo fill WV",
+  },
+  {
+    name: "University of Wyoming",
+    state: "WY",
+    notes: "flagship public; geo fill WY; low COA",
+  },
+  {
+    name: "University of Alaska Fairbanks",
+    state: "AK",
+    notes: "public; arctic research; geo fill AK",
+  },
+  {
+    name: "University of Alaska Anchorage",
+    state: "AK",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of New Hampshire-Main Campus",
+    state: "NH",
+    notes: "flagship public; thin state",
+  },
+  {
+    name: "University of Rhode Island",
+    state: "RI",
+    notes: "flagship public; thin state",
+  },
+  {
+    name: "University of Maine",
+    state: "ME",
+    notes: "flagship public; thin state",
+  },
+
+  // ── Additional public universities / regional publics (target/safety) ──────
+  {
+    name: "University of Louisville",
+    state: "KY",
+    notes: "public; health/business",
+  },
+  {
+    name: "Louisiana State University and Agricultural & Mechanical College",
+    state: "LA",
+    notes: "flagship public; thin state LA",
+  },
+  {
+    name: "Oklahoma State University-Main Campus",
+    state: "OK",
+    notes: "public; engineering/ag",
+  },
+  {
+    name: "University of Memphis",
+    state: "TN",
+    notes: "public; access-oriented; urban",
+  },
+  {
+    name: "University of Alabama at Birmingham",
+    state: "AL",
+    notes: "public; health/CS; R1",
+  },
+  {
+    name: "Kansas State University",
+    state: "KS",
+    notes: "public; engineering/ag",
+  },
+  {
+    name: "Wichita State University",
+    state: "KS",
+    notes: "public; aerospace engineering",
+  },
+  {
+    name: "University of Wisconsin-Milwaukee",
+    state: "WI",
+    notes: "public; access-oriented; urban",
+  },
+  {
+    name: "Wayne State University",
+    state: "MI",
+    notes: "public; urban; health/medicine",
+  },
+  {
+    name: "Western Michigan University",
+    state: "MI",
+    notes: "public; aviation/business",
+  },
+  {
+    name: "Ohio University-Main Campus",
+    state: "OH",
+    notes: "public; journalism/business",
+  },
+  {
+    name: "Kent State University at Kent",
+    state: "OH",
+    notes: "public; fashion/aeronautics",
+  },
+  {
+    name: "Bowling Green State University-Main Campus",
+    state: "OH",
+    notes: "public; safety",
+  },
+  {
+    name: "University of Illinois Chicago",
+    state: "IL",
+    notes: "public R1; CS/health; urban",
+  },
+  {
+    name: "Portland State University",
+    state: "OR",
+    notes: "public; urban; access-oriented",
+  },
+  {
+    name: "Western Washington University",
+    state: "WA",
+    notes: "public; environmental/education",
+  },
+  {
+    name: "San Jose State University",
+    state: "CA",
+    notes: "public; CS; Silicon Valley pipeline",
+  },
+  {
+    name: "San Francisco State University",
+    state: "CA",
+    notes: "public; access-oriented; urban",
+  },
+  {
+    name: "California State University-Long Beach",
+    state: "CA",
+    notes: "public; engineering/business",
+  },
+  {
+    name: "California State University-Fullerton",
+    state: "CA",
+    notes: "public; business/CS; large",
+  },
+  {
+    name: "California State Polytechnic University-Pomona",
+    state: "CA",
+    notes: "public polytechnic; engineering",
+  },
+  {
+    name: "University at Buffalo",
+    state: "NY",
+    notes: "public R1 (SUNY); engineering/CS",
+  },
+  {
+    name: "Binghamton University",
+    state: "NY",
+    notes: "public (SUNY); selective; business",
+  },
+  {
+    name: "University at Albany",
+    state: "NY",
+    notes: "public (SUNY); public policy/CS",
+  },
+  {
+    name: "The College of New Jersey",
+    state: "NJ",
+    notes: "public; selective; engineering/business",
+  },
+  {
+    name: "Montclair State University",
+    state: "NJ",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "George Mason University",
+    state: "VA",
+    notes: "public R1; CS/econ; large",
+  },
+  {
+    name: "James Madison University",
+    state: "VA",
+    notes: "public; business/education",
+  },
+  {
+    name: "Virginia Commonwealth University",
+    state: "VA",
+    notes: "public; arts/health; urban",
+  },
+  {
+    name: "University of North Carolina at Charlotte",
+    state: "NC",
+    notes: "public; engineering/business; urban",
+  },
+  {
+    name: "Appalachian State University",
+    state: "NC",
+    notes: "public; business/education",
+  },
+  {
+    name: "East Carolina University",
+    state: "NC",
+    notes: "public; health/business; access-oriented",
+  },
+  {
+    name: "Florida International University",
+    state: "FL",
+    notes: "public R1; CS/business; large HSI",
+  },
+  {
+    name: "Florida Atlantic University",
+    state: "FL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "The University of Texas at San Antonio",
+    state: "TX",
+    notes: "public; cybersecurity/business",
+  },
+  {
+    name: "University of North Texas",
+    state: "TX",
+    notes: "public; music/business; large",
+  },
+  {
+    name: "Texas State University",
+    state: "TX",
+    notes: "public; access-oriented; large",
+  },
+  {
+    name: "The University of Texas at Arlington",
+    state: "TX",
+    notes: "public; engineering/nursing",
+  },
+  {
+    name: "Kennesaw State University",
+    state: "GA",
+    notes: "public; business/CS; large",
+  },
+  {
+    name: "Georgia Southern University",
+    state: "GA",
+    notes: "public; engineering/business",
+  },
+  {
+    name: "University of Maryland-Baltimore County",
+    state: "MD",
+    notes: "public R1; CS; strong STEM",
+  },
+  {
+    name: "Towson University",
+    state: "MD",
+    notes: "public; business/education",
+  },
+  {
+    name: "College of Charleston",
+    state: "SC",
+    notes: "public LAC-style; humanities",
+  },
+  {
+    name: "Northern Arizona University",
+    state: "AZ",
+    notes: "public; forestry/health",
+  },
+  {
+    name: "Utah State University",
+    state: "UT",
+    notes: "public; engineering/ag",
+  },
+  {
+    name: "University of Nebraska at Omaha",
+    state: "NE",
+    notes: "public; CS/business; urban",
+  },
+
+  // ── Liberal arts colleges (target/safety; humanities/social science/econ) ──
+  {
+    name: "Harvey Mudd College",
+    state: "CA",
+    notes: "LAC; elite engineering/CS (Claremont)",
+  },
+  {
+    name: "Claremont McKenna College",
+    state: "CA",
+    notes: "LAC; econ/government (Claremont)",
+  },
+  {
+    name: "Scripps College",
+    state: "CA",
+    notes: "LAC; women's; humanities (Claremont)",
+  },
+  {
+    name: "Pitzer College",
+    state: "CA",
+    notes: "LAC; social sciences (Claremont)",
+  },
+  {
+    name: "Trinity College",
+    state: "CT",
+    notes: "LAC; humanities/social science",
+  },
+  { name: "Connecticut College", state: "CT", notes: "LAC; humanities/arts" },
+  { name: "Bard College", state: "NY", notes: "LAC; arts/humanities" },
+  { name: "Sarah Lawrence College", state: "NY", notes: "LAC; writing/arts" },
+  {
+    name: "Union College",
+    state: "NY",
+    notes: "LAC; engineering + liberal arts",
+  },
+  { name: "St Olaf College", state: "MN", notes: "LAC; music/STEM" },
+  { name: "Lawrence University", state: "WI", notes: "LAC + conservatory" },
+  { name: "Beloit College", state: "WI", notes: "LAC; social science" },
+  { name: "DePauw University", state: "IN", notes: "LAC; business/media" },
+  { name: "Rhodes College", state: "TN", notes: "LAC; pre-health/humanities" },
+  { name: "Centre College", state: "KY", notes: "LAC; humanities" },
+  {
+    name: "Willamette University",
+    state: "OR",
+    notes: "LAC; social science/business",
+  },
+  {
+    name: "Lewis & Clark College",
+    state: "OR",
+    notes: "LAC; environmental/humanities",
+  },
+  {
+    name: "The College of Wooster",
+    state: "OH",
+    notes: "LAC; research/mentoring",
+  },
+
+  // ── Mid-selective private universities (target/safety; business/eng/health) ─
+  { name: "Bryant University", state: "RI", notes: "private; business focus" },
+  {
+    name: "Fairfield University",
+    state: "CT",
+    notes: "private Jesuit; business/nursing",
+  },
+  {
+    name: "Providence College",
+    state: "RI",
+    notes: "private; humanities/business",
+  },
+  {
+    name: "Quinnipiac University",
+    state: "CT",
+    notes: "private; health/business",
+  },
+  {
+    name: "Drake University",
+    state: "IA",
+    notes: "private; business/pharmacy",
+  },
+  {
+    name: "University of Dayton",
+    state: "OH",
+    notes: "private Catholic; engineering",
+  },
+  {
+    name: "Duquesne University",
+    state: "PA",
+    notes: "private; health/business",
+  },
+  { name: "Belmont University", state: "TN", notes: "private; music business" },
+  {
+    name: "University of the Pacific",
+    state: "CA",
+    notes: "private; pharmacy/engineering",
+  },
+  {
+    name: "Clarkson University",
+    state: "NY",
+    notes: "private; engineering/business",
+  },
+  {
+    name: "Trinity University",
+    state: "TX",
+    notes: "private LAC-style; business/STEM",
+  },
+  {
+    name: "Saint Louis University",
+    state: "MO",
+    notes: "private Jesuit; health/business",
+  },
+  {
+    name: "Brigham Young University",
+    state: "UT",
+    notes: "private; business/CS; large",
   },
 ];
