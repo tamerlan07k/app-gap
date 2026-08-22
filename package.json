@@ -8,6 +8,7 @@
     "start": "next start",
     "format": "biome format --write .",
     "lint": "biome check .",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "preinstall": "npx only-allow pnpm"
   },
@@ -39,7 +40,8 @@
     "@types/react-dom": "^19",
     "supabase": "^2.107.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.11"
   },
   "packageManager": "pnpm@11.7.0",
   "engines": {

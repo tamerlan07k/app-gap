@@ -35,13 +35,80 @@ export interface MatchProfile {
   actScore: number | null;
 }
 
+/** A college's test-score policy for the current cycle, when known. */
+export type TestPolicy =
+  | "required"
+  | "optional"
+  | "blind"
+  | "considered"
+  | "unknown";
+
+/** How confident the assessment is, driven by data completeness — never by how
+ * strong the applicant is. */
+export type Confidence = "high" | "medium" | "low";
+
+/** A bounded personal-chance range (0..1 fractions). We present a range, never a
+ * lone precise percentage, to avoid false precision at selective schools. */
+export interface ChanceRange {
+  low: number;
+  high: number;
+}
+
+/** A short human-readable factor explaining the assessment. */
+export interface AdmissionDriver {
+  kind: "positive" | "caution" | "info";
+  text: string;
+}
+
 export interface AdmissionFit {
   category: MatchCategory;
-  /** Estimated personal admission chance (0..1), or null if unrated. */
+  /**
+   * A finer-grained display label layered on top of `category`. "reach" splits
+   * into "Reach" vs "High Reach" for ultra-selective schools. `category` stays
+   * canonical (safety/target/reach/unrated) so grouping and list-building are
+   * unaffected.
+   */
+  displayCategory: string;
+  /**
+   * Representative point estimate (0..1) — the MIDPOINT of `chanceRange`. Kept
+   * for sorting and backward compatibility only; never shown alone in the UI.
+   */
   chance: number | null;
+  /** The bounded chance range shown to the user, or null if unrated. */
+  chanceRange: ChanceRange | null;
+  /** Confidence from data completeness, or null if unrated. */
+  confidence: Confidence | null;
+  /** Concise factors explaining WHY (in-range academics, selectivity, etc.). */
+  drivers: AdmissionDriver[];
+  /** The college's overall admit rate (0..1), surfaced alongside the estimate. */
+  collegeAdmitRate: number | null;
+  /** 0..1 fraction of the signals we'd want that were actually available. */
+  dataCompleteness: number;
   rationale: string;
-  /** Lower confidence when the profile lacks test scores. */
+  /** Lower confidence when the profile lacks test scores (back-compat flag). */
   lowConfidence: boolean;
+  /** Which version of the admission model produced this, for auditability. */
+  modelVersion: string;
+}
+
+/**
+ * Normalized applicant-strength vector (Layer 2), all fields on a 0..1 scale.
+ * Derived ONCE from the cached LLM component scores and reused everywhere so a
+ * given student is consistently strong across all colleges. This is absolute
+ * strength — it says nothing about any specific college.
+ */
+export interface ApplicantStrength {
+  /** Absolute academic quality (LLM). Used as a fallback signal, not stacked on
+   * top of the college-relative academic position. */
+  academics: number | null;
+  activities: number | null;
+  awards: number | null;
+  /** Placeholder for essays/personal narrative — 0-weight until essays exist. */
+  narrative: number;
+  /** The holistic lift signal (activities + awards + narrative), 0..1. */
+  holistic: number;
+  /** True only when real cached component scores backed this vector. */
+  hasHolistic: boolean;
 }
 
 // ─── Field dimension ──────────────────────────────────────────────────────────

@@ -4,7 +4,9 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { CollegeFieldData } from "./evaluate";
+import { deriveApplicantStrength, neutralStrength } from "./strength";
 import {
+  type ApplicantStrength,
   type ApplicationRound,
   type CollegeCycle,
   type CollegeWithData,
@@ -68,6 +70,39 @@ export async function loadMatchProfile(
     satScore: data.sat_score ?? null,
     actScore: data.act_score ?? null,
   };
+}
+
+/**
+ * Load the student's holistic Applicant Strength (Layer 2) from their most
+ * recent cached profile analysis. Reuses the LLM component scores already stored
+ * on `ai_analyses.analysis.componentScores` — it never triggers a new analysis.
+ * Returns a neutral vector (hasHolistic = false) when no analysis exists yet, so
+ * the assessment lowers confidence rather than assuming an average applicant.
+ */
+export async function loadApplicantStrength(
+  client: SupabaseClient,
+  userId: string,
+): Promise<ApplicantStrength> {
+  const { data } = await client
+    .from("ai_analyses")
+    .select("analysis")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const components = (
+    data?.analysis as { componentScores?: unknown } | null | undefined
+  )?.componentScores as
+    | {
+        academics?: { score: number };
+        activities?: { score: number };
+        awards?: { score: number };
+      }
+    | undefined;
+
+  if (!components) return neutralStrength();
+  return deriveApplicantStrength(components);
 }
 
 export interface SavedCollege {
