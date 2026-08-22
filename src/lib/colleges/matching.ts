@@ -10,8 +10,11 @@
 // ranking, or name. A college with no usable stats is `unrated`; we never invent
 // numbers to force a category.
 
+import { type AssessOptions, assessAdmission } from "./assessment";
+import { neutralStrength } from "./strength";
 import type {
   AdmissionFit,
+  ApplicantStrength,
   CollegeStats,
   CollegeWithData,
   MatchCategory,
@@ -125,48 +128,29 @@ export function estimateChance(
   return clamp(chance, 0.01, 0.99);
 }
 
-function categoryFor(
-  chance: number | null,
-  admitRate: number | null,
-): MatchCategory {
-  if (chance == null) return "unrated";
-  let category: MatchCategory =
-    chance >= 0.65 ? "safety" : chance >= 0.3 ? "target" : "reach";
-  // Reality guard: a sub-12% school is never a "safety" regardless of scores.
-  if (category === "safety" && admitRate != null && admitRate < 0.12) {
-    category = "target";
-  }
-  return category;
-}
-
-function pct(n: number): string {
-  return `${Math.round(n * 100)}%`;
-}
-
-/** Classify the ADMISSION dimension for a college. */
+/**
+ * Classify the ADMISSION dimension for a college.
+ *
+ * As of the V2 admission model this delegates to the structured assessment
+ * engine (see assessment.ts), which blends the student's college-relative
+ * academic position WITH their holistic applicant strength and expresses
+ * uncertainty as a range + confidence rather than a lone precise percentage.
+ *
+ * `strength` defaults to a neutral vector so legacy callers (e.g.
+ * buildBalancedList) keep working; passing the real applicant strength is what
+ * makes two profiles with the same test score diverge at selective colleges.
+ *
+ * The legacy point-estimate core (estimateChance, above) is intentionally
+ * retained for reference and comparison until the new model is fully verified in
+ * production.
+ */
 export function classifyAdmission(
   profile: MatchProfile,
   stats: CollegeStats | null,
+  strength: ApplicantStrength = neutralStrength(),
+  options: AssessOptions = {},
 ): AdmissionFit {
-  const chance = estimateChance(profile, stats);
-  const admitRate = stats?.admitRate ?? null;
-  const category = categoryFor(chance, admitRate);
-  const lowConfidence = studentSat(profile) == null && category !== "unrated";
-
-  let rationale: string;
-  if (category === "unrated") {
-    rationale = "Not enough admission data to classify yet.";
-  } else {
-    const chancePart = chance != null ? `~${pct(chance)} estimated chance` : "";
-    const ratePart =
-      admitRate != null ? `${pct(admitRate)} overall admit rate` : "";
-    const parts = [chancePart, ratePart].filter(Boolean);
-    rationale = lowConfidence
-      ? `Based on selectivity only (add a test score for a sharper estimate) — ${parts.join(", ")}.`
-      : `${parts.join(", ")}.`;
-  }
-
-  return { category, chance, rationale, lowConfidence };
+  return assessAdmission(profile, stats, strength, options);
 }
 
 /**

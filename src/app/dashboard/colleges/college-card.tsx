@@ -1,9 +1,17 @@
-import { BadgeCheck, CircleHelp } from "lucide-react";
+import {
+  BadgeCheck,
+  Check,
+  CircleHelp,
+  Info,
+  TriangleAlert,
+} from "lucide-react";
+import { formatChanceRange } from "~/lib/colleges/assessment";
 import { fieldRatingLabel } from "~/lib/colleges/field-fit";
-import { categoryLabel } from "~/lib/colleges/matching";
 import type {
+  AdmissionDriver,
   ApplicationRound,
   CollegeMatch,
+  Confidence,
   FieldRating,
   MatchCategory,
 } from "~/lib/colleges/types";
@@ -28,6 +36,33 @@ const FIELD_STYLES: Record<FieldRating, string> = {
   unknown: "bg-muted text-muted-foreground",
   not_applicable: "bg-muted text-muted-foreground",
 };
+
+const CONFIDENCE_LABEL: Record<Confidence, string> = {
+  high: "High",
+  medium: "Medium",
+  low: "Low",
+};
+
+function DriverRow({ driver }: { driver: AdmissionDriver }) {
+  const Icon =
+    driver.kind === "positive"
+      ? Check
+      : driver.kind === "caution"
+        ? TriangleAlert
+        : Info;
+  const color =
+    driver.kind === "positive"
+      ? "text-emerald-600 dark:text-emerald-400"
+      : driver.kind === "caution"
+        ? "text-amber-600 dark:text-amber-400"
+        : "text-muted-foreground";
+  return (
+    <li className="flex items-start gap-1.5 text-xs text-muted-foreground">
+      <Icon className={cn("mt-0.5 size-3 shrink-0", color)} />
+      <span>{driver.text}</span>
+    </li>
+  );
+}
 
 function RoundRow({ round }: { round: ApplicationRound }) {
   const deadline = formatDeadline(round.deadlineDate);
@@ -113,11 +148,11 @@ export function CollegeCard({
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             <span
               className={cn(
-                "rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                "rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide",
                 CATEGORY_STYLES[admission.category],
               )}
             >
-              {categoryLabel(admission.category)}
+              {admission.displayCategory}
             </span>
             <span
               className={cn(
@@ -129,11 +164,47 @@ export function CollegeCard({
             </span>
           </div>
 
+          {/* Admission: a bounded range + confidence + overall admit rate — never
+              a lone precise percentage. */}
+          {admission.chanceRange ? (
+            <div className="mt-2 space-y-1.5">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs">
+                <span>
+                  <span className="font-medium text-foreground/70">
+                    Estimated range:
+                  </span>{" "}
+                  <span className="font-semibold text-foreground">
+                    {formatChanceRange(admission.chanceRange)}
+                  </span>
+                </span>
+                {admission.confidence && (
+                  <span className="text-muted-foreground">
+                    Confidence: {CONFIDENCE_LABEL[admission.confidence]}
+                  </span>
+                )}
+                {admission.collegeAdmitRate != null && (
+                  <span className="text-muted-foreground">
+                    Overall admit rate:{" "}
+                    {Math.round(admission.collegeAdmitRate * 100)}%
+                  </span>
+                )}
+              </div>
+              {admission.drivers.length > 0 && (
+                <ul className="space-y-0.5">
+                  {admission.drivers.map((d) => (
+                    <DriverRow key={d.text} driver={d} />
+                  ))}
+                </ul>
+              )}
+            </div>
+          ) : (
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground/70">Admission:</span>{" "}
+              {admission.rationale}
+            </p>
+          )}
+
           <p className="mt-1.5 text-xs text-muted-foreground">
-            <span className="font-medium text-foreground/70">Admission:</span>{" "}
-            {admission.rationale}
-          </p>
-          <p className="mt-0.5 text-xs text-muted-foreground">
             <span className="font-medium text-foreground/70">Field:</span>{" "}
             {fieldFit.rationale}
           </p>

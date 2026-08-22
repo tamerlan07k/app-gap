@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import {
   fieldDataFor,
+  loadApplicantStrength,
   loadCollegesWithData,
   loadFieldDataIndex,
   loadFieldKey,
@@ -42,13 +43,15 @@ export default async function CollegesPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [profile, fieldKey, colleges, saved, finalizedAt] = await Promise.all([
-    loadMatchProfile(supabase, user.id),
-    loadFieldKey(supabase, user.id),
-    loadCollegesWithData(supabase),
-    loadUserColleges(supabase, user.id),
-    loadFinalizedAt(supabase, user.id),
-  ]);
+  const [profile, strength, fieldKey, colleges, saved, finalizedAt] =
+    await Promise.all([
+      loadMatchProfile(supabase, user.id),
+      loadApplicantStrength(supabase, user.id),
+      loadFieldKey(supabase, user.id),
+      loadCollegesWithData(supabase),
+      loadUserColleges(supabase, user.id),
+      loadFinalizedAt(supabase, user.id),
+    ]);
   const fieldIndex = await loadFieldDataIndex(supabase, fieldKey);
 
   const { all, byId } = colleges;
@@ -65,6 +68,7 @@ export default async function CollegesPage() {
           if (!college) return null;
           return evaluateCollege({
             profile,
+            strength,
             fieldKey,
             college,
             fieldData: fieldDataFor(fieldIndex, s.collegeId, fieldKey),
