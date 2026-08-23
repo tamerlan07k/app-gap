@@ -27,7 +27,7 @@ import type {
 } from "./types";
 
 /** Bump on any change to the math so stored/derived results are auditable. */
-export const ADMISSION_MODEL_VERSION = "admission-v2.0.0";
+export const ADMISSION_MODEL_VERSION = "admission-v2.1.0";
 
 const clamp = (n: number, lo: number, hi: number) =>
   Math.max(lo, Math.min(hi, n));
@@ -45,8 +45,57 @@ const SHIFT_SCALE = 2.4;
 const HOLISTIC_WEIGHT_SELECTIVE = 0.5; // admit <= 6%
 const HOLISTIC_WEIGHT_ACCESSIBLE = 0.15; // admit >= 50%
 
-// GPA distance that maps to a full ±1 of academic position.
-const GPA_FULL_SCALE = 0.3;
+// ─── Academic-position calibration (v2.1) ────────────────────────────────────
+// These are STARTING calibration values, recalibratable here in one place — not
+// immutable constants. See the audit that motivated them: at ultra-selective
+// schools the published SAT middle-50% is extremely narrow (~60–80 pts), so the
+// old half-width unit over-amplified small differences (a near-miss floored to
+// the same value as a far-miss) and a strong GPA was silently discarded because
+// college gpa_avg is null across the whole dataset.
+//
+// MIN_HALF: floor on the SAT half-width so a pathologically narrow band can't
+//   over-amplify position. A no-op for schools whose band is already this wide.
+const MIN_HALF = 90; // SAT points
+// POS_CLAMP: saturation bound for the standardized SAT distance (softer than the
+//   old ±2, so a slightly-below score keeps resolution instead of flooring).
+const POS_CLAMP = 2.5;
+// GPA distance from the reference that maps to a full ±1 of academic position.
+const GPA_SPAN = 0.4;
+// When BOTH a test score and a GPA exist, the test leads; GPA fills the rest.
+const SAT_WEIGHT = 0.7;
+// GPA alone (test-optional/blind, or no score) is a weaker signal → damp it so it
+//   positions but never dominates.
+const GPA_ONLY_DAMP = 0.6;
+// Selectivity-scaled GPA reference used ONLY when the college reports no gpa_avg
+// (true for the entire dataset today). A strong GPA still counts, calibrated to
+// the tier: ~3.9 where a 4.0 is the norm, ~3.4 at accessible schools so an
+// average GPA there isn't wrongly penalized. Real college gpa_avg, when present,
+// always takes precedence over this anchor.
+const GPA_ANCHOR_SELECTIVE = 3.9; // admit <= 5%
+const GPA_ANCHOR_ACCESSIBLE = 3.4; // admit >= 50%
+
+/** Selectivity-scaled GPA reference, interpolated by admit rate. */
+function gpaAnchor(admitRate: number): number {
+  const t = clamp((0.5 - admitRate) / (0.5 - 0.05), 0, 1); // 1 at <=5%, 0 at >=50%
+  return (
+    GPA_ANCHOR_ACCESSIBLE + (GPA_ANCHOR_SELECTIVE - GPA_ANCHOR_ACCESSIBLE) * t
+  );
+}
+
+// ─── Academics-component nudge (course rigor, beyond raw SAT+GPA) ─────────────
+// The LLM's absolute "academics" component score (0..1) captures course rigor and
+// overall academic quality — signals GPA alone misses. It gently pulls the
+// college-relative academic position toward that quality read, deliberately SMALL
+// so SAT/GPA still lead and it can never dominate (or rescue a far-below score).
+const ACAD_COMP_WEIGHT = 0.15; // fraction of academic position it can pull
+const ACAD_COMP_ANCHOR = 0.7; // a 70/100 academics score is the neutral point
+const ACAD_COMP_SPAN = 0.3; // distance from the anchor mapping to a full ±1
+const ACAD_COMP_ONLY_DAMP = 0.6; // damp when it's the ONLY academic signal we have
+
+/** Convert the absolute LLM academics score (0..1) to a −1..1 position nudge. */
+function academicsComponentPos(academics: number): number {
+  return clamp((academics - ACAD_COMP_ANCHOR) / ACAD_COMP_SPAN, -1, 1);
+}
 
 // ─── Selectivity envelope ────────────────────────────────────────────────────
 
@@ -87,42 +136,79 @@ interface AcademicPosition {
   /** −1..1, where 0 = at the college's median. Null when we can't compute it. */
   value: number | null;
   usedTest: boolean;
+  /** A GPA term contributed (real college data OR the selectivity-scaled anchor). */
   usedGpa: boolean;
+  /** True only when the GPA term used REAL college gpa_avg (not the anchor). */
+  usedRealGpa: boolean;
+  /** Where the student's score sits vs the published SAT middle-50%, when a score
+   * was actually used. Drives the honest range label (never the point math). */
+  band: "below" | "in" | "above" | null;
 }
 
 function academicPosition(
   profile: MatchProfile,
   stats: CollegeStats,
   testPolicy: TestPolicy,
+  admitRate: number,
 ): AcademicPosition {
-  const parts: number[] = [];
-  let usedTest = false;
-  let usedGpa = false;
-
+  // ── SAT/ACT position, relative to the college's published middle-50% ──
+  let satPos: number | null = null;
+  let band: "below" | "in" | "above" | null = null;
   // Test-blind colleges do not consider scores at all — never use them.
   if (testPolicy !== "blind") {
     const range = collegeSatRange(stats);
     const sat = studentSat(profile);
     if (sat != null && range && range.p75 > range.p25) {
       const mid = (range.p25 + range.p75) / 2;
-      const half = (range.p75 - range.p25) / 2;
-      parts.push(clamp((sat - mid) / half, -2, 2) / 2); // → −1..1
-      usedTest = true;
+      // Floor the half-width so an artificially narrow band (ubiquitous at
+      // ultra-selective schools) can't over-amplify small score differences.
+      const half = Math.max((range.p75 - range.p25) / 2, MIN_HALF);
+      satPos = clamp((sat - mid) / half, -POS_CLAMP, POS_CLAMP) / POS_CLAMP; // → −1..1
+      // The label is honest to the PUBLISHED percentiles, independent of the
+      // (softened, MIN_HALF-floored) scoring math: p25..p75 is "in range".
+      band = sat < range.p25 ? "below" : sat > range.p75 ? "above" : "in";
     }
   }
 
-  // GPA term only fires with REAL college GPA data — never fabricated, never a
-  // silent zero/median. Missing GPA simply drops out and lowers completeness.
-  if (profile.unweightedGpa != null && stats.gpaAvg != null) {
-    parts.push(
-      clamp((profile.unweightedGpa - stats.gpaAvg) / GPA_FULL_SCALE, -1, 1),
-    );
-    usedGpa = true;
+  // ── GPA position ──
+  // Prefer REAL college GPA data. When the college reports none (the entire
+  // dataset today), fall back to a selectivity-scaled anchor so a strong GPA is
+  // never silently discarded — but flag it as anchored (lowers completeness).
+  // We never fabricate the STUDENT's GPA; a missing student GPA simply drops out.
+  let gpaPos: number | null = null;
+  let usedRealGpa = false;
+  if (profile.unweightedGpa != null) {
+    if (stats.gpaAvg != null) {
+      gpaPos = clamp((profile.unweightedGpa - stats.gpaAvg) / GPA_SPAN, -1, 1);
+      usedRealGpa = true;
+    } else {
+      gpaPos = clamp(
+        (profile.unweightedGpa - gpaAnchor(admitRate)) / GPA_SPAN,
+        -1,
+        1,
+      );
+    }
   }
 
-  if (parts.length === 0) return { value: null, usedTest, usedGpa };
-  const avg = parts.reduce((a, b) => a + b, 0) / parts.length;
-  return { value: avg, usedTest, usedGpa };
+  // ── Blend: test leads when both exist; GPA alone is damped (weaker signal). ──
+  let value: number | null;
+  if (satPos != null && gpaPos != null) {
+    value = SAT_WEIGHT * satPos + (1 - SAT_WEIGHT) * gpaPos;
+  } else if (satPos != null) {
+    value = satPos;
+  } else if (gpaPos != null) {
+    value = GPA_ONLY_DAMP * gpaPos;
+  } else {
+    value = null;
+  }
+
+  return {
+    value,
+    usedTest: satPos != null,
+    usedGpa: gpaPos != null,
+    usedRealGpa,
+    band,
+  };
 }
 
 // ─── Data completeness & confidence ──────────────────────────────────────────
@@ -140,7 +226,9 @@ function dataCompleteness(
     : testPolicy === "blind" || testPolicy === "optional"
       ? 0.5
       : 0;
-  const cGpa = acad.usedGpa ? 1 : 0;
+  // Real college GPA data is full credit; a student GPA compared to the anchor
+  // (no college benchmark) is partial; nothing is zero.
+  const cGpa = acad.usedRealGpa ? 1 : acad.usedGpa ? 0.5 : 0;
   const cHolistic = strength.hasHolistic ? 1 : 0;
   return clamp(cTest * 0.35 + cGpa * 0.2 + cHolistic * 0.3 + 0.15, 0, 1);
   //                                                      ↑ admit rate (required to reach here)
@@ -196,16 +284,18 @@ function buildDrivers(
 ): AdmissionDriver[] {
   const drivers: AdmissionDriver[] = [];
 
-  if (acad.value != null) {
-    if (acad.value > 0.35) {
+  if (acad.usedTest) {
+    // Label from the PUBLISHED percentiles, so a score at/above p25 is never
+    // called "below range" (and p75+ is "above").
+    if (acad.band === "above") {
       drivers.push({
         kind: "positive",
         text: "Academics above this college's typical range",
       });
-    } else if (acad.value >= -0.35) {
+    } else if (acad.band === "in") {
       drivers.push({
         kind: "info",
-        text: "Academics in range (near the middle 50%)",
+        text: "Academics in range (within the middle 50%)",
       });
     } else {
       drivers.push({
@@ -213,6 +303,12 @@ function buildDrivers(
         text: "Academics below this college's typical range",
       });
     }
+  } else if (acad.usedGpa) {
+    // No usable test score, but the student's GPA anchored the academic read.
+    drivers.push({
+      kind: "info",
+      text: "Assessed on GPA (no test score used)",
+    });
   } else if (testPolicy === "optional" || testPolicy === "blind") {
     drivers.push({
       kind: "info",
@@ -315,14 +411,31 @@ export function assessAdmission(
   const admitRate = clamp(stats.admitRate, 0.005, 0.99);
   const testPolicy = options.testPolicy ?? "unknown";
 
-  const acad = academicPosition(profile, stats, testPolicy);
+  const acad = academicPosition(profile, stats, testPolicy, admitRate);
   const gpaMissing = stats.gpaAvg == null;
+
+  // Small course-rigor nudge: pull the college-relative academic position toward
+  // the LLM's absolute academics-quality read (which reflects course rigor beyond
+  // GPA). Bounded by ACAD_COMP_WEIGHT so SAT/GPA still lead; when it's the only
+  // academic signal it's damped like a GPA-only read.
+  let acadValue = acad.value;
+  if (strength.academics != null) {
+    const compPos = academicsComponentPos(strength.academics);
+    acadValue =
+      acadValue != null
+        ? clamp(
+            (1 - ACAD_COMP_WEIGHT) * acadValue + ACAD_COMP_WEIGHT * compPos,
+            -1,
+            1,
+          )
+        : ACAD_COMP_ONLY_DAMP * compPos;
+  }
 
   // Blend academic position and holistic strength with selectivity-aware
   // weights. Missing signals use a NEUTRAL 0.5 for the point math (they neither
   // help nor hurt) while separately lowering confidence — never assumed average
   // in a way that flatters or penalizes.
-  const aPosNorm = acad.value != null ? (acad.value + 1) / 2 : 0.5;
+  const aPosNorm = acadValue != null ? (acadValue + 1) / 2 : 0.5;
   const hNorm = strength.hasHolistic ? strength.holistic : 0.5;
   const wH = holisticWeight(admitRate);
   const fit = (1 - wH) * aPosNorm + wH * hNorm; // 0..1
