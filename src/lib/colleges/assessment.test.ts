@@ -254,3 +254,373 @@ describe("unrated & determinism", () => {
     expect(r.drivers.some((d) => /profile analysis/i.test(d.text))).toBe(true);
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  v2.1 UNIVERSAL CALIBRATION — real production stats, no school-specific logic.
+//  These lock in the audited behaviour: SAT position is a real but non-dominant
+//  signal, a strong GPA counts even with no college GPA data, holistic strength
+//  differentiates strong applicants, and selectivity still owns a low ceiling.
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Real middle-50% (EBRW+Math) and admit rates pulled from the DB. gpa_avg is null
+// for every school (College Scorecard never reports it) — mirrored here.
+const realStats = (
+  admitRate: number,
+  p25: number | null,
+  p75: number | null,
+): CollegeStats => ({
+  admitRate,
+  satEbrw25: null,
+  satEbrw75: null,
+  satMath25: null,
+  satMath75: null,
+  satTotal25: p25,
+  satTotal75: p75,
+  actComposite25: null,
+  actComposite75: null,
+  gpaAvg: null,
+});
+
+// The ultra-selective tier (real p25/p75). The SAME rules must hold for all.
+const TIER: { name: string; stats: CollegeStats; p25: number; p75: number }[] =
+  [
+    {
+      name: "Stanford",
+      stats: realStats(0.0361, 1510, 1580),
+      p25: 1510,
+      p75: 1580,
+    },
+    {
+      name: "Harvard",
+      stats: realStats(0.0365, 1510, 1580),
+      p25: 1510,
+      p75: 1580,
+    },
+    {
+      name: "Yale",
+      stats: realStats(0.0387, 1470, 1570),
+      p25: 1470,
+      p75: 1570,
+    },
+    {
+      name: "Columbia",
+      stats: realStats(0.0399, 1510, 1580),
+      p25: 1510,
+      p75: 1580,
+    },
+    {
+      name: "Princeton",
+      stats: realStats(0.0462, 1510, 1580),
+      p25: 1510,
+      p75: 1580,
+    },
+    { name: "MIT", stats: realStats(0.0455, 1520, 1580), p25: 1520, p75: 1580 },
+    {
+      name: "Brown",
+      stats: realStats(0.0539, 1510, 1580),
+      p25: 1510,
+      p75: 1580,
+    },
+    { name: "Penn", stats: realStats(0.054, 1510, 1570), p25: 1510, p75: 1570 },
+    {
+      name: "Dartmouth",
+      stats: realStats(0.054, 1500, 1570),
+      p25: 1500,
+      p75: 1570,
+    },
+    {
+      name: "Cornell",
+      stats: realStats(0.0876, 1500, 1570),
+      p25: 1500,
+      p75: 1570,
+    },
+  ];
+const COLUMBIA = {
+  name: "Columbia",
+  stats: realStats(0.0399, 1510, 1580),
+  p25: 1510,
+  p75: 1580,
+};
+
+// Profiles keep the real GPA (4.0) and vary the SAT; strength varies by fixture.
+const gpaProfile = (sat: number | null, gpa = 4.0): MatchProfile => ({
+  unweightedGpa: gpa,
+  satScore: sat,
+  actScore: null,
+});
+const WEAK = deriveApplicantStrength({
+  academics: { score: 45 },
+  activities: { score: 30 },
+  awards: { score: 20 },
+}); // holistic ≈ 0.26
+
+const optional = { testPolicy: "optional" as const };
+
+describe("v2.1 · 74 vs 89 distinguished by holistic strength (real Columbia)", () => {
+  it("1. same SAT & GPA → 89 is meaningfully stronger than 74", () => {
+    const sat = 1545; // in Columbia's real 1510–1580 band
+    const a74 = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      STRENGTH_74,
+      optional,
+    );
+    const a89 = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      STRENGTH_89,
+      optional,
+    );
+    expect(a89.chance ?? 0).toBeGreaterThan((a74.chance ?? 0) * 1.4); // clearly, not marginally
+    expect(a89.chance ?? 0).toBeGreaterThan(a74.chance ?? 0);
+  });
+
+  it("5. a genuinely weak profile scores lower than the 74 (same SAT & GPA)", () => {
+    const sat = 1545;
+    const weak = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      WEAK,
+      optional,
+    );
+    const a74 = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      STRENGTH_74,
+      optional,
+    );
+    expect(weak.chance ?? 1).toBeLessThan(a74.chance ?? 0);
+  });
+
+  it("6. a 74 stays a High Reach at an Ivy-level school (no inflated odds)", () => {
+    const a74 = assessAdmission(
+      gpaProfile(1545),
+      COLUMBIA.stats,
+      STRENGTH_74,
+      optional,
+    );
+    expect(a74.category).toBe("reach");
+    expect(a74.displayCategory).toBe("High Reach");
+    expect(a74.chance ?? 1).toBeLessThan(0.25); // still bounded by selectivity
+  });
+});
+
+describe("v2.1 · academics component (course rigor) is a small extra signal", () => {
+  // Two profiles identical in activities/awards/SAT/GPA, differing ONLY in the
+  // LLM academics component score (course rigor / academic quality).
+  const richCourses = deriveApplicantStrength({
+    academics: { score: 95 },
+    activities: { score: 70 },
+    awards: { score: 70 },
+  });
+  const thinCourses = deriveApplicantStrength({
+    academics: { score: 55 },
+    activities: { score: 70 },
+    awards: { score: 70 },
+  });
+
+  it("adds a little beyond GPA: stronger course rigor helps, holistic held equal", () => {
+    const sat = 1545; // in-range at Columbia
+    const rich = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      richCourses,
+      optional,
+    );
+    const thin = assessAdmission(
+      gpaProfile(sat),
+      COLUMBIA.stats,
+      thinCourses,
+      optional,
+    );
+    expect(rich.chance ?? 0).toBeGreaterThan(thin.chance ?? 0);
+  });
+
+  it("stays SMALL: the course-rigor swing is far smaller than the SAT swing", () => {
+    const sat = 1545;
+    const rich =
+      assessAdmission(gpaProfile(sat), COLUMBIA.stats, richCourses, optional)
+        .chance ?? 0;
+    const thin =
+      assessAdmission(gpaProfile(sat), COLUMBIA.stats, thinCourses, optional)
+        .chance ?? 0;
+    const courseSwing = rich - thin;
+    // Same holistic, move SAT from in-range to well-above → the academic axis's
+    // dominant lever must still move the estimate more than course rigor alone.
+    const lowSat =
+      assessAdmission(gpaProfile(1450), COLUMBIA.stats, richCourses, optional)
+        .chance ?? 0;
+    const highSat =
+      assessAdmission(gpaProfile(1580), COLUMBIA.stats, richCourses, optional)
+        .chance ?? 0;
+    expect(highSat - lowSat).toBeGreaterThan(courseSwing);
+  });
+
+  it("cannot rescue a far-below-range score into a target", () => {
+    const r = assessAdmission(
+      gpaProfile(1250),
+      COLUMBIA.stats,
+      richCourses,
+      optional,
+    );
+    expect(r.category).toBe("reach");
+  });
+});
+
+describe("v2.1 · academic position is a real but non-dominant signal", () => {
+  it("2. 4.0 GPA + slightly-below-p25 SAT does NOT collapse to ~1–2%", () => {
+    for (const s of TIER) {
+      const sat = s.p25 - 20; // just under the published 25th percentile
+      const mod = assessAdmission(
+        gpaProfile(sat),
+        s.stats,
+        STRENGTH_74,
+        optional,
+      );
+      const str = assessAdmission(
+        gpaProfile(sat),
+        s.stats,
+        STRENGTH_89,
+        optional,
+      );
+      // The reported bug: below-p25 collapsed everyone to ~1–2%. It must not.
+      expect(mod.chance ?? 0).toBeGreaterThan(0.03);
+      expect(str.chance ?? 0).toBeGreaterThan(0.05);
+      // …but selectivity still keeps it a reach, never a target/safety.
+      expect(str.category).toBe("reach");
+    }
+  });
+
+  it("3. SAT exactly at p25 is labelled 'in range' (never 'below')", () => {
+    for (const s of TIER) {
+      const r = assessAdmission(
+        gpaProfile(s.p25),
+        s.stats,
+        STRENGTH_89,
+        optional,
+      );
+      const acad = r.drivers.find((d) => /Academics/.test(d.text));
+      expect(acad?.text).toMatch(/in range/i);
+      expect(acad?.text).not.toMatch(/below/i);
+    }
+  });
+
+  it("3b. SAT at p75 is 'in range' (not yet 'above')", () => {
+    const r = assessAdmission(
+      gpaProfile(COLUMBIA.p75),
+      COLUMBIA.stats,
+      STRENGTH_89,
+      optional,
+    );
+    const acad = r.drivers.find((d) => /Academics/.test(d.text));
+    expect(acad?.text).toMatch(/in range/i);
+  });
+
+  it("4. slightly-below-p25 is 'below range' BUT keeps resolution vs far-below", () => {
+    for (const s of TIER) {
+      const slight = assessAdmission(
+        gpaProfile(s.p25 - 30),
+        s.stats,
+        STRENGTH_89,
+        optional,
+      );
+      const far = assessAdmission(
+        gpaProfile(s.p25 - 250),
+        s.stats,
+        STRENGTH_89,
+        optional,
+      );
+      const acad = slight.drivers.find((d) => /Academics/.test(d.text));
+      expect(acad?.text).toMatch(/below/i);
+      // Not lumped together: a slightly-below score must beat a far-below one.
+      expect(slight.chance ?? 0).toBeGreaterThan((far.chance ?? 0) + 0.005);
+    }
+  });
+
+  it("GPA still discriminates: 4.0 beats 3.4 at the same (below-range) SAT", () => {
+    const strong = assessAdmission(
+      gpaProfile(1490, 4.0),
+      COLUMBIA.stats,
+      STRENGTH_89,
+      optional,
+    );
+    const weakGpa = assessAdmission(
+      gpaProfile(1490, 3.4),
+      COLUMBIA.stats,
+      STRENGTH_89,
+      optional,
+    );
+    expect(strong.chance ?? 0).toBeGreaterThan(weakGpa.chance ?? 0);
+  });
+});
+
+describe("v2.1 · the same rules hold across the whole ultra-selective tier", () => {
+  it("7. 89 > 74 at every school, and both remain a reach", () => {
+    for (const s of TIER) {
+      const sat = Math.round((s.p25 + s.p75) / 2); // in-range median
+      const a74 = assessAdmission(
+        gpaProfile(sat),
+        s.stats,
+        STRENGTH_74,
+        optional,
+      );
+      const a89 = assessAdmission(
+        gpaProfile(sat),
+        s.stats,
+        STRENGTH_89,
+        optional,
+      );
+      expect(a89.chance ?? 0, `${s.name}: 89 must beat 74`).toBeGreaterThan(
+        a74.chance ?? 0,
+      );
+      expect(a74.category, `${s.name}: 74 is a reach`).toBe("reach");
+      expect(a89.category, `${s.name}: 89 is a reach`).toBe("reach");
+      // Selectivity ceiling: even the strong profile never looks like a normal bet.
+      expect(a89.chance ?? 1, `${s.name}: ceiling`).toBeLessThan(0.3);
+    }
+  });
+
+  it("holistic strength differentiates strong applicants everywhere (spread ≥ 2pt)", () => {
+    for (const s of TIER) {
+      const sat = Math.round((s.p25 + s.p75) / 2);
+      const a74 =
+        assessAdmission(gpaProfile(sat), s.stats, STRENGTH_74, optional)
+          .chance ?? 0;
+      const a89 =
+        assessAdmission(gpaProfile(sat), s.stats, STRENGTH_89, optional)
+          .chance ?? 0;
+      expect(a89 - a74, `${s.name}: holistic spread`).toBeGreaterThan(0.02);
+    }
+  });
+});
+
+describe("v2.1 · 74 & 89 before/after snapshot (real stats, printed)", () => {
+  it("8. prints the after-fix ranges for 74 and 89 across the tier", () => {
+    const pct = (n: number | null) =>
+      n == null ? "—" : `${(n * 100).toFixed(1)}%`;
+    for (const s of TIER) {
+      const mid = Math.round((s.p25 + s.p75) / 2);
+      const cases: [string, number][] = [
+        ["below p25-20", s.p25 - 20],
+        ["in-range mid", mid],
+        ["at p75", s.p75],
+      ];
+      const parts = cases.map(([label, sat]) => {
+        const a74 = assessAdmission(
+          gpaProfile(sat),
+          s.stats,
+          STRENGTH_74,
+          optional,
+        );
+        const a89 = assessAdmission(
+          gpaProfile(sat),
+          s.stats,
+          STRENGTH_89,
+          optional,
+        );
+        return `${label}: 74=${pct(a74.chance)} [${a74.displayCategory}] / 89=${pct(a89.chance)} [${a89.displayCategory}]`;
+      });
+      console.log(`${s.name.padEnd(10)} | ${parts.join("  |  ")}`);
+    }
+  });
+});

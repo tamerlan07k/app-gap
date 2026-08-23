@@ -25,6 +25,10 @@ export function normalizeTestPolicy(
       return "required";
     case "optional":
     case "test_optional":
+    // Test-flexible (accept SAT/ACT OR other assessments) behaves like optional
+    // for our purposes: a submitted score is used, a missing one isn't penalized.
+    case "flexible":
+    case "test_flexible":
       return "optional";
     case "blind":
     case "test_blind":
