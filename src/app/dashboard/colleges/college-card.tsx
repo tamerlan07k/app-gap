@@ -2,9 +2,11 @@ import {
   BadgeCheck,
   Check,
   CircleHelp,
+  ExternalLink,
   Info,
   TriangleAlert,
 } from "lucide-react";
+import Link from "next/link";
 import { formatChanceRange } from "~/lib/colleges/assessment";
 import { fieldRatingLabel } from "~/lib/colleges/field-fit";
 import type {
@@ -42,6 +44,12 @@ const CONFIDENCE_LABEL: Record<Confidence, string> = {
   medium: "Medium",
   low: "Low",
 };
+
+/** Scorecard sometimes stores a bare domain (e.g. "www.columbia.edu"); ensure a
+ * protocol so the link resolves to the official site, not a relative path. */
+function ensureHttps(url: string): string {
+  return /^https?:\/\//i.test(url) ? url : `https://${url}`;
+}
 
 function DriverRow({ driver }: { driver: AdmissionDriver }) {
   const Icon =
@@ -125,7 +133,15 @@ export function CollegeCard({
   const rounds = college.cycle?.rounds ?? [];
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <div className="group relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:border-brand-teal/40 hover:shadow-md">
+      {/* Stretched link makes the whole card navigate to the college page, while
+          interactive children below (remove, website, plan) sit above it via
+          `relative z-10` so their own clicks still work. */}
+      <Link
+        href={`/dashboard/colleges/${college.slug}`}
+        aria-label={`View ${college.name}`}
+        className="absolute inset-0"
+      />
       <div className="flex items-start gap-4 p-5">
         <CollegeLogo
           name={college.name}
@@ -135,13 +151,29 @@ export function CollegeCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="truncate font-semibold">{college.name}</p>
+              {/* The student's OWN AppGap estimate — placed directly under the
+                  name and made deliberately more prominent than the school's
+                  overall admit rate below. The subtle fade-up is AppGap's
+                  existing score-reveal motion (respects reduced-motion). */}
+              {admission.chanceRange && (
+                <p className="mt-0.5 animate-fade-up text-sm font-medium">
+                  <span className="text-muted-foreground">
+                    Estimated chance:{" "}
+                  </span>
+                  <span className="font-semibold text-brand-teal">
+                    {formatChanceRange(admission.chanceRange)}
+                  </span>
+                </p>
+              )}
               {(college.city || college.state) && (
                 <p className="truncate text-xs text-muted-foreground">
                   {[college.city, college.state].filter(Boolean).join(", ")}
                 </p>
               )}
             </div>
-            <RemoveButton collegeId={college.id} collegeName={college.name} />
+            <div className="relative z-10">
+              <RemoveButton collegeId={college.id} collegeName={college.name} />
+            </div>
           </div>
 
           {/* Two independent dimensions: admission fit + field fit. */}
@@ -164,19 +196,13 @@ export function CollegeCard({
             </span>
           </div>
 
-          {/* Admission: a bounded range + confidence + overall admit rate — never
-              a lone precise percentage. */}
+          {/* The AppGap estimate itself is shown prominently under the name
+              above. Here we keep the supporting context: confidence (how sure
+              AppGap is) and the school's OWN overall admit rate — kept distinct
+              from, and less prominent than, the student's estimate. */}
           {admission.chanceRange ? (
             <div className="mt-2 space-y-1.5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs">
-                <span>
-                  <span className="font-medium text-foreground/70">
-                    Estimated range:
-                  </span>{" "}
-                  <span className="font-semibold text-foreground">
-                    {formatChanceRange(admission.chanceRange)}
-                  </span>
-                </span>
                 {admission.confidence && (
                   <span className="text-muted-foreground">
                     Confidence: {CONFIDENCE_LABEL[admission.confidence]}
@@ -208,10 +234,24 @@ export function CollegeCard({
             <span className="font-medium text-foreground/70">Field:</span>{" "}
             {fieldFit.rationale}
           </p>
+
+          {/* Small, unobtrusive transparency link to the school's official site
+              (reuses the stored, verified colleges.official_website). */}
+          {college.officialWebsite && (
+            <a
+              href={ensureHttps(college.officialWebsite)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground underline decoration-dotted underline-offset-2 hover:text-foreground"
+            >
+              Visit official website
+              <ExternalLink className="size-3" />
+            </a>
+          )}
         </div>
       </div>
 
-      <div className="border-t border-border/60 bg-muted/30 px-5 py-4">
+      <div className="relative z-10 border-t border-border/60 bg-muted/30 px-5 py-4">
         {finalized ? (
           <>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
