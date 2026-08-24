@@ -3,7 +3,7 @@
 // only place they meet.
 
 import { scoreFieldFit } from "./field-fit";
-import { classifyAdmission } from "./matching";
+import { classifyAdmission, normalizeTestPolicy } from "./matching";
 import { neutralStrength } from "./strength";
 import type {
   ApplicantStrength,
@@ -12,34 +12,11 @@ import type {
   FieldResource,
   FieldStrengthRecord,
   MatchProfile,
-  TestPolicy,
 } from "./types";
 
-/** Map the raw cycle test_policy string to our normalized TestPolicy. */
-export function normalizeTestPolicy(
-  raw: string | null | undefined,
-): TestPolicy {
-  switch ((raw ?? "").toLowerCase()) {
-    case "required":
-    case "test_required":
-      return "required";
-    case "optional":
-    case "test_optional":
-    // Test-flexible (accept SAT/ACT OR other assessments) behaves like optional
-    // for our purposes: a submitted score is used, a missing one isn't penalized.
-    case "flexible":
-    case "test_flexible":
-      return "optional";
-    case "blind":
-    case "test_blind":
-      return "blind";
-    case "considered":
-    case "test_considered":
-      return "considered";
-    default:
-      return "unknown";
-  }
-}
+// `normalizeTestPolicy` now lives in matching.ts so generation and display share
+// one implementation; re-exported here for existing importers of this module.
+export { normalizeTestPolicy };
 
 export interface CollegeFieldData {
   strength: FieldStrengthRecord | null;
