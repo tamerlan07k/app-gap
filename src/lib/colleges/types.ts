@@ -190,6 +190,39 @@ export interface CollegeWithData extends CollegeRecord {
   cycle: CollegeCycle | null;
 }
 
+/**
+ * Editorial/structured profile content for the dedicated college page. Facts are
+ * source-attributed; prose (`history`) is only meaningful once verified — the UI
+ * must gate its display on `historyVerified`.
+ */
+export interface CollegeProfile {
+  foundedYear: number | null;
+  studentFacultyRatio: number | null;
+  locale: string | null;
+  setting: string | null;
+  factsSourceUrl: string | null;
+  factsVerified: boolean;
+  history: string | null;
+  historySourceUrl: string | null;
+  /** True only when the history prose has been human-verified (verified_at set).
+   * The page renders history ONLY when this is true — never an unverified draft. */
+  historyVerified: boolean;
+  /** Section-3 "fit" prose facets. Rendered ONLY when `fitVerified` is true. */
+  fit: {
+    campusLife: string | null;
+    diversity: string | null;
+    opportunities: string | null;
+    vibe: string | null;
+    careerFit: string | null;
+  } | null;
+  fitVerified: boolean;
+}
+
+/** A single college with everything the dedicated page needs. */
+export interface CollegeDetail extends CollegeWithData {
+  profile: CollegeProfile | null;
+}
+
 // ─── Composed match ───────────────────────────────────────────────────────────
 
 /** A saved college evaluated on both dimensions, plus the user's plan choice. */
