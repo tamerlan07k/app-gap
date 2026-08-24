@@ -9,6 +9,8 @@ import {
   type ApplicantStrength,
   type ApplicationRound,
   type CollegeCycle,
+  type CollegeDetail,
+  type CollegeProfile,
   type CollegeWithData,
   CURRENT_CYCLE_YEAR,
   type FieldResource,
@@ -140,6 +142,53 @@ export async function loadFieldKey(
   return (data?.major_category as string | null) ?? null;
 }
 
+export interface StudentFitContext {
+  careerInterest: string | null;
+  activities: {
+    category: string;
+    name: string;
+    leadershipRole: string | null;
+  }[];
+}
+
+/**
+ * Load the student profile bits used to PERSONALIZE the dedicated college page's
+ * "why this fits you" section: their career interest and their own activities.
+ * Read-only, best-effort — returns null when there's no profile yet.
+ */
+export async function loadStudentFitContext(
+  client: SupabaseClient,
+  userId: string,
+): Promise<StudentFitContext | null> {
+  const [profileRes, activitiesRes] = await Promise.all([
+    client
+      .from("profiles")
+      .select("career_interest")
+      .eq("id", userId)
+      .maybeSingle(),
+    client
+      .from("activities")
+      .select("category, name, leadership_role")
+      .eq("user_id", userId)
+      .order("sort_order"),
+  ]);
+  if (!profileRes.data) return null;
+  return {
+    careerInterest: (profileRes.data.career_interest as string | null) || null,
+    activities: (activitiesRes.data ?? []).map(
+      (a: {
+        category: string;
+        name: string;
+        leadership_role: string | null;
+      }) => ({
+        category: a.category,
+        name: a.name,
+        leadershipRole: a.leadership_role ?? null,
+      }),
+    ),
+  };
+}
+
 /** List-level finalization timestamp, or null if still in exploration. */
 export async function loadFinalizedAt(
   client: SupabaseClient,
@@ -196,19 +245,24 @@ export async function loadFieldDataIndex(
   if (!fieldKey) return { strengthByKey, resourcesByKey };
 
   try {
+    // Only VERIFIED rows are ever displayed (the project-wide invariant): an
+    // unreviewed draft — e.g. one written by the content generator — must not
+    // surface until a human sets verified_at.
     const [strengthsRes, resourcesRes] = await Promise.all([
       client
         .from("college_field_strengths")
         .select(
           "college_id, field_key, strength, headline, notes, source_url, verified_at",
         )
-        .eq("field_key", fieldKey),
+        .eq("field_key", fieldKey)
+        .not("verified_at", "is", null),
       client
         .from("college_field_resources")
         .select(
           "college_id, field_key, resource_type, title, description, url, verified_at",
         )
-        .eq("field_key", fieldKey),
+        .eq("field_key", fieldKey)
+        .not("verified_at", "is", null),
     ]);
     for (const s of (strengthsRes.data ?? []) as FieldStrengthRow[]) {
       strengthByKey.set(`${s.college_id}:${s.field_key}`, s);
@@ -349,6 +403,173 @@ export async function loadCollegesWithData(client: SupabaseClient): Promise<{
 
   const byId = new Map(all.map((c) => [c.id, c]));
   return { all, byId };
+}
+
+interface ProfileRow {
+  college_id: string;
+  founded_year: number | null;
+  student_faculty_ratio: number | null;
+  locale: string | null;
+  setting: string | null;
+  facts_source_url: string | null;
+  facts_verified_at: string | null;
+  history: string | null;
+  history_source_url: string | null;
+  history_verified_at: string | null;
+  fit: {
+    campusLife?: string | null;
+    diversity?: string | null;
+    opportunities?: string | null;
+    vibe?: string | null;
+    careerFit?: string | null;
+  } | null;
+  fit_verified_at: string | null;
+}
+
+/**
+ * Load ONE college by slug with everything the dedicated page needs: standardized
+ * stats, the current-cycle application data, and the editorial profile. Returns
+ * null when the slug doesn't match an active college. Fail-soft on the profile
+ * table (page still works before any profile rows are ingested).
+ */
+export async function loadCollegeDetailBySlug(
+  client: SupabaseClient,
+  slug: string,
+): Promise<CollegeDetail | null> {
+  const { data: c } = await client
+    .from("colleges")
+    .select(
+      "id, slug, canonical_name, city, state, institution_type, logo_asset_path, logo_variant, official_website",
+    )
+    .eq("slug", slug)
+    .eq("status", "active")
+    .maybeSingle();
+  if (!c) return null;
+
+  const [statsRes, cycleRes, profileRes] = await Promise.all([
+    client
+      .from("college_admission_stats")
+      .select(
+        "college_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg",
+      )
+      .eq("college_id", c.id),
+    client
+      .from("application_cycles")
+      .select("id, college_id, test_policy, verified_at")
+      .eq("college_id", c.id)
+      .eq("cycle_year", CURRENT_CYCLE_YEAR)
+      .maybeSingle(),
+    // Profile table may not exist yet in every environment — tolerate failure.
+    client
+      .from("college_profiles")
+      .select(
+        "college_id, founded_year, student_faculty_ratio, locale, setting, facts_source_url, facts_verified_at, history, history_source_url, history_verified_at, fit, fit_verified_at",
+      )
+      .eq("college_id", c.id)
+      .maybeSingle()
+      .then(
+        (r) => r,
+        () => ({ data: null }),
+      ),
+  ]);
+
+  // Most-recent stats row.
+  const statsRows = (statsRes.data ?? []) as StatsRow[];
+  let s: StatsRow | undefined;
+  for (const row of statsRows) {
+    if (!s || (row.source_date ?? "") > (s.source_date ?? "")) s = row;
+  }
+
+  const cycleRow = (cycleRes.data ?? null) as CycleRow | null;
+  let cycle: CollegeCycle | null = null;
+  if (cycleRow) {
+    const { data: roundData } = await client
+      .from("application_rounds")
+      .select(
+        "id, cycle_id, round_type, name, deadline_date, decision_release_date, is_binding, is_restrictive, is_rolling, offered, verified_at",
+      )
+      .eq("cycle_id", cycleRow.id)
+      .eq("offered", true);
+    const rounds: ApplicationRound[] = ((roundData ?? []) as RoundRow[])
+      .map((r) => ({
+        id: r.id,
+        roundType: r.round_type,
+        name: r.name,
+        deadlineDate: r.deadline_date,
+        decisionReleaseDate: r.decision_release_date,
+        isBinding: r.is_binding,
+        isRestrictive: r.is_restrictive,
+        isRolling: r.is_rolling,
+        verified: r.verified_at != null,
+      }))
+      .sort((a, b) => {
+        const oa = ROUND_ORDER.indexOf(a.roundType);
+        const ob = ROUND_ORDER.indexOf(b.roundType);
+        if (oa !== ob) return oa - ob;
+        return (a.deadlineDate ?? "9999").localeCompare(
+          b.deadlineDate ?? "9999",
+        );
+      });
+    cycle = {
+      cycleYear: CURRENT_CYCLE_YEAR,
+      testPolicy: cycleRow.test_policy,
+      verified: cycleRow.verified_at != null,
+      rounds,
+    };
+  }
+
+  const pr = (profileRes as { data: ProfileRow | null }).data;
+  const profile: CollegeProfile | null = pr
+    ? {
+        foundedYear: pr.founded_year,
+        studentFacultyRatio: pr.student_faculty_ratio,
+        locale: pr.locale,
+        setting: pr.setting,
+        factsSourceUrl: pr.facts_source_url,
+        factsVerified: pr.facts_verified_at != null,
+        history: pr.history,
+        historySourceUrl: pr.history_source_url,
+        historyVerified: pr.history_verified_at != null,
+        fit: pr.fit
+          ? {
+              campusLife: pr.fit.campusLife ?? null,
+              diversity: pr.fit.diversity ?? null,
+              opportunities: pr.fit.opportunities ?? null,
+              vibe: pr.fit.vibe ?? null,
+              careerFit: pr.fit.careerFit ?? null,
+            }
+          : null,
+        fitVerified: pr.fit_verified_at != null,
+      }
+    : null;
+
+  return {
+    id: c.id,
+    slug: c.slug,
+    name: c.canonical_name,
+    city: c.city,
+    state: c.state,
+    institutionType: c.institution_type,
+    logoAssetPath: c.logo_asset_path,
+    logoVariant: c.logo_variant,
+    officialWebsite: c.official_website,
+    stats: s
+      ? {
+          admitRate: s.admit_rate,
+          satEbrw25: s.sat_ebrw_25,
+          satEbrw75: s.sat_ebrw_75,
+          satMath25: s.sat_math_25,
+          satMath75: s.sat_math_75,
+          satTotal25: s.sat_total_25,
+          satTotal75: s.sat_total_75,
+          actComposite25: s.act_composite_25,
+          actComposite75: s.act_composite_75,
+          gpaAvg: s.gpa_avg,
+        }
+      : null,
+    cycle,
+    profile,
+  };
 }
 
 /** Extract the (college, field) field data from the index, mapped to the

@@ -19,7 +19,40 @@ import type {
   CollegeWithData,
   MatchCategory,
   MatchProfile,
+  TestPolicy,
 } from "./types";
+
+/**
+ * Map the raw cycle `test_policy` string to our normalized TestPolicy. Lives here
+ * (the admission engine) so BOTH the generation path (buildBalancedList) and the
+ * display path (evaluate.ts) normalize identically — the two must feed the
+ * assessment the same inputs or the generated buckets won't match the displayed
+ * ones. evaluate.ts re-exports it for its existing callers.
+ */
+export function normalizeTestPolicy(
+  raw: string | null | undefined,
+): TestPolicy {
+  switch ((raw ?? "").toLowerCase()) {
+    case "required":
+    case "test_required":
+      return "required";
+    case "optional":
+    case "test_optional":
+    // Test-flexible (accept SAT/ACT OR other assessments) behaves like optional
+    // for our purposes: a submitted score is used, a missing one isn't penalized.
+    case "flexible":
+    case "test_flexible":
+      return "optional";
+    case "blind":
+    case "test_blind":
+      return "blind";
+    case "considered":
+    case "test_considered":
+      return "considered";
+    default:
+      return "unknown";
+  }
+}
 
 // ACT composite → SAT total concordance (College Board / ACT official table,
 // rounded). Lets a student with only an ACT be positioned against a college's
@@ -154,6 +187,25 @@ export function classifyAdmission(
 }
 
 /**
+ * Pick `n` items evenly spread across an already-sorted list, so the selection
+ * doesn't cluster at one end. Used for the reach bucket: sorting reaches by
+ * chance and taking the top-N clusters every pick at the 0.3 boundary (all
+ * "barely reaches"); a spread keeps one attainable reach AND genuine long shots.
+ * Deterministic; preserves the input ordering of whatever it returns.
+ */
+function pickSpread<T>(sorted: T[], n: number): T[] {
+  if (sorted.length <= n) return sorted;
+  const idxs = new Set<number>();
+  for (let i = 0; i < n; i++) {
+    idxs.add(Math.round((i * (sorted.length - 1)) / (n - 1)));
+  }
+  // Rounding can collide when the list is short — backfill from the top
+  // (most-attainable reaches first) so we always return exactly n distinct picks.
+  for (let j = 0; idxs.size < n && j < sorted.length; j++) idxs.add(j);
+  return [...idxs].sort((a, b) => a - b).map((i) => sorted[i]);
+}
+
+/**
  * Build a balanced starter list of college IDs: 3 safeties, 6 targets, 4
  * reaches, drawn from the classified pool. Best-effort when a bucket is short
  * (a highly selective pool may not have 3 safeties) — never pads with unrated
@@ -162,41 +214,54 @@ export function classifyAdmission(
  * Admission-driven by design: the balanced spread is about admission odds.
  * Field fit refines the ORDER within categories once field data exists (higher
  * field fit wins ties), but never turns a reach into a safety.
+ *
+ * `strength` and per-college test policy MUST be the same inputs the college
+ * page feeds `classifyAdmission` when it re-buckets the saved list (see
+ * evaluate.ts / colleges/page.tsx). If generation used neutral strength while
+ * display used the real applicant strength, a strong profile's generated reaches
+ * would re-bucket into targets on load (the 3/10/0 regression). We classify here
+ * exactly as the page will, so the generated 3/6/4 is what the user sees.
  */
 export function buildBalancedList(
   profile: MatchProfile,
   colleges: CollegeWithData[],
+  strength: ApplicantStrength = neutralStrength(),
   exclude: Set<string> = new Set(),
 ): { safetyIds: string[]; targetIds: string[]; reachIds: string[] } {
   const rated = colleges
     .filter((c) => !exclude.has(c.id))
-    .map((c) => ({ college: c, fit: classifyAdmission(profile, c.stats) }))
+    .map((c) => ({
+      college: c,
+      fit: classifyAdmission(profile, c.stats, strength, {
+        testPolicy: normalizeTestPolicy(c.cycle?.testPolicy),
+      }),
+    }))
     .filter((r) => r.fit.category !== "unrated" && r.fit.chance != null);
 
   const chanceOf = (r: { fit: AdmissionFit }) => r.fit.chance ?? 0;
   const byChanceDesc = (a: (typeof rated)[number], b: (typeof rated)[number]) =>
     chanceOf(b) - chanceOf(a);
 
-  const pick = (
-    category: MatchCategory,
-    n: number,
-    sort: typeof byChanceDesc,
-  ) =>
-    rated
-      .filter((r) => r.fit.category === category)
-      .sort(sort)
-      .slice(0, n)
-      .map((r) => r.college.id);
+  const inCategory = (category: MatchCategory) =>
+    rated.filter((r) => r.fit.category === category);
 
-  return {
-    safetyIds: pick("safety", 3, byChanceDesc),
-    targetIds: pick(
-      "target",
-      6,
-      (a, b) => Math.abs(chanceOf(a) - 0.5) - Math.abs(chanceOf(b) - 0.5),
-    ),
-    reachIds: pick("reach", 4, byChanceDesc),
-  };
+  const safetyIds = inCategory("safety")
+    .sort(byChanceDesc)
+    .slice(0, 3)
+    .map((r) => r.college.id);
+
+  const targetIds = inCategory("target")
+    .sort((a, b) => Math.abs(chanceOf(a) - 0.5) - Math.abs(chanceOf(b) - 0.5))
+    .slice(0, 6)
+    .map((r) => r.college.id);
+
+  // Reaches: spread across the reach band (most-attainable → genuine long shot)
+  // rather than the 4 highest-chance, so the list isn't 4 borderline reaches.
+  const reachIds = pickSpread(inCategory("reach").sort(byChanceDesc), 4).map(
+    (r) => r.college.id,
+  );
+
+  return { safetyIds, targetIds, reachIds };
 }
 
 export const CATEGORY_ORDER: MatchCategory[] = [
