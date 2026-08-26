@@ -7,6 +7,7 @@ import { checkFeatureAllowance } from "~/lib/feature-usage";
 import { createClient } from "~/lib/supabase/server";
 import { GapScoreCard } from "../../analysis/gap-score-card";
 import { NarrativeCard } from "../../analysis/narrative-card";
+import { PersonalStatementCard } from "../../analysis/personal-statement-card";
 import { StrongestAreasCard } from "../../analysis/strongest-areas-card";
 import { TopGapsCard } from "../../analysis/top-gaps-card";
 
@@ -94,6 +95,10 @@ export default async function RoadmapResultPage({
 
       {analysis.applicationNarrative && (
         <NarrativeCard narrative={analysis.applicationNarrative} />
+      )}
+
+      {analysis.personalStatement && (
+        <PersonalStatementCard diagnostic={analysis.personalStatement} />
       )}
 
       {/* Advisor note */}

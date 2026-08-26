@@ -1,37 +1,54 @@
 // Overall AppGap score computation.
 //
 // The overall score is NOT the LLM's free-hand number. In the V2 model the LLM
-// scores three application components (Academics, Activities, Awards) 0–100 each,
-// and this module combines them with fixed, configurable weights
-// (0.35 / 0.45 / 0.20). The legacy six-category composite + coherence gate lower
-// in this file is retained so analyses generated before V2 still compute a
-// coherent overall.
+// scores three core application components (Academics, Activities, Awards) 0–100
+// each, and — when the student provides one during onboarding — a fourth optional
+// component, the Personal Statement (scored by the lightweight onboarding
+// diagnostic). This module combines whatever components are present with fixed,
+// configurable weights, RENORMALIZING over the components actually present so a
+// skipped Personal Statement neither penalizes nor is fabricated:
+//   With PS:    0.30·Academics + 0.40·Activities + 0.15·Awards + 0.15·PS
+//   Without PS: the three core weights renormalize over their 0.85 sum
+//               (≈ 0.353·Academics + 0.471·Activities + 0.176·Awards)
+// The legacy six-category composite + coherence gate lower in this file is
+// retained so analyses generated before V2 still compute a coherent overall.
 //
 // This runs identically for the free and pro tiers.
 
 import type { ApplicationNarrative, ComponentScores } from "./schema";
 
-// ─── V2 component weights (must sum to 100) ──────────────────────────────────
-// The diagnostic score is a weighted average of three components the model scores
-// 0–100 each. Weights live here so the product baseline can be tuned in one place.
-//   AppGap Score = 0.35·Academics + 0.45·Activities + 0.20·Awards
+// ─── V2 component weights (with a Personal Statement, these sum to 100) ───────
+// Weights live here so the product baseline can be tuned in one place. The
+// Personal Statement is OPTIONAL; computeComponentScore renormalizes over the
+// components that are actually present, so its weight is only "spent" when a
+// Personal Statement was provided.
 
 export const COMPONENT_WEIGHTS = {
-  academics: 35,
-  activities: 45,
-  awards: 20,
+  academics: 30,
+  activities: 40,
+  awards: 15,
+  personalStatement: 15,
 } as const;
 
 export type ComponentKey = keyof typeof COMPONENT_WEIGHTS;
 
+// The three components the model always scores. The Personal Statement is added
+// separately (only when the student supplied one), so it's not required here.
+export const CORE_COMPONENT_KEYS: ComponentKey[] = [
+  "academics",
+  "activities",
+  "awards",
+];
+
 /**
- * Extract the three component scores from the model's componentScores block.
- * Returns null if any is missing (e.g. legacy analyses), signalling the caller
- * to fall back to the legacy category composite.
+ * Extract the three CORE component scores from the model's componentScores block.
+ * Returns null if any core score is missing (e.g. legacy analyses), signalling
+ * the caller to fall back to the legacy category composite. The optional
+ * Personal Statement component is injected by the caller, not read here.
  */
 export function extractComponentScores(
   componentScores: ComponentScores | undefined,
-): Record<ComponentKey, number> | null {
+): Partial<Record<ComponentKey, number>> | null {
   if (!componentScores) return null;
 
   const scores: Partial<Record<ComponentKey, number>> = {
@@ -40,29 +57,35 @@ export function extractComponentScores(
     awards: componentScores.awards?.score,
   };
 
-  for (const key of Object.keys(COMPONENT_WEIGHTS) as ComponentKey[]) {
+  for (const key of CORE_COMPONENT_KEYS) {
     if (typeof scores[key] !== "number" || Number.isNaN(scores[key])) {
       return null;
     }
   }
 
-  return scores as Record<ComponentKey, number>;
+  return scores;
 }
 
 /**
  * Compute the overall AppGap diagnostic score as the weighted average of the
- * three component scores. The number reflects the quality of the student's actual
- * application data (academics, activities, awards) — not task completion.
+ * components that are PRESENT, renormalizing the weights over that subset. A
+ * missing component (e.g. a skipped Personal Statement) simply drops out of both
+ * the numerator and the denominator — it is never treated as a zero.
  */
 export function computeComponentScore(
-  scores: Record<ComponentKey, number>,
+  scores: Partial<Record<ComponentKey, number>>,
 ): number {
   const clamp = (n: number) => Math.max(0, Math.min(100, n));
   let weighted = 0;
+  let weightSum = 0;
   for (const key of Object.keys(COMPONENT_WEIGHTS) as ComponentKey[]) {
-    weighted += clamp(scores[key]) * (COMPONENT_WEIGHTS[key] / 100);
+    const s = scores[key];
+    if (typeof s !== "number" || Number.isNaN(s)) continue;
+    const w = COMPONENT_WEIGHTS[key];
+    weighted += clamp(s) * w;
+    weightSum += w;
   }
-  return Math.round(weighted);
+  return weightSum > 0 ? Math.round(weighted / weightSum) : 0;
 }
 
 // ─── Legacy category composite (pre-V2 analyses) ─────────────────────────────

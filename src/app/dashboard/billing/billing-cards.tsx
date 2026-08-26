@@ -13,10 +13,11 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Everything in Free, plus:",
-  "Regenerate your analysis as your application grows",
+  "Personal Statement Coach — brainstorm, draft & refine your essay",
+  "Line-by-line essay feedback + a graded 4-part essay score",
+  "GapCoach live chat while you write",
+  "Regenerate your AppGap analysis as your application grows",
   "Premium AI models for deeper, more detailed analysis",
-  "Stronger, more strategic recommendations",
-  "Priority access to new AppGap tools as they launch",
 ];
 
 interface BillingCardsProps {

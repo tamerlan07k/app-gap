@@ -236,9 +236,9 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <OnboardingStepper current={5} />
+          <OnboardingStepper current={6} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 5 of 5
+            Step 6 of 6
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Review &amp; generate
@@ -593,7 +593,7 @@ export default function ReviewPage() {
         {/* Navigation */}
         <div className="flex items-center justify-between">
           <Button variant="ghost" asChild>
-            <Link href="/profile/activities">
+            <Link href="/profile/personal-statement">
               <ArrowLeft />
               Back
             </Link>

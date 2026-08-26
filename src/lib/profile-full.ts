@@ -44,6 +44,7 @@ export async function loadFullProfile(
     career_interest: string | null;
     selectivity: string | null;
     additional_context: string | null;
+    personal_statement_draft: string | null;
   };
 
   const profile: FullProfile = {
@@ -72,6 +73,7 @@ export async function loadFullProfile(
     careerInterest: p.career_interest ?? "",
     selectivity: p.selectivity ?? "",
     additionalContext: p.additional_context ?? null,
+    personalStatementDraft: p.personal_statement_draft ?? null,
     activities: (activitiesRes.data ?? []).map(
       (a: {
         name: string;

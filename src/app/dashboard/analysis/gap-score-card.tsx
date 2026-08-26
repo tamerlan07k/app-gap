@@ -99,11 +99,13 @@ function ScoreArc({
   );
 }
 
-// The three visible diagnostic components, in weight order.
+// The visible diagnostic components, in weight order. Personal Statement is
+// optional — it only renders when the student provided one during onboarding.
 const COMPONENT_META: { key: ComponentKey; label: string }[] = [
   { key: "academics", label: "Academics" },
   { key: "activities", label: "Activities" },
   { key: "awards", label: "Awards" },
+  { key: "personalStatement", label: "Personal Statement" },
 ];
 
 function ComponentGauge({
@@ -172,37 +174,67 @@ export function GapScoreCard({
           </div>
         </div>
 
-        {/* Three diagnostic components (V2). Only present on analyses that carry
-            component scores; legacy analyses show the overall arc alone. */}
-        {components && (
-          <div className="space-y-5 border-t border-border pt-6">
-            <div className="grid grid-cols-3 gap-4">
-              {COMPONENT_META.map(({ key, label: componentLabel }) => (
-                <ComponentGauge
-                  key={key}
-                  label={componentLabel}
-                  weight={COMPONENT_WEIGHTS[key]}
-                  score={components[key].score}
-                />
-              ))}
-            </div>
-            {!compact && (
-              <div className="space-y-2">
-                {COMPONENT_META.map(({ key, label: componentLabel }) => (
-                  <p
-                    key={key}
-                    className="text-xs leading-relaxed text-muted-foreground"
-                  >
-                    <span className="font-medium text-foreground">
-                      {componentLabel}:
-                    </span>{" "}
-                    {components[key].explanation}
-                  </p>
-                ))}
+        {/* Diagnostic components (V2). Only present on analyses that carry
+            component scores; legacy analyses show the overall arc alone. The
+            Personal Statement gauge appears only when one was scored. Displayed
+            weights are RENORMALIZED over the present components so they always
+            sum to 100 and match how the overall score was computed. */}
+        {components &&
+          (() => {
+            const present = COMPONENT_META.filter((m) => components[m.key]);
+            const presentWeightSum = present.reduce(
+              (sum, m) => sum + COMPONENT_WEIGHTS[m.key],
+              0,
+            );
+            const effectiveWeight = (key: ComponentKey) =>
+              presentWeightSum > 0
+                ? Math.round((COMPONENT_WEIGHTS[key] / presentWeightSum) * 100)
+                : 0;
+            return (
+              <div className="space-y-5 border-t border-border pt-6">
+                <div
+                  className={cn(
+                    "grid gap-4",
+                    present.length >= 4
+                      ? "grid-cols-2 sm:grid-cols-4"
+                      : "grid-cols-3",
+                  )}
+                >
+                  {present.map(({ key, label: componentLabel }) => {
+                    const c = components[key];
+                    if (!c) return null;
+                    return (
+                      <ComponentGauge
+                        key={key}
+                        label={componentLabel}
+                        weight={effectiveWeight(key)}
+                        score={c.score}
+                      />
+                    );
+                  })}
+                </div>
+                {!compact && (
+                  <div className="space-y-2">
+                    {present.map(({ key, label: componentLabel }) => {
+                      const c = components[key];
+                      if (!c) return null;
+                      return (
+                        <p
+                          key={key}
+                          className="text-xs leading-relaxed text-muted-foreground"
+                        >
+                          <span className="font-medium text-foreground">
+                            {componentLabel}:
+                          </span>{" "}
+                          {c.explanation}
+                        </p>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        )}
+            );
+          })()}
       </div>
     </div>
   );

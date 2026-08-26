@@ -2,7 +2,7 @@
 
 // Clickable step indicator shown at the top of every onboarding page.
 //
-// Five bars, one per step. Steps up to and including the current one are green;
+// One bar per step. Steps up to and including the current one are green;
 // the current step also gets a ring. Hovering (or keyboard-focusing) a bar
 // reveals the page name, and clicking it jumps straight to that step — so a
 // returning user can skip the Back/Back/Continue/Continue shuffle.
@@ -20,6 +20,7 @@ const STEPS: Step[] = [
   { href: "/profile/school-type", label: "High school" },
   { href: "/profile/career-direction", label: "Career direction" },
   { href: "/profile/activities", label: "Activities & impact" },
+  { href: "/profile/personal-statement", label: "Personal statement" },
   { href: "/profile/review", label: "Review & generate" },
 ];
 

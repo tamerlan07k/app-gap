@@ -188,7 +188,7 @@ export default function CareerDirectionPage() {
         <div className="space-y-3">
           <OnboardingStepper current={3} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 3 of 5
+            Step 3 of 6
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Career direction
