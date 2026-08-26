@@ -52,6 +52,14 @@ export interface HighSchoolInfo {
   schoolType: string;
 }
 
+// Optional onboarding personal statement. `choice` is the gate answer
+// ("yes" | "no" | "unsure" | "" = unanswered); only "yes" reveals the paste box.
+// `text` is the pasted statement (empty unless choice === "yes").
+export interface PersonalStatementInfo {
+  choice: string;
+  text: string;
+}
+
 export interface Step3Data {
   activities: Activity[];
   awards: Award[];
@@ -61,6 +69,7 @@ const KEY_STEP1 = "appgap:step1";
 const KEY_STEP2 = "appgap:step2";
 const KEY_STEP3 = "appgap:step3";
 const KEY_SCHOOL = "appgap:school";
+const KEY_PS = "appgap:personal-statement";
 
 function safeParse<T>(key: string): T | null {
   try {
@@ -101,4 +110,12 @@ export function saveSchoolInfo(data: HighSchoolInfo): void {
 
 export function loadSchoolInfo(): HighSchoolInfo | null {
   return safeParse<HighSchoolInfo>(KEY_SCHOOL);
+}
+
+export function savePersonalStatementInfo(data: PersonalStatementInfo): void {
+  localStorage.setItem(KEY_PS, JSON.stringify(data));
+}
+
+export function loadPersonalStatementInfo(): PersonalStatementInfo | null {
+  return safeParse<PersonalStatementInfo>(KEY_PS);
 }

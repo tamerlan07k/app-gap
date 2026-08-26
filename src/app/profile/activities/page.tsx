@@ -599,7 +599,7 @@ export default function ActivitiesPage() {
     setIsSaving(true);
     try {
       await saveStep3ToDb(saved, awards);
-      router.push("/profile/review");
+      router.push("/profile/personal-statement");
     } catch {
       setSaveError(
         "Couldn't save your progress. Please check your connection and try again.",
@@ -638,7 +638,7 @@ export default function ActivitiesPage() {
         <div className="space-y-3">
           <OnboardingStepper current={4} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 4 of 5
+            Step 4 of 6
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Activities &amp; impact

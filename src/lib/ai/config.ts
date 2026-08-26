@@ -11,7 +11,9 @@ export type FeatureKey =
   | "profileAnalysis" // the AppGap diagnostic / gap analysis
   | "applicationWriting" // activity descriptions + Additional Information help
   | "activitiesAnalysis" // Activities workspace: analysis + verdicts + recommendations
-  | "personalStatementCoach" // Personal Statement coaching (future)
+  | "personalStatementCoach" // Personal Statement: brainstorm/topic/draft/revision (Gemini)
+  | "personalStatementDeepCoach" // Personal Statement: line-by-line + graded evaluation (Opus, higher cost)
+  | "personalStatementChat" // Personal Statement: GapCoach live chat while writing (Gemini, metered per message)
   | "supplementalCoach" // supplemental-essay coaching (future)
   | "opportunityFinder"; // internships / research / competitions finder (future, data-backed)
 
@@ -45,6 +47,35 @@ export const AI_FEATURES = {
     temperature: 0.4,
     description:
       "Analyzes existing activities (strength, field alignment, continue/deepen verdicts) and generates realistic, timeline-aware activity recommendations",
+  },
+  // Personal Statement — the Gemini-tier coaching operations (brainstorm, topic,
+  // draft, revision). The per-tier model actually used comes from FEATURE_ACCESS
+  // (Pro = google/gemini-2.5-pro); this default + temperature are read by the
+  // engine modules. Brainstorming leans slightly warmer for generative range,
+  // but the prompt keeps it grounded (no inventing the student's life).
+  personalStatementCoach: {
+    model: "google/gemini-2.5-pro",
+    temperature: 0.7,
+    description:
+      "Personal Statement coaching — brainstorming, topic analysis, draft feedback, and revision guidance (coaches, never authors)",
+  },
+  // The expensive, nuance-heavy Personal Statement operations (sentence-level
+  // line-by-line feedback + the graded evaluation). Opus 5 via the gateway; the
+  // per-tier model still comes from FEATURE_ACCESS. Low temperature — this is
+  // careful diagnosis, not ideation.
+  personalStatementDeepCoach: {
+    model: "anthropic/claude-opus-5",
+    temperature: 0.3,
+    description:
+      "Personal Statement deep coaching — line-by-line feedback and graded evaluation (Opus)",
+  },
+  // GapCoach live chat while writing. Gemini (cheap, conversational); metered
+  // per message under its OWN allowance so it never eats the Opus caps.
+  personalStatementChat: {
+    model: "google/gemini-2.5-pro",
+    temperature: 0.6,
+    description:
+      "GapCoach live chat — answers a student's questions while they write (coaches, never authors)",
   },
 } satisfies Partial<Record<FeatureKey, FeatureConfig>>;
 
@@ -153,13 +184,46 @@ export const FEATURE_ACCESS: Record<
       model: "google/gemini-2.5-pro",
     },
   },
-  // Pro-only tools (future, not enforced yet). Bounded monthly Pro allowances so
-  // no future feature is ever accidentally unlimited.
+  // Personal Statement — Pro-only. Split into two ledgers to keep AI cost under a
+  // hard ceiling (target: ≤ $1.50/user/month at expected usage):
+  //   personalStatementCoach     → the cheaper Gemini operations (brainstorm,
+  //                                topic, draft analysis, revision, mechanical
+  //                                checks). Generous monthly allowance.
+  //   personalStatementDeepCoach → the expensive Opus operations (line-by-line
+  //                                feedback + graded evaluation). Tighter cap so
+  //                                even worst-case spend stays under budget.
+  // Enforcement is wired in Phase 2; the entitlement/gating for the workspace
+  // itself reads `personalStatementCoach.enabled` (false for Free → upgrade CTA).
   personalStatementCoach: {
     free: { enabled: false, limit: 0, window: null },
     pro: {
       enabled: true,
-      limit: 50,
+      limit: 20,
+      window: "month",
+      model: "google/gemini-2.5-pro",
+    },
+  },
+  // NOTE: confirm the exact AI-gateway model ID for Opus 5 before wiring Phase 2
+  // (Vercel AI Gateway exposes Anthropic models as "anthropic/…"; if Opus 5 is
+  // not yet listed, "anthropic/claude-sonnet-5" / "anthropic/claude-opus-4.8"
+  // are the fallbacks). Not called anywhere yet.
+  personalStatementDeepCoach: {
+    free: { enabled: false, limit: 0, window: null },
+    pro: {
+      enabled: true,
+      limit: 8,
+      window: "month",
+      model: "anthropic/claude-opus-5",
+    },
+  },
+  // GapCoach live chat — Pro-only, its own bounded monthly message allowance
+  // (each message = one use) so conversational usage never touches the Gemini
+  // coaching cap or the Opus deep-coach cap. Gemini keeps per-message cost tiny.
+  personalStatementChat: {
+    free: { enabled: false, limit: 0, window: null },
+    pro: {
+      enabled: true,
+      limit: 40,
       window: "month",
       model: "google/gemini-2.5-pro",
     },

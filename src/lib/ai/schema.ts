@@ -59,13 +59,25 @@ export const applicationNarrativeSchema = z.object({
   schoolFitReasoning: z.string().optional(),
 });
 
-// The three application-component scores that drive the V2 diagnostic score
-// (AppGap Score = 0.35·Academics + 0.45·Activities + 0.20·Awards, computed in
-// score.ts). Optional so legacy analyses generated before V2 still validate.
+// The application-component scores that drive the V2 diagnostic score (weighted
+// + renormalized in score.ts). academics/activities/awards always come from the
+// model; personalStatement is present ONLY when the student supplied one during
+// onboarding (its score comes from the lightweight onboarding diagnostic, not the
+// profile model). Optional so legacy analyses generated before V2 still validate.
 export const componentScoresSchema = z.object({
   academics: narrativeScoreSchema,
   activities: narrativeScoreSchema,
   awards: narrativeScoreSchema,
+  personalStatement: narrativeScoreSchema.optional(),
+});
+
+// The lightweight onboarding Personal Statement diagnostic result — a rough
+// signal only, distinct from the full Personal Statement Coach. Present only when
+// the student provided a statement during onboarding.
+export const personalStatementDiagnosticSchema = z.object({
+  score: z.number().int().min(0).max(100),
+  strength: z.string(),
+  opportunity: z.string(),
 });
 
 export const analysisSchema = z.object({
@@ -78,6 +90,7 @@ export const analysisSchema = z.object({
   roadmap: z.array(roadmapItemSchema).min(1).max(8),
   advisorNote: z.string(),
   applicationNarrative: applicationNarrativeSchema.optional(),
+  personalStatement: personalStatementDiagnosticSchema.optional(),
 });
 
 export type Analysis = z.infer<typeof analysisSchema>;
@@ -87,5 +100,8 @@ export type NextStep = z.infer<typeof nextStepSchema>;
 export type RoadmapItem = z.infer<typeof roadmapItemSchema>;
 export type ApplicationNarrative = z.infer<typeof applicationNarrativeSchema>;
 export type ComponentScores = z.infer<typeof componentScoresSchema>;
+export type PersonalStatementDiagnostic = z.infer<
+  typeof personalStatementDiagnosticSchema
+>;
 export type NarrativeScore = z.infer<typeof narrativeScoreSchema>;
 export type NarrativeGapItem = z.infer<typeof narrativeGapItemSchema>;

@@ -1,8 +1,9 @@
 import { generateText } from "ai";
 import { gateway } from "./client";
 import { AI_FEATURES } from "./config";
+import { generateOnboardingPsDiagnostic } from "./personal-statement/onboarding-diagnostic";
 import { buildProfilePrompt, type FullProfile, SYSTEM_PROMPT } from "./prompt";
-import { type Analysis, analysisSchema } from "./schema";
+import { type Analysis, analysisSchema, type ComponentScores } from "./schema";
 import {
   computeComponentScore,
   computeOverallScore,
@@ -54,6 +55,38 @@ export async function analyzeProfile(
   // gapScore, rather than failing the request.
   const componentScores = extractComponentScores(analysis.componentScores);
   if (componentScores) {
+    // Optional Personal Statement component: only when the student provided a
+    // statement during onboarding. Scored separately on the 4-category framework
+    // (Gemini, lightweight). Failures are NON-FATAL — the overall simply omits PS
+    // and renormalizes over the remaining components, so a diagnostic hiccup never
+    // fails the whole analysis or fabricates a PS score.
+    const psText = profile.personalStatementDraft?.trim();
+    if (psText) {
+      try {
+        const { diagnostic } = await generateOnboardingPsDiagnostic(
+          psText,
+          profile,
+        );
+        componentScores.personalStatement = diagnostic.score;
+        analysis.personalStatement = {
+          score: diagnostic.score,
+          strength: diagnostic.strength,
+          opportunity: diagnostic.opportunity,
+        };
+        analysis.componentScores = {
+          ...(analysis.componentScores as ComponentScores),
+          personalStatement: {
+            score: diagnostic.score,
+            explanation: diagnostic.strength,
+          },
+        };
+      } catch (err) {
+        console.error(
+          "[AI] onboarding PS diagnostic failed (scoring without PS):",
+          err instanceof Error ? err.message : String(err),
+        );
+      }
+    }
     analysis.gapScore = computeComponentScore(componentScores);
   } else {
     const categoryScores = extractCategoryScores(analysis.applicationNarrative);

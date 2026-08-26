@@ -16,7 +16,7 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "personal-statement",
     label: "Personal Statement",
-    locked: true,
+    locked: false,
     description:
       "Draft and refine your Common App personal statement with an AppGap coach — brainstorming, structure, feedback, and revision.",
   },

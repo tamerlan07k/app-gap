@@ -553,7 +553,7 @@ export default function ProfilePage() {
         <div className="space-y-3">
           <OnboardingStepper current={1} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 1 of 5
+            Step 1 of 6
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile

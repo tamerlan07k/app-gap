@@ -31,6 +31,8 @@ export interface FullProfile {
     grade: string;
   }>;
   additionalContext?: string | null;
+  /** Optional onboarding personal statement (scored separately, not in the prompt). */
+  personalStatementDraft?: string | null;
 }
 
 // ─── Label maps ───────────────────────────────────────────────────────────────

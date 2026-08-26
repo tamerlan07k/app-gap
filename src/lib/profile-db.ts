@@ -220,6 +220,48 @@ export async function saveAdditionalContextToDb(
   if (error) throw new Error(error.message);
 }
 
+export async function loadPersonalStatementDraftFromDb(): Promise<
+  string | null
+> {
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("personal_statement_draft")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return (p?.personal_statement_draft as string | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function savePersonalStatementDraftToDb(
+  text: string,
+): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      personal_statement_draft: text.trim() || null,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
+  );
+  if (error) throw new Error(error.message);
+}
+
 export async function loadSchoolTypeFromDb(): Promise<HighSchoolInfo | null> {
   try {
     const supabase = createClient();
