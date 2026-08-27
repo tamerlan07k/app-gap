@@ -50,6 +50,10 @@ const SAMPLE = has("--sample");
 const LIMIT = Number(val("--limit", Infinity));
 const FILTER = val("--filter", null);
 const MAJORS_ARG = val("--majors", null);
+// How many LLM calls to run at once. Default 1 (sequential, unchanged behavior).
+// Writes are idempotent upserts and the skip-existing set is computed up front,
+// so raising this only parallelizes — it never duplicates rows.
+const CONCURRENCY = Math.max(1, Number(val("--concurrency", 1)) || 1);
 
 const VALID_TYPES = ["history", "fit", "program"];
 if (!VALID_TYPES.includes(TYPE)) {
@@ -253,22 +257,36 @@ async function loadColleges() {
   return all;
 }
 
+// Page through an entire table (PostgREST caps a single select at 1000 rows).
+async function selectAll(table, columns) {
+  const all = [];
+  let from = 0;
+  for (;;) {
+    const { data, error } = await db
+      .from(table)
+      .select(columns)
+      .range(from, from + 999);
+    if (error) throw new Error(`load ${table}: ${error.message}`);
+    all.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+    from += 1000;
+  }
+  return all;
+}
+
 async function loadFactsAndExisting() {
-  const [profilesRes, statsRes] = await Promise.all([
-    db
-      .from("college_profiles")
-      .select("college_id, founded_year, setting, history, fit"),
-    db
-      .from("college_admission_stats")
-      .select("college_id, admit_rate, source_date"),
+  const [profiles, stats] = await Promise.all([
+    selectAll(
+      "college_profiles",
+      "college_id, founded_year, setting, history, fit",
+    ),
+    selectAll("college_admission_stats", "college_id, admit_rate, source_date"),
   ]);
-  const profileById = new Map(
-    (profilesRes.data ?? []).map((p) => [p.college_id, p]),
-  );
+  const profileById = new Map(profiles.map((p) => [p.college_id, p]));
   // Most-recent admit rate per college.
   const admitById = new Map();
   const dateById = new Map();
-  for (const s of statsRes.data ?? []) {
+  for (const s of stats) {
     const prev = dateById.get(s.college_id) ?? "";
     if ((s.source_date ?? "") >= prev) {
       dateById.set(s.college_id, s.source_date ?? "");
@@ -372,13 +390,24 @@ async function main() {
 
   let targets = [];
   if (TYPE === "program") {
-    const { data: existing } = await db
-      .from("college_field_strengths")
-      .select("college_id, field_key")
-      .in("field_key", majors);
-    const have = new Set(
-      (existing ?? []).map((r) => `${r.college_id}:${r.field_key}`),
-    );
+    // Page through ALL existing (college, field) rows. A single select is capped
+    // at 1000 by PostgREST's default limit, so at >1000 program rows it would
+    // under-count what's already done and re-attempt existing rows — harmless
+    // (writes ignore duplicates) but each retry still burns an LLM call/budget.
+    const have = new Set();
+    let existFrom = 0;
+    for (;;) {
+      const { data, error } = await db
+        .from("college_field_strengths")
+        .select("college_id, field_key")
+        .in("field_key", majors)
+        .range(existFrom, existFrom + 999);
+      if (error)
+        throw new Error(`load existing program rows: ${error.message}`);
+      for (const r of data ?? []) have.add(`${r.college_id}:${r.field_key}`);
+      if (!data || data.length < 1000) break;
+      existFrom += 1000;
+    }
     for (const c of colleges) {
       const e = enrich(c);
       for (const fk of majors) {
@@ -430,7 +459,8 @@ async function main() {
   }
 
   const summary = { ok: 0, empty: 0, errors: [] };
-  for (const t of targets) {
+
+  async function processTarget(t) {
     const label =
       TYPE === "program" ? `${t.college.name} · ${t.fieldKey}` : t.college.name;
     try {
@@ -441,7 +471,7 @@ async function main() {
         console.log(`\n── ${label} (${out.confidence ?? "?"}) ──`);
         console.log(JSON.stringify(out, null, 2));
         summary.ok++;
-        continue;
+        return;
       }
 
       let wrote = false;
@@ -461,6 +491,21 @@ async function main() {
       console.log(`  ! ERROR ${label}: ${err.message}`);
     }
   }
+
+  // Worker pool: process up to CONCURRENCY targets at once. Targets are
+  // independent (each writes its own row via an idempotent upsert), so order
+  // doesn't matter and the only effect of concurrency is wall-clock speed.
+  if (CONCURRENCY > 1) console.log(`(running ${CONCURRENCY} at a time)\n`);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < targets.length) {
+      const i = cursor++;
+      await processTarget(targets[i]);
+    }
+  }
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, targets.length) }, worker),
+  );
 
   console.log(
     `\nDone. ${SAMPLE ? "sampled" : "wrote-drafts"}=${summary.ok} ` +
