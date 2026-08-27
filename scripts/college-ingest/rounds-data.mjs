@@ -1381,4 +1381,353 @@ export const COLLEGE_ROUNDS = [
   },
   { name: "Western Kentucky University", verified: false, rounds: ["ROLLING"] },
   { name: "Marshall University", verified: false, rounds: ["ROLLING"] },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V5 expansion (+100). ROUND STRUCTURE ONLY, all `verified: false`. Same rule
+  // as the V2/V3/V4 blocks: these reflect each school's well-known round
+  // offerings (rolling/RD floors for access-oriented publics, EA+RD for the
+  // comprehensives that publish an EA date, ED/EA for the selective privates),
+  // but no deadline is stored here and nothing is trusted until a human sets
+  // `verified: true`. Names must match the V5 seeds in seed-colleges.mjs.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── HBCUs ──────────────────────────────────────────────────────────────────
+  { name: "Bethune-Cookman University", verified: false, rounds: ["ROLLING"] },
+  { name: "Alabama A & M University", verified: false, rounds: ["ROLLING"] },
+  { name: "Alabama State University", verified: false, rounds: ["ROLLING"] },
+  { name: "Clark Atlanta University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Fisk University", verified: false, rounds: ["RD"] },
+  { name: "Dillard University", verified: false, rounds: ["ROLLING"] },
+  { name: "Grambling State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Southern University and A & M College",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Norfolk State University", verified: false, rounds: ["ROLLING"] },
+  { name: "Virginia State University", verified: false, rounds: ["ROLLING"] },
+  { name: "Texas Southern University", verified: false, rounds: ["ROLLING"] },
+  { name: "Delaware State University", verified: false, rounds: ["ROLLING"] },
+
+  // ── CSU access campuses (single filing window → RD floor) ──────────────────
+  {
+    name: "California State University-Bakersfield",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "California State University-Dominguez Hills",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "California State University-Los Angeles",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "California State University-San Bernardino",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "California State University-Stanislaus",
+    verified: false,
+    rounds: ["RD"],
+  },
+  { name: "Sonoma State University", verified: false, rounds: ["RD"] },
+  {
+    name: "California State University-Monterey Bay",
+    verified: false,
+    rounds: ["RD"],
+  },
+
+  // ── CUNY campuses (single filing window → RD floor) ────────────────────────
+  {
+    name: "CUNY John Jay College of Criminal Justice",
+    verified: false,
+    rounds: ["RD"],
+  },
+  { name: "CUNY Lehman College", verified: false, rounds: ["RD"] },
+  { name: "College of Staten Island CUNY", verified: false, rounds: ["RD"] },
+
+  // ── PASSHE (Pennsylvania) regional publics ─────────────────────────────────
+  {
+    name: "West Chester University of Pennsylvania",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Shippensburg University of Pennsylvania",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Millersville University of Pennsylvania",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Kutztown University of Pennsylvania",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Indiana University of Pennsylvania",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── New Jersey regional publics ────────────────────────────────────────────
+  { name: "Rowan University", verified: false, rounds: ["ROLLING"] },
+  { name: "Kean University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Ramapo College of New Jersey",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Stockton University", verified: false, rounds: ["ROLLING"] },
+
+  // ── New England regional publics ───────────────────────────────────────────
+  {
+    name: "University of Massachusetts-Dartmouth",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Bridgewater State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Central Connecticut State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Southern Connecticut State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Keene State College", verified: false, rounds: ["ROLLING"] },
+  { name: "Rhode Island College", verified: false, rounds: ["ROLLING"] },
+
+  // ── Southeast regional publics ─────────────────────────────────────────────
+  {
+    name: "Coastal Carolina University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Winthrop University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Citadel Military College of South Carolina",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of North Carolina Asheville",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "University of North Carolina at Pembroke",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "East Tennessee State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Tennessee Technological University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Radford University", verified: false, rounds: ["ROLLING"] },
+  { name: "Longwood University", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "University of Mary Washington",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+
+  // ── Georgia / Florida regional publics ─────────────────────────────────────
+  { name: "Valdosta State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Georgia College & State University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "University of North Georgia", verified: false, rounds: ["ROLLING"] },
+  { name: "University of West Florida", verified: false, rounds: ["ROLLING"] },
+  { name: "Florida Gulf Coast University", verified: false, rounds: ["RD"] },
+  { name: "University of West Georgia", verified: false, rounds: ["ROLLING"] },
+
+  // ── Midwest regional publics ───────────────────────────────────────────────
+  { name: "Eastern Michigan University", verified: false, rounds: ["ROLLING"] },
+  { name: "Central Michigan University", verified: false, rounds: ["ROLLING"] },
+  { name: "Oakland University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Southern Illinois University-Carbondale",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Southern Illinois University Edwardsville",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Missouri State University-Springfield",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Central Missouri",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Indiana State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "University of Wisconsin-La Crosse",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "University of Wisconsin-Oshkosh",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Wisconsin-Whitewater",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Minnesota State University-Mankato",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── Plains / Mountain regional publics ─────────────────────────────────────
+  {
+    name: "Saint Cloud State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "University of Minnesota-Duluth", verified: false, rounds: ["RD"] },
+  {
+    name: "University of Nebraska at Kearney",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Fort Hays State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Metropolitan State University of Denver",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Northern Colorado",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── West regional publics ──────────────────────────────────────────────────
+  { name: "Weber State University", verified: false, rounds: ["ROLLING"] },
+  { name: "Utah Valley University", verified: false, rounds: ["ROLLING"] },
+  { name: "Southern Utah University", verified: false, rounds: ["ROLLING"] },
+  { name: "Idaho State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Eastern Washington University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Central Washington University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "The Evergreen State College", verified: false, rounds: ["ROLLING"] },
+  { name: "Western Oregon University", verified: false, rounds: ["ROLLING"] },
+
+  // ── Texas regional publics ─────────────────────────────────────────────────
+  {
+    name: "Texas A & M University-Corpus Christi",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Texas A&M University-Kingsville",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Stephen F Austin State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Lamar University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "The University of Texas Rio Grande Valley",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Tarleton State University", verified: false, rounds: ["ROLLING"] },
+
+  // ── Louisiana / Deep South regional publics ────────────────────────────────
+  {
+    name: "University of Louisiana at Lafayette",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Louisiana at Monroe",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Southern Mississippi",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── Kentucky regional publics ──────────────────────────────────────────────
+  { name: "Eastern Kentucky University", verified: false, rounds: ["ROLLING"] },
+  { name: "Murray State University", verified: false, rounds: ["ROLLING"] },
+
+  // ── Selective / distinctive privates ───────────────────────────────────────
+  {
+    name: "The University of the South",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  { name: "St Lawrence University", verified: false, rounds: ["ED", "RD"] },
+  { name: "Mercer University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Samford University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Yeshiva University", verified: false, rounds: ["EA", "RD"] },
+
+  // ── SUNY comprehensive colleges ────────────────────────────────────────────
+  {
+    name: "State University of New York at Oswego",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "State University of New York at Cortland",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "State University of New York at Plattsburgh",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "SUNY Oneonta", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "SUNY Buffalo State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
 ];

@@ -1,4 +1,4 @@
-// College seed list (381 = V1 ~53 + V2 +128 + V3 +100 + V4 +100).
+// College seed list (481 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -1638,5 +1638,513 @@ export const SEED_COLLEGES = [
     name: "Marshall University",
     state: "WV",
     notes: "public; access-oriented; second WV school",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V5 expansion (+100). Same rules as V1–V4: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Chosen to (a) deepen categories
+  // still thin in the set — more HBCUs, CSU/CUNY/SUNY access campuses, PASSHE
+  // and other regional-public systems — and (b) keep widening the
+  // target/likely/safety band across states. `notes` records the selectivity
+  // band + why the school is here, never app facts. Names are best-effort
+  // Scorecard canonical names, corrected by the --dry-run no-match/ambiguous
+  // report before the live run.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── HBCUs not yet covered ──────────────────────────────────────────────────
+  {
+    name: "Bethune-Cookman University",
+    state: "FL",
+    notes: "HBCU; private; access-oriented",
+  },
+  {
+    name: "Alabama A & M University",
+    state: "AL",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Alabama State University",
+    state: "AL",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Clark Atlanta University",
+    state: "GA",
+    notes: "HBCU; private; AUC member",
+  },
+  {
+    name: "Fisk University",
+    state: "TN",
+    notes: "HBCU; private; selective LAC",
+  },
+  {
+    name: "Dillard University",
+    state: "LA",
+    notes: "HBCU; private; access-oriented",
+  },
+  {
+    name: "Grambling State University",
+    state: "LA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Southern University and A & M College",
+    state: "LA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Norfolk State University",
+    state: "VA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Virginia State University",
+    state: "VA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Texas Southern University",
+    state: "TX",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Delaware State University",
+    state: "DE",
+    notes: "HBCU; public; access-oriented",
+  },
+
+  // ── CSU access campuses ────────────────────────────────────────────────────
+  {
+    name: "California State University-Bakersfield",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+  {
+    name: "California State University-Dominguez Hills",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+  {
+    name: "California State University-Los Angeles",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+  {
+    name: "California State University-San Bernardino",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+  {
+    name: "California State University-Stanislaus",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+  {
+    name: "Sonoma State University",
+    state: "CA",
+    notes: "public; CSU; moderate",
+  },
+  {
+    name: "California State University-Monterey Bay",
+    state: "CA",
+    notes: "public; CSU; access-oriented",
+  },
+
+  // ── CUNY campuses not yet covered ──────────────────────────────────────────
+  {
+    name: "CUNY John Jay College of Criminal Justice",
+    state: "NY",
+    notes: "public; CUNY; criminal justice",
+  },
+  {
+    name: "CUNY Lehman College",
+    state: "NY",
+    notes: "public; CUNY; access-oriented",
+  },
+  {
+    name: "College of Staten Island CUNY",
+    state: "NY",
+    notes: "public; CUNY; access-oriented",
+  },
+
+  // ── PASSHE (Pennsylvania) regional publics ─────────────────────────────────
+  {
+    name: "West Chester University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; moderate",
+  },
+  {
+    name: "Shippensburg University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; access-oriented",
+  },
+  {
+    name: "Millersville University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; access-oriented",
+  },
+  {
+    name: "Kutztown University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; access-oriented",
+  },
+  {
+    name: "Indiana University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; access-oriented",
+  },
+
+  // ── New Jersey regional publics ────────────────────────────────────────────
+  { name: "Rowan University", state: "NJ", notes: "public; moderate" },
+  { name: "Kean University", state: "NJ", notes: "public; access-oriented" },
+  {
+    name: "Ramapo College of New Jersey",
+    state: "NJ",
+    notes: "public; moderate",
+  },
+  {
+    name: "Stockton University",
+    state: "NJ",
+    notes: "public; access-oriented",
+  },
+
+  // ── New England regional publics ───────────────────────────────────────────
+  {
+    name: "University of Massachusetts-Dartmouth",
+    state: "MA",
+    notes: "public; UMass; access-oriented",
+  },
+  {
+    name: "Bridgewater State University",
+    state: "MA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Central Connecticut State University",
+    state: "CT",
+    notes: "public; CSCU; access-oriented",
+  },
+  {
+    name: "Southern Connecticut State University",
+    state: "CT",
+    notes: "public; CSCU; access-oriented",
+  },
+  {
+    name: "Keene State College",
+    state: "NH",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Rhode Island College",
+    state: "RI",
+    notes: "public; access-oriented",
+  },
+
+  // ── Southeast regional publics ─────────────────────────────────────────────
+  {
+    name: "Coastal Carolina University",
+    state: "SC",
+    notes: "public; moderate",
+  },
+  { name: "Winthrop University", state: "SC", notes: "public; moderate" },
+  {
+    name: "Citadel Military College of South Carolina",
+    state: "SC",
+    notes: "public; senior military college",
+  },
+  {
+    name: "University of North Carolina Asheville",
+    state: "NC",
+    notes: "public; UNC; liberal-arts focus",
+  },
+  {
+    name: "University of North Carolina at Pembroke",
+    state: "NC",
+    notes: "public; UNC; access-oriented",
+  },
+  {
+    name: "East Tennessee State University",
+    state: "TN",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Tennessee Technological University",
+    state: "TN",
+    notes: "public; engineering/tech; moderate",
+  },
+  { name: "Radford University", state: "VA", notes: "public; access-oriented" },
+  { name: "Longwood University", state: "VA", notes: "public; moderate" },
+  {
+    name: "University of Mary Washington",
+    state: "VA",
+    notes: "public; liberal-arts focus; moderate",
+  },
+
+  // ── Georgia / Florida regional publics ─────────────────────────────────────
+  {
+    name: "Valdosta State University",
+    state: "GA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Georgia College & State University",
+    state: "GA",
+    notes: "public liberal-arts university; moderate",
+  },
+  {
+    name: "University of North Georgia",
+    state: "GA",
+    notes: "public; senior military college option; moderate",
+  },
+  {
+    name: "University of West Florida",
+    state: "FL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Florida Gulf Coast University",
+    state: "FL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of West Georgia",
+    state: "GA",
+    notes: "public; access-oriented",
+  },
+
+  // ── Midwest regional publics ───────────────────────────────────────────────
+  {
+    name: "Eastern Michigan University",
+    state: "MI",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Central Michigan University",
+    state: "MI",
+    notes: "public; access-oriented",
+  },
+  { name: "Oakland University", state: "MI", notes: "public; moderate" },
+  {
+    name: "Southern Illinois University-Carbondale",
+    state: "IL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Southern Illinois University Edwardsville",
+    state: "IL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Missouri State University-Springfield",
+    state: "MO",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Central Missouri",
+    state: "MO",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Indiana State University",
+    state: "IN",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Wisconsin-La Crosse",
+    state: "WI",
+    notes: "public; moderate",
+  },
+  {
+    name: "University of Wisconsin-Oshkosh",
+    state: "WI",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Wisconsin-Whitewater",
+    state: "WI",
+    notes: "public; business; access-oriented",
+  },
+  {
+    name: "Minnesota State University-Mankato",
+    state: "MN",
+    notes: "public; access-oriented",
+  },
+
+  // ── Plains / Mountain regional publics ─────────────────────────────────────
+  {
+    name: "Saint Cloud State University",
+    state: "MN",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Minnesota-Duluth",
+    state: "MN",
+    notes: "public; moderate",
+  },
+  {
+    name: "University of Nebraska at Kearney",
+    state: "NE",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Fort Hays State University",
+    state: "KS",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Metropolitan State University of Denver",
+    state: "CO",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Northern Colorado",
+    state: "CO",
+    notes: "public; education; access-oriented",
+  },
+
+  // ── West regional publics ──────────────────────────────────────────────────
+  {
+    name: "Weber State University",
+    state: "UT",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Utah Valley University",
+    state: "UT",
+    notes: "public; access-oriented",
+  },
+  { name: "Southern Utah University", state: "UT", notes: "public; moderate" },
+  {
+    name: "Idaho State University",
+    state: "ID",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Eastern Washington University",
+    state: "WA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Central Washington University",
+    state: "WA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "The Evergreen State College",
+    state: "WA",
+    notes: "public; nontraditional liberal-arts; access-oriented",
+  },
+  {
+    name: "Western Oregon University",
+    state: "OR",
+    notes: "public; access-oriented",
+  },
+
+  // ── Texas regional publics ─────────────────────────────────────────────────
+  {
+    name: "Texas A & M University-Corpus Christi",
+    state: "TX",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Texas A&M University-Kingsville",
+    state: "TX",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Stephen F Austin State University",
+    state: "TX",
+    notes: "public; access-oriented",
+  },
+  { name: "Lamar University", state: "TX", notes: "public; access-oriented" },
+  {
+    name: "The University of Texas Rio Grande Valley",
+    state: "TX",
+    notes: "public; UT system; access-oriented",
+  },
+  {
+    name: "Tarleton State University",
+    state: "TX",
+    notes: "public; Texas A&M system; access-oriented",
+  },
+
+  // ── Louisiana / Deep South regional publics ────────────────────────────────
+  {
+    name: "University of Louisiana at Lafayette",
+    state: "LA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Louisiana at Monroe",
+    state: "LA",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Southern Mississippi",
+    state: "MS",
+    notes: "public; access-oriented",
+  },
+
+  // ── Kentucky regional publics ──────────────────────────────────────────────
+  {
+    name: "Eastern Kentucky University",
+    state: "KY",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Murray State University",
+    state: "KY",
+    notes: "public; moderate",
+  },
+
+  // ── Selective / distinctive privates not yet covered ───────────────────────
+  {
+    name: "The University of the South",
+    state: "TN",
+    notes: "private LAC; selective; Episcopal",
+  },
+  {
+    name: "St Lawrence University",
+    state: "NY",
+    notes: "private LAC; moderate-selective",
+  },
+  { name: "Mercer University", state: "GA", notes: "private; moderate" },
+  {
+    name: "Samford University",
+    state: "AL",
+    notes: "private; Christian; moderate",
+  },
+  {
+    name: "Yeshiva University",
+    state: "NY",
+    notes: "private; Jewish; selective",
+  },
+
+  // ── SUNY comprehensive colleges ────────────────────────────────────────────
+  {
+    name: "State University of New York at Oswego",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
+  },
+  {
+    name: "State University of New York at Cortland",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
+  },
+  {
+    name: "State University of New York at Plattsburgh",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
+  },
+  {
+    name: "SUNY Oneonta",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
+  },
+  {
+    name: "SUNY Buffalo State University",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
   },
 ];
