@@ -1,4 +1,4 @@
-// College seed list (281 = V1 ~53 + V2 +128 + V3 +100).
+// College seed list (381 = V1 ~53 + V2 +128 + V3 +100 + V4 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -1143,5 +1143,500 @@ export const SEED_COLLEGES = [
     name: "Brigham Young University",
     state: "UT",
     notes: "private; business/CS; large",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V4 expansion (+100). Same rules as V1–V3: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Chosen to (a) add categories the
+  // dataset lacked — service academies, art/design & comms specialists, more
+  // HBCUs, CUNY/CSU access-oriented publics — and (b) keep widening the
+  // target/likely/safety band with regional publics and mid-selective privates
+  // across more of the country. `notes` records the selectivity band + why the
+  // school is here, never app facts. Names are best-effort Scorecard canonical
+  // names, corrected by the --dry-run no-match/ambiguous report before the live
+  // run. Deliberate edge cases the schema already handles (name collisions
+  // disambiguated by state): Wheaton College IL vs MA, Cornell College IA vs
+  // Cornell University NY, University of St Thomas MN vs TX.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Highly selective / selective not yet covered ───────────────────────────
+  {
+    name: "Washington and Lee University",
+    state: "VA",
+    notes: "highly selective private LAC-style; ED",
+  },
+  {
+    name: "College of the Holy Cross",
+    state: "MA",
+    notes: "selective private; Jesuit LAC-style",
+  },
+  {
+    name: "Bryn Mawr College",
+    state: "PA",
+    notes: "LAC; women's; highly selective (Seven Sisters)",
+  },
+  {
+    name: "The Cooper Union for the Advancement of Science and Art",
+    state: "NY",
+    notes: "selective; engineering/art/architecture",
+  },
+  {
+    name: "Franklin W Olin College of Engineering",
+    state: "MA",
+    notes: "elite undergraduate engineering",
+  },
+  {
+    name: "United States Military Academy",
+    state: "NY",
+    notes: "service academy; selective; West Point",
+  },
+  {
+    name: "United States Naval Academy",
+    state: "MD",
+    notes: "service academy; selective",
+  },
+  {
+    name: "United States Air Force Academy",
+    state: "CO",
+    notes: "service academy; selective",
+  },
+
+  // ── Arts / comms / design specialists ──────────────────────────────────────
+  {
+    name: "Emerson College",
+    state: "MA",
+    notes: "selective private; communication/arts",
+  },
+  {
+    name: "Ithaca College",
+    state: "NY",
+    notes: "private; communications/media/music",
+  },
+  {
+    name: "Rhode Island School of Design",
+    state: "RI",
+    notes: "top art/design school",
+  },
+  {
+    name: "Pratt Institute-Main",
+    state: "NY",
+    notes: "private; art/design/architecture",
+  },
+  {
+    name: "Savannah College of Art and Design",
+    state: "GA",
+    notes: "private; art/design; large",
+  },
+  {
+    name: "Maryland Institute College of Art",
+    state: "MD",
+    notes: "private; art/design",
+  },
+  {
+    name: "The New School",
+    state: "NY",
+    notes: "private; design (Parsons)/social science; urban",
+  },
+  {
+    name: "Berklee College of Music",
+    state: "MA",
+    notes: "private; contemporary music",
+  },
+
+  // ── Engineering / tech specialists ─────────────────────────────────────────
+  {
+    name: "Embry-Riddle Aeronautical University-Daytona Beach",
+    state: "FL",
+    notes: "private tech; aviation/aerospace",
+  },
+  {
+    name: "Florida Institute of Technology",
+    state: "FL",
+    notes: "private tech; engineering/aerospace",
+  },
+  {
+    name: "Milwaukee School of Engineering",
+    state: "WI",
+    notes: "private; engineering; co-op",
+  },
+  {
+    name: "Kettering University",
+    state: "MI",
+    notes: "private; engineering; co-op",
+  },
+  {
+    name: "South Dakota School of Mines and Technology",
+    state: "SD",
+    notes: "public tech; engineering",
+  },
+  {
+    name: "Wentworth Institute of Technology",
+    state: "MA",
+    notes: "private; engineering/technology; co-op",
+  },
+
+  // ── HBCUs (broaden coverage) ───────────────────────────────────────────────
+  {
+    name: "Hampton University",
+    state: "VA",
+    notes: "HBCU; selective private",
+  },
+  {
+    name: "Tuskegee University",
+    state: "AL",
+    notes: "HBCU; private; engineering",
+  },
+  {
+    name: "Xavier University of Louisiana",
+    state: "LA",
+    notes: "HBCU; private; pre-health powerhouse",
+  },
+  {
+    name: "Morgan State University",
+    state: "MD",
+    notes: "HBCU; public R2; engineering",
+  },
+  { name: "Jackson State University", state: "MS", notes: "HBCU; public" },
+  {
+    name: "Tennessee State University",
+    state: "TN",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Prairie View A & M University",
+    state: "TX",
+    notes: "HBCU; public; engineering",
+  },
+  {
+    name: "North Carolina Central University",
+    state: "NC",
+    notes: "HBCU; public",
+  },
+
+  // ── Liberal arts colleges (selective → mid) ────────────────────────────────
+  { name: "Wabash College", state: "IN", notes: "LAC; men's; selective" },
+  { name: "Hillsdale College", state: "MI", notes: "LAC; selective" },
+  {
+    name: "Berea College",
+    state: "KY",
+    notes: "LAC; no-tuition/work-study; selective",
+  },
+  { name: "Kalamazoo College", state: "MI", notes: "LAC; selective" },
+  { name: "Hope College", state: "MI", notes: "LAC; moderate" },
+  {
+    name: "Wheaton College",
+    state: "IL",
+    notes: "LAC; Christian; moderate",
+  },
+  {
+    name: "Wheaton College (Massachusetts)",
+    state: "MA",
+    notes: "LAC; moderate",
+  },
+  {
+    name: "Agnes Scott College",
+    state: "GA",
+    notes: "LAC; women's; moderate",
+  },
+  { name: "Muhlenberg College", state: "PA", notes: "LAC; moderate" },
+  { name: "Allegheny College", state: "PA", notes: "LAC; moderate" },
+  {
+    name: "Gustavus Adolphus College",
+    state: "MN",
+    notes: "LAC; moderate",
+  },
+  { name: "Knox College", state: "IL", notes: "LAC; moderate" },
+  {
+    name: "Cornell College",
+    state: "IA",
+    notes: "LAC; moderate (name collision: Cornell University NY)",
+  },
+  { name: "Wofford College", state: "SC", notes: "LAC; moderate" },
+  {
+    name: "Hobart William Smith Colleges",
+    state: "NY",
+    notes: "LAC; moderate",
+  },
+  { name: "Goucher College", state: "MD", notes: "LAC; less selective" },
+
+  // ── Religious / mid-selective private universities ─────────────────────────
+  {
+    name: "University of San Francisco",
+    state: "CA",
+    notes: "private Jesuit; urban; moderate",
+  },
+  {
+    name: "Seton Hall University",
+    state: "NJ",
+    notes: "private Catholic; business/health",
+  },
+  {
+    name: "Saint Joseph's University - Philadelphia",
+    state: "PA",
+    notes: "private Jesuit; business",
+  },
+  {
+    name: "University of Scranton",
+    state: "PA",
+    notes: "private Jesuit; health/business",
+  },
+  {
+    name: "John Carroll University",
+    state: "OH",
+    notes: "private Jesuit; moderate",
+  },
+  {
+    name: "University of St Thomas",
+    state: "MN",
+    notes: "private Catholic; business (name collision: TX)",
+  },
+  {
+    name: "University of Portland",
+    state: "OR",
+    notes: "private Catholic; engineering/nursing",
+  },
+  {
+    name: "Loyola University Maryland",
+    state: "MD",
+    notes: "private Jesuit; business",
+  },
+  {
+    name: "Sacred Heart University",
+    state: "CT",
+    notes: "private Catholic; health/business",
+  },
+  {
+    name: "University of Tulsa",
+    state: "OK",
+    notes: "private; energy/engineering",
+  },
+  {
+    name: "Xavier University",
+    state: "OH",
+    notes: "private Jesuit; business/health (distinct from Xavier of LA)",
+  },
+  {
+    name: "Stonehill College",
+    state: "MA",
+    notes: "private Catholic LAC-style; moderate",
+  },
+
+  // ── CSU campuses (access-oriented publics; CA) ─────────────────────────────
+  {
+    name: "California State University-Sacramento",
+    state: "CA",
+    notes: "public CSU; access-oriented",
+  },
+  {
+    name: "California State University-Northridge",
+    state: "CA",
+    notes: "public CSU; large; access-oriented",
+  },
+  {
+    name: "California State University-Fresno",
+    state: "CA",
+    notes: "public CSU; access-oriented",
+  },
+  {
+    name: "California State University-Chico",
+    state: "CA",
+    notes: "public CSU; moderate",
+  },
+  {
+    name: "California State University-San Marcos",
+    state: "CA",
+    notes: "public CSU; access-oriented",
+  },
+  {
+    name: "California State University-East Bay",
+    state: "CA",
+    notes: "public CSU; urban; access-oriented",
+  },
+
+  // ── CUNY campuses (urban access-oriented publics; NY) ──────────────────────
+  {
+    name: "CUNY Bernard M Baruch College",
+    state: "NY",
+    notes: "public CUNY; selective; business",
+  },
+  {
+    name: "CUNY Hunter College",
+    state: "NY",
+    notes: "public CUNY; moderate; urban",
+  },
+  {
+    name: "CUNY City College",
+    state: "NY",
+    notes: "public CUNY; engineering; urban",
+  },
+  {
+    name: "CUNY Queens College",
+    state: "NY",
+    notes: "public CUNY; access-oriented; urban",
+  },
+  {
+    name: "CUNY Brooklyn College",
+    state: "NY",
+    notes: "public CUNY; access-oriented; urban",
+  },
+
+  // ── SUNY additional ────────────────────────────────────────────────────────
+  {
+    name: "SUNY College at Geneseo",
+    state: "NY",
+    notes: "public SUNY; selective LAC-style",
+  },
+  {
+    name: "State University of New York at New Paltz",
+    state: "NY",
+    notes: "public SUNY; moderate",
+  },
+  {
+    name: "SUNY College of Environmental Science and Forestry",
+    state: "NY",
+    notes: "public SUNY; environmental/forestry",
+  },
+
+  // ── Regional / access-oriented publics (geo + safety coverage) ─────────────
+  {
+    name: "University of Massachusetts-Lowell",
+    state: "MA",
+    notes: "public; engineering/CS",
+  },
+  {
+    name: "University of Massachusetts-Boston",
+    state: "MA",
+    notes: "public; urban; access-oriented",
+  },
+  {
+    name: "Old Dominion University",
+    state: "VA",
+    notes: "public; engineering; access-oriented",
+  },
+  {
+    name: "Christopher Newport University",
+    state: "VA",
+    notes: "public LAC-style; moderate",
+  },
+  {
+    name: "University of North Carolina at Greensboro",
+    state: "NC",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of North Carolina Wilmington",
+    state: "NC",
+    notes: "public; moderate; coastal",
+  },
+  {
+    name: "Western Carolina University",
+    state: "NC",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Alabama in Huntsville",
+    state: "AL",
+    notes: "public; engineering/aerospace",
+  },
+  {
+    name: "University of South Alabama",
+    state: "AL",
+    notes: "public; health/access-oriented",
+  },
+  {
+    name: "University of Toledo",
+    state: "OH",
+    notes: "public; engineering/health",
+  },
+  {
+    name: "Cleveland State University",
+    state: "OH",
+    notes: "public; urban; access-oriented",
+  },
+  {
+    name: "Wright State University-Main Campus",
+    state: "OH",
+    notes: "public; engineering; access-oriented",
+  },
+  {
+    name: "University of Colorado Denver/Anschutz Medical Campus",
+    state: "CO",
+    notes: "public; urban; access-oriented",
+  },
+  {
+    name: "University of Missouri-Kansas City",
+    state: "MO",
+    notes: "public; urban; health",
+  },
+  {
+    name: "University of New Orleans",
+    state: "LA",
+    notes: "public; urban; access-oriented",
+  },
+  {
+    name: "The University of Texas at El Paso",
+    state: "TX",
+    notes: "public; HSI; access-oriented",
+  },
+  {
+    name: "Texas Woman's University",
+    state: "TX",
+    notes: "public; health/nursing",
+  },
+  {
+    name: "University of Northern Iowa",
+    state: "IA",
+    notes: "public; education/business",
+  },
+  {
+    name: "Ball State University",
+    state: "IN",
+    notes: "public; architecture/communications",
+  },
+  {
+    name: "Illinois State University",
+    state: "IL",
+    notes: "public; education/business",
+  },
+  {
+    name: "Northern Illinois University",
+    state: "IL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "University of Wisconsin-Eau Claire",
+    state: "WI",
+    notes: "public; moderate",
+  },
+  {
+    name: "Grand Valley State University",
+    state: "MI",
+    notes: "public; health/business; access-oriented",
+  },
+  {
+    name: "University of North Florida",
+    state: "FL",
+    notes: "public; moderate",
+  },
+  {
+    name: "Sam Houston State University",
+    state: "TX",
+    notes: "public; criminal justice; access-oriented",
+  },
+  {
+    name: "Middle Tennessee State University",
+    state: "TN",
+    notes: "public; aerospace/media; access-oriented",
+  },
+  {
+    name: "Western Kentucky University",
+    state: "KY",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Marshall University",
+    state: "WV",
+    notes: "public; access-oriented; second WV school",
   },
 ];
