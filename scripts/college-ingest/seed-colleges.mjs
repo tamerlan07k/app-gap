@@ -2147,4 +2147,501 @@ export const SEED_COLLEGES = [
     state: "NY",
     notes: "public; SUNY; access-oriented",
   },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V6 expansion (+100). Same rules as V1–V5: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Chosen to (a) deepen categories
+  // still thin in the set — more HBCUs, women's colleges, Catholic/Jesuit and
+  // large-Christian universities, military/maritime academies, art/music/design
+  // specialists, and additional SUNY campuses — and (b) keep widening the
+  // target/likely/safety band with regional publics across more states. `notes`
+  // records the selectivity band + why the school is here, never app facts.
+  // Names are best-effort Scorecard canonical names, corrected by the --dry-run
+  // no-match/ambiguous report before the live run. Deliberate collisions the
+  // schema handles by state: Saint Mary's College (IN) vs Saint Mary's College
+  // of California; University of Dallas (TX) vs The University of Texas at
+  // Dallas; Regis University (CO) vs Regis College (MA, not seeded).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── HBCUs not yet covered ──────────────────────────────────────────────────
+  {
+    name: "Fayetteville State University",
+    state: "NC",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Winston-Salem State University",
+    state: "NC",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "South Carolina State University",
+    state: "SC",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Albany State University",
+    state: "GA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Savannah State University",
+    state: "GA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Fort Valley State University",
+    state: "GA",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Bowie State University",
+    state: "MD",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Alcorn State University",
+    state: "MS",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Langston University",
+    state: "OK",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Central State University",
+    state: "OH",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Kentucky State University",
+    state: "KY",
+    notes: "HBCU; public; access-oriented",
+  },
+  {
+    name: "Johnson C Smith University",
+    state: "NC",
+    notes: "HBCU; private; access-oriented",
+  },
+
+  // ── Women's colleges & distinctive LACs ────────────────────────────────────
+  {
+    name: "Simmons University",
+    state: "MA",
+    notes: "private; women's undergrad; health/nursing",
+  },
+  {
+    name: "Meredith College",
+    state: "NC",
+    notes: "private; women's; moderate",
+  },
+  {
+    name: "Hollins University",
+    state: "VA",
+    notes: "private; women's; LAC; moderate",
+  },
+  {
+    name: "Saint Mary's College",
+    state: "IN",
+    notes: "private; women's; LAC (collision: Saint Mary's of CA)",
+  },
+  { name: "Hendrix College", state: "AR", notes: "LAC; selective" },
+  { name: "Millsaps College", state: "MS", notes: "LAC; moderate" },
+  { name: "Berry College", state: "GA", notes: "LAC; moderate; large campus" },
+  { name: "Ursinus College", state: "PA", notes: "LAC; moderate" },
+  { name: "Juniata College", state: "PA", notes: "LAC; moderate; pre-health" },
+  {
+    name: "Earlham College",
+    state: "IN",
+    notes: "LAC; moderate; Quaker heritage",
+  },
+
+  // ── More liberal-arts colleges (mid band) ──────────────────────────────────
+  { name: "Roanoke College", state: "VA", notes: "LAC; moderate" },
+  { name: "Randolph-Macon College", state: "VA", notes: "LAC; moderate" },
+  {
+    name: "Hampden-Sydney College",
+    state: "VA",
+    notes: "LAC; men's; moderate",
+  },
+  { name: "Coe College", state: "IA", notes: "LAC; moderate" },
+  { name: "Luther College", state: "IA", notes: "LAC; moderate; music" },
+  { name: "Wittenberg University", state: "OH", notes: "LAC; moderate" },
+  { name: "Ohio Wesleyan University", state: "OH", notes: "LAC; moderate" },
+  {
+    name: "Susquehanna University",
+    state: "PA",
+    notes: "LAC; moderate; business/writing",
+  },
+  {
+    name: "Washington & Jefferson College",
+    state: "PA",
+    notes: "LAC; moderate; pre-health",
+  },
+  {
+    name: "Saint Michael's College",
+    state: "VT",
+    notes: "private Catholic LAC-style; moderate",
+  },
+
+  // ── Selective / mid national privates not covered ──────────────────────────
+  {
+    name: "Rollins College",
+    state: "FL",
+    notes: "private; LAC-style; business/arts",
+  },
+  {
+    name: "Stetson University",
+    state: "FL",
+    notes: "private; music/business; moderate",
+  },
+  {
+    name: "Butler University",
+    state: "IN",
+    notes: "private; business/pharmacy; moderate",
+  },
+  {
+    name: "Valparaiso University",
+    state: "IN",
+    notes: "private Lutheran; engineering; moderate",
+  },
+  {
+    name: "Adelphi University",
+    state: "NY",
+    notes: "private; nursing/business; access-oriented",
+  },
+  {
+    name: "Marist University",
+    state: "NY",
+    notes:
+      "private; comms/business; moderate (renamed 2024 from Marist College)",
+  },
+  {
+    name: "Siena University",
+    state: "NY",
+    notes: "private Franciscan LAC; moderate (renamed 2024 from Siena College)",
+  },
+  {
+    name: "St. John's University-New York",
+    state: "NY",
+    notes: "private Catholic; large; urban",
+  },
+  {
+    name: "Pace University",
+    state: "NY",
+    notes: "private; business/performing arts; urban",
+  },
+  {
+    name: "The Catholic University of America",
+    state: "DC",
+    notes: "private Catholic; architecture/politics",
+  },
+
+  // ── Catholic / Jesuit / Christian universities not covered ─────────────────
+  {
+    name: "Canisius University",
+    state: "NY",
+    notes: "private Jesuit; moderate",
+  },
+  {
+    name: "Le Moyne College",
+    state: "NY",
+    notes: "private Jesuit; moderate",
+  },
+  {
+    name: "Saint Peter's University",
+    state: "NJ",
+    notes: "private Jesuit; access-oriented; urban",
+  },
+  {
+    name: "Loyola University New Orleans",
+    state: "LA",
+    notes: "private Jesuit; music/business (distinct from Loyola Chicago/MD)",
+  },
+  {
+    name: "Rockhurst University",
+    state: "MO",
+    notes: "private Jesuit; pre-health; moderate",
+  },
+  {
+    name: "Regis University",
+    state: "CO",
+    notes: "private Jesuit; access-oriented (collision: Regis College MA)",
+  },
+  {
+    name: "Saint Mary's College of California",
+    state: "CA",
+    notes: "private Catholic LAC-style; business",
+  },
+  {
+    name: "University of Dallas",
+    state: "TX",
+    notes: "private Catholic; great-books core (distinct from UT Dallas)",
+  },
+  {
+    name: "Assumption University",
+    state: "MA",
+    notes: "private Catholic; moderate",
+  },
+  {
+    name: "Salve Regina University",
+    state: "RI",
+    notes: "private Catholic; coastal; moderate",
+  },
+
+  // ── Large Christian / religious universities ───────────────────────────────
+  {
+    name: "Liberty University",
+    state: "VA",
+    notes: "private Christian; very large; access-oriented",
+  },
+  {
+    name: "Grand Canyon University",
+    state: "AZ",
+    notes: "private Christian; very large; access-oriented",
+  },
+  {
+    name: "Abilene Christian University",
+    state: "TX",
+    notes: "private Christian; moderate",
+  },
+  {
+    name: "Biola University",
+    state: "CA",
+    notes: "private Christian; moderate",
+  },
+  {
+    name: "Calvin University",
+    state: "MI",
+    notes: "private Christian LAC-style; moderate",
+  },
+  {
+    name: "Brigham Young University-Idaho",
+    state: "ID",
+    notes: "private; large; access-oriented (distinct from BYU-Provo)",
+  },
+
+  // ── Military / maritime academies (thin category) ──────────────────────────
+  {
+    name: "United States Coast Guard Academy",
+    state: "CT",
+    notes: "service academy; selective; no application fee",
+  },
+  {
+    name: "United States Merchant Marine Academy",
+    state: "NY",
+    notes: "service academy; selective; maritime",
+  },
+  {
+    name: "Virginia Military Institute",
+    state: "VA",
+    notes: "public; senior military college; engineering",
+  },
+  {
+    name: "Norwich University",
+    state: "VT",
+    notes: "private; senior military college; oldest",
+  },
+  {
+    name: "Massachusetts Maritime Academy",
+    state: "MA",
+    notes: "public; maritime; engineering",
+  },
+  {
+    name: "SUNY Maritime College",
+    state: "NY",
+    notes: "public; SUNY; maritime; engineering",
+  },
+
+  // ── Art / music / design specialists ───────────────────────────────────────
+  {
+    name: "School of the Art Institute of Chicago",
+    state: "IL",
+    notes: "private; top art/design; portfolio",
+  },
+  {
+    name: "California Institute of the Arts",
+    state: "CA",
+    notes: "private; art/film/music; portfolio/audition",
+  },
+  {
+    name: "Fashion Institute of Technology",
+    state: "NY",
+    notes: "public (SUNY-affiliated); fashion/design; portfolio",
+  },
+  {
+    name: "Columbia College Chicago",
+    state: "IL",
+    notes: "private; film/media/arts; access-oriented",
+  },
+  {
+    name: "Ringling College of Art and Design",
+    state: "FL",
+    notes: "private; art/design/animation; portfolio",
+  },
+  {
+    name: "The New England Conservatory of Music",
+    state: "MA",
+    notes: "private; music conservatory; audition",
+  },
+  {
+    name: "Art Center College of Design",
+    state: "CA",
+    notes: "private; industrial/transportation design; portfolio",
+  },
+
+  // ── Engineering / tech specialists not covered ─────────────────────────────
+  {
+    name: "New Mexico Institute of Mining and Technology",
+    state: "NM",
+    notes: "public tech; engineering/geoscience; small",
+  },
+  {
+    name: "Oregon Institute of Technology",
+    state: "OR",
+    notes: "public tech; engineering/health; hands-on",
+  },
+  {
+    name: "Lawrence Technological University",
+    state: "MI",
+    notes: "private tech; engineering/architecture",
+  },
+  {
+    name: "Embry-Riddle Aeronautical University-Prescott",
+    state: "AZ",
+    notes: "private tech; aviation/aerospace (distinct from Daytona)",
+  },
+  {
+    name: "Montana Technological University",
+    state: "MT",
+    notes: "public tech; engineering/mining",
+  },
+
+  // ── SUNY campuses not yet covered ──────────────────────────────────────────
+  {
+    name: "SUNY at Fredonia",
+    state: "NY",
+    notes: "public; SUNY; music/education; access-oriented",
+  },
+  {
+    name: "SUNY College at Potsdam",
+    state: "NY",
+    notes: "public; SUNY; music (Crane); access-oriented",
+  },
+  {
+    name: "SUNY Brockport",
+    state: "NY",
+    notes: "public; SUNY; access-oriented",
+  },
+  {
+    name: "SUNY at Purchase College",
+    state: "NY",
+    notes: "public; SUNY; arts/conservatory + liberal arts",
+  },
+  {
+    name: "Farmingdale State College",
+    state: "NY",
+    notes: "public; SUNY; applied tech/engineering",
+  },
+
+  // ── Additional regional publics (selective → access) ───────────────────────
+  {
+    name: "Truman State University",
+    state: "MO",
+    notes: "public liberal-arts university; selective; honors-style",
+  },
+  {
+    name: "New College of Florida",
+    state: "FL",
+    notes: "public honors LAC; narrative evaluations",
+  },
+  {
+    name: "University of Montevallo",
+    state: "AL",
+    notes: "public liberal-arts university; moderate",
+  },
+  {
+    name: "The University of Tennessee-Chattanooga",
+    state: "TN",
+    notes: "public; engineering/business; access-oriented",
+  },
+  {
+    name: "Salisbury University",
+    state: "MD",
+    notes: "public; business/education; moderate",
+  },
+  {
+    name: "University of Wisconsin-Stevens Point",
+    state: "WI",
+    notes: "public; natural resources; access-oriented",
+  },
+  {
+    name: "Winona State University",
+    state: "MN",
+    notes: "public; nursing/education; access-oriented",
+  },
+  {
+    name: "Ferris State University",
+    state: "MI",
+    notes: "public; applied tech/pharmacy; access-oriented",
+  },
+  {
+    name: "University of Central Arkansas",
+    state: "AR",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Arkansas State University",
+    state: "AR",
+    notes: "public; access-oriented (distinct from U of Arkansas)",
+  },
+  {
+    name: "Louisiana Tech University",
+    state: "LA",
+    notes: "public; engineering/business; moderate",
+  },
+  {
+    name: "Salem State University",
+    state: "MA",
+    notes: "public; access-oriented; urban",
+  },
+
+  // ── More access-oriented publics (widen safety band) ───────────────────────
+  {
+    name: "Rutgers University-Newark",
+    state: "NJ",
+    notes: "public R2; diverse; urban (distinct from New Brunswick)",
+  },
+  {
+    name: "William Paterson University of New Jersey",
+    state: "NJ",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Slippery Rock University of Pennsylvania",
+    state: "PA",
+    notes: "public; PASSHE; access-oriented",
+  },
+  {
+    name: "University of Akron Main Campus",
+    state: "OH",
+    notes: "public; polymer engineering; access-oriented",
+  },
+  {
+    name: "Western Illinois University",
+    state: "IL",
+    notes: "public; access-oriented",
+  },
+  {
+    name: "Angelo State University",
+    state: "TX",
+    notes: "public; Texas Tech system; access-oriented",
+  },
+  {
+    name: "Troy University",
+    state: "AL",
+    notes: "public; large; access-oriented",
+  },
 ];
