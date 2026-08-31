@@ -9,6 +9,7 @@ import {
   loadFieldKey,
   loadFinalizedAt,
   loadMatchProfile,
+  loadSchoolLevelStats,
   loadUserColleges,
 } from "~/lib/colleges/db";
 import { evaluateCollege } from "~/lib/colleges/evaluate";
@@ -52,7 +53,19 @@ export default async function CollegesPage() {
       loadUserColleges(supabase, user.id),
       loadFinalizedAt(supabase, user.id),
     ]);
-  const fieldIndex = await loadFieldDataIndex(supabase, fieldKey);
+  const [fieldIndex, schoolStats] = await Promise.all([
+    loadFieldDataIndex(supabase, fieldKey),
+    // B2: real school-level baselines for saved colleges with a chosen school.
+    loadSchoolLevelStats(
+      supabase,
+      saved
+        .filter((s) => s.schoolId)
+        .map((s) => ({
+          collegeId: s.collegeId,
+          schoolId: s.schoolId as string,
+        })),
+    ),
+  ]);
 
   const { all, byId } = colleges;
   const savedSet = new Set(saved.map((s) => s.collegeId));
@@ -66,14 +79,29 @@ export default async function CollegesPage() {
         .map((s) => {
           const college = byId.get(s.collegeId);
           if (!college) return null;
+          // When the student targeted a specific school AND we have a real
+          // school-level stats row, use it as the baseline (B2). No fabrication:
+          // absent such data, the institution-level stats stand.
+          const override = s.schoolId
+            ? schoolStats.get(`${s.collegeId}:${s.schoolId}`)
+            : undefined;
+          const effectiveCollege = override
+            ? { ...college, stats: override }
+            : college;
           return evaluateCollege({
             profile,
             strength,
             fieldKey,
-            college,
+            college: effectiveCollege,
             fieldData: fieldDataFor(fieldIndex, s.collegeId, fieldKey),
             source: s.source,
             selectedRoundId: s.selectedRoundId,
+            target: {
+              schoolId: s.schoolId,
+              programId: s.programId,
+              degreeType: s.degreeType,
+              intendedMajor: s.intendedMajor,
+            },
           });
         })
         .filter((m): m is CollegeMatch => m !== null)

@@ -7,7 +7,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
-import { formatChanceRange } from "~/lib/colleges/assessment";
+import { ChanceReveal } from "~/components/chance-reveal";
 import { fieldRatingLabel } from "~/lib/colleges/field-fit";
 import type {
   AdmissionDriver,
@@ -20,6 +20,7 @@ import type {
 import { cn } from "~/lib/utils";
 import { CollegeLogo } from "./college-logo";
 import { PlanSelector } from "./plan-selector";
+import { ProgramSelector } from "./program-selector";
 import { RemoveButton } from "./remove-button";
 import { formatDeadline, roundLabel } from "./round-format";
 
@@ -129,7 +130,7 @@ export function CollegeCard({
   match: CollegeMatch;
   finalized: boolean;
 }) {
-  const { college, admission, fieldFit, selectedRoundId } = match;
+  const { college, admission, fieldFit, selectedRoundId, target } = match;
   const rounds = college.cycle?.rounds ?? [];
 
   return (
@@ -151,19 +152,20 @@ export function CollegeCard({
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="truncate font-semibold">{college.name}</p>
-              {/* The student's OWN AppGap estimate — placed directly under the
-                  name and made deliberately more prominent than the school's
-                  overall admit rate below. The subtle fade-up is AppGap's
-                  existing score-reveal motion (respects reduced-motion). */}
-              {admission.chanceRange && (
-                <p className="mt-0.5 animate-fade-up text-sm font-medium">
-                  <span className="text-muted-foreground">
-                    Estimated chance:{" "}
+              {/* The student's OWN AppGap estimate — a single representative
+                  percentage revealed with the subtle bubble animation, made
+                  deliberately more prominent than the school's overall admit
+                  rate below. Clearly labeled an AppGap estimate, never an
+                  official probability. */}
+              {admission.chance != null && (
+                <div className="mt-1 flex items-center gap-2">
+                  <ChanceReveal chance={admission.chance} size="md" />
+                  <span className="text-xs leading-tight text-muted-foreground">
+                    AppGap
+                    <br />
+                    estimate
                   </span>
-                  <span className="font-semibold text-brand-teal">
-                    {formatChanceRange(admission.chanceRange)}
-                  </span>
-                </p>
+                </div>
               )}
               {(college.city || college.state) && (
                 <p className="truncate text-xs text-muted-foreground">
@@ -200,7 +202,7 @@ export function CollegeCard({
               above. Here we keep the supporting context: confidence (how sure
               AppGap is) and the school's OWN overall admit rate — kept distinct
               from, and less prominent than, the student's estimate. */}
-          {admission.chanceRange ? (
+          {admission.chance != null ? (
             <div className="mt-2 space-y-1.5">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-xs">
                 {admission.confidence && (
@@ -234,6 +236,15 @@ export function CollegeCard({
             <span className="font-medium text-foreground/70">Field:</span>{" "}
             {fieldFit.rationale}
           </p>
+
+          {/* Conditional per-college school/program/degree — renders only for
+              colleges with separately-admitting schools (e.g. Cornell). */}
+          <ProgramSelector
+            collegeId={college.id}
+            initialSchoolId={target.schoolId}
+            initialProgramId={target.programId}
+            initialDegreeType={target.degreeType}
+          />
 
           {/* Small, unobtrusive transparency link to the school's official site
               (reuses the stored, verified colleges.official_website). */}

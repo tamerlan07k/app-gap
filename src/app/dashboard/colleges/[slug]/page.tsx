@@ -1,7 +1,7 @@
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { formatChanceRange } from "~/lib/colleges/assessment";
+import { ChanceReveal } from "~/components/chance-reveal";
 import {
   fieldDataFor,
   loadApplicantStrength,
@@ -26,12 +26,6 @@ const CATEGORY_STYLES: Record<MatchCategory, string> = {
   unrated: "bg-muted text-muted-foreground",
 };
 
-function pctOf(n: number): string {
-  const v = n * 100;
-  if (v < 1) return "<1%";
-  return `${Math.round(v)}%`;
-}
-
 /** Ensure a stored bare domain (e.g. "www.mit.edu/") resolves to the real site. */
 function ensureHttps(url: string): string {
   return /^https?:\/\//i.test(url) ? url : `https://${url}`;
@@ -46,19 +40,19 @@ function AssessmentPanel({
   admission: AdmissionFit;
   officialWebsite: string | null;
 }) {
-  const range = admission.chanceRange;
   return (
     <div className="rounded-2xl border border-brand-teal/30 bg-brand-teal/[0.05] p-5">
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-teal">
         Your AppGap Assessment
       </p>
-      {range ? (
-        <div className="mt-2 animate-fade-up">
-          {/* The RANGE is the primary figure — never replaced by the point. */}
-          <p className="text-3xl font-bold tracking-tight tabular-nums">
-            {formatChanceRange(range)}
+      {admission.chance != null ? (
+        <div className="mt-3">
+          {/* Single representative estimate with the bubble reveal. */}
+          <ChanceReveal chance={admission.chance} size="lg" />
+          <p className="mt-1 text-xs text-muted-foreground">
+            AppGap estimate — not an official admission probability
           </p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+          <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <span
               className={cn(
                 "rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide",
@@ -74,13 +68,24 @@ function AssessmentPanel({
               </span>
             )}
           </div>
-          {admission.chance != null && (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Representative estimate: ~{pctOf(admission.chance)}{" "}
-              <span className="text-muted-foreground/70">
-                (midpoint of the range — the range above is the reliable read)
-              </span>
-            </p>
+          {admission.drivers.length > 0 && (
+            <ul className="mt-3 space-y-1">
+              {admission.drivers.map((d) => (
+                <li
+                  key={d.text}
+                  className={cn(
+                    "text-xs",
+                    d.kind === "positive"
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : d.kind === "caution"
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-muted-foreground",
+                  )}
+                >
+                  • {d.text}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       ) : (

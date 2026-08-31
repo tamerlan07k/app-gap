@@ -10,18 +10,24 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useHistory } from "~/hooks/use-history";
+import {
+  ACADEMIC_AREAS,
+  fieldKeyForMajor,
+  majorsForArea,
+  specializationsForMajor,
+} from "~/lib/academic-interests";
 import { loadStep2FromDb, saveStep2ToDb } from "~/lib/profile-db";
 import {
   type CareerDirection,
   loadStep2,
   saveStep2,
 } from "~/lib/profile-storage";
+import { OnboardingCollegeTargets } from "./onboarding-college-targets";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface FormErrors {
-  majorCategory?: string;
-  selectivity?: string;
+  academicMajor?: string;
 }
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -31,32 +37,6 @@ const SELECT_CLASS =
 
 const SELECT_ERROR_CLASS =
   "h-9 w-full rounded-md border border-destructive bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30";
-
-const MAJOR_CATEGORIES = [
-  { value: "", label: "Select a category" },
-  { value: "cs", label: "Computer Science / Software / Data" },
-  { value: "engineering", label: "Engineering" },
-  { value: "bio-premed", label: "Biology / Pre-Med / Health Sciences" },
-  { value: "business", label: "Business / Finance / Economics" },
-  { value: "math-physics", label: "Math / Physics / Statistics" },
-  { value: "polisci", label: "Political Science / International Relations" },
-  { value: "psych", label: "Psychology / Neuroscience" },
-  { value: "humanities", label: "English / History / Humanities" },
-  { value: "design", label: "Architecture / Design / Arts" },
-  { value: "education", label: "Education / Social Work / Public Policy" },
-  { value: "law", label: "Pre-Law / Legal Studies" },
-  { value: "undecided", label: "Undecided" },
-  { value: "other", label: "Other" },
-];
-
-const SELECTIVITY_OPTIONS = [
-  { value: "", label: "Select a goal" },
-  { value: "highly-selective", label: "Highly selective / reach schools" },
-  { value: "competitive", label: "Competitive target schools" },
-  { value: "balanced", label: "Balanced mix" },
-  { value: "safer", label: "Mostly safer / likely schools" },
-  { value: "unsure", label: "Not sure yet" },
-];
 
 // ─── Field helper ────────────────────────────────────────────────────────────
 
@@ -99,10 +79,12 @@ export default function CareerDirectionPage() {
     canUndo,
     canRedo,
   } = useHistory<CareerDirection>({
+    academicArea: "",
+    academicMajor: "",
+    academicInterests: [],
     majorCategory: "",
     specificMajor: "",
     careerInterest: "",
-    selectivity: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -129,18 +111,48 @@ export default function CareerDirectionPage() {
     setDirection((prev) => ({ ...prev, [field]: value }), {
       coalesceKey: `direction.${field}`,
     });
-    if (field === "majorCategory" || field === "selectivity") {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
+  }
+
+  /** Broad area changed → reset the dependent major + specializations. */
+  function selectArea(areaKey: string) {
+    setDirection((prev) => ({
+      ...prev,
+      academicArea: areaKey,
+      academicMajor: "",
+      academicInterests: [],
+      majorCategory: "",
+    }));
+  }
+
+  /** Major changed → derive the coarse field key and clear specializations. */
+  function selectMajor(majorKey: string) {
+    setDirection((prev) => ({
+      ...prev,
+      academicMajor: majorKey,
+      majorCategory: majorKey ? fieldKeyForMajor(majorKey) : "",
+      academicInterests: [],
+    }));
+    setErrors((prev) => ({ ...prev, academicMajor: undefined }));
+  }
+
+  /** Toggle one specialization on/off. */
+  function toggleInterest(specKey: string) {
+    setDirection((prev) => {
+      const has = prev.academicInterests.includes(specKey);
+      return {
+        ...prev,
+        academicInterests: has
+          ? prev.academicInterests.filter((k) => k !== specKey)
+          : [...prev.academicInterests, specKey],
+      };
+    });
   }
 
   async function handleContinue() {
     const next: FormErrors = {};
-    if (!direction.majorCategory)
-      next.majorCategory =
-        "Please select an academic interest or intended major.";
-    if (!direction.selectivity)
-      next.selectivity = "Please select your college goals.";
+    if (!direction.academicMajor)
+      next.academicMajor =
+        "Please choose an area and a major (or “Not sure yet”).";
 
     if (Object.keys(next).length > 0) {
       setErrors(next);
@@ -200,47 +212,99 @@ export default function CareerDirectionPage() {
           </p>
         </div>
 
-        {/* Section: Intended major */}
+        {/* Section: Academic direction (broad area → major → specializations) */}
         <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
           <div className="space-y-1">
-            <h2 className="font-semibold">Intended major</h2>
+            <h2 className="font-semibold">Academic direction</h2>
             <p className="text-sm text-muted-foreground">
-              Choose a broad category, then optionally name a specific major
-              you&apos;re considering.
+              Pick a broad area, then the specific major that fits best. You can
+              add specializations if you have them — or choose “Not sure yet.”
             </p>
           </div>
 
           <div className="space-y-5">
-            <Field
-              id="major-category"
-              label="Academic interest / intended major"
-              error={errors.majorCategory}
-            >
+            <Field id="academic-area" label="Broad academic area">
               <select
-                id="major-category"
-                value={direction.majorCategory}
-                onChange={(e) => setDir("majorCategory", e.target.value)}
-                className={
-                  errors.majorCategory ? SELECT_ERROR_CLASS : SELECT_CLASS
-                }
+                id="academic-area"
+                value={direction.academicArea}
+                onChange={(e) => selectArea(e.target.value)}
+                className={SELECT_CLASS}
               >
-                {MAJOR_CATEGORIES.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
+                <option value="">Select an area</option>
+                {ACADEMIC_AREAS.map((area) => (
+                  <option key={area.key} value={area.key}>
+                    {area.label}
                   </option>
                 ))}
               </select>
             </Field>
 
+            {direction.academicArea && (
+              <Field
+                id="academic-major"
+                label="Specific major"
+                error={errors.academicMajor}
+              >
+                <select
+                  id="academic-major"
+                  value={direction.academicMajor}
+                  onChange={(e) => selectMajor(e.target.value)}
+                  className={
+                    errors.academicMajor ? SELECT_ERROR_CLASS : SELECT_CLASS
+                  }
+                >
+                  <option value="">Select a major</option>
+                  {majorsForArea(direction.academicArea).map((m) => (
+                    <option key={m.key} value={m.key}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+
+            {specializationsForMajor(direction.academicMajor).length > 0 && (
+              <Field
+                id="academic-interests"
+                label="Specializations / interests"
+                hint="optional — pick any that apply"
+              >
+                <div className="flex flex-wrap gap-2">
+                  {specializationsForMajor(direction.academicMajor).map(
+                    (spec) => {
+                      const active = direction.academicInterests.includes(
+                        spec.key,
+                      );
+                      return (
+                        <button
+                          key={spec.key}
+                          type="button"
+                          onClick={() => toggleInterest(spec.key)}
+                          aria-pressed={active}
+                          className={
+                            active
+                              ? "rounded-full border border-brand-teal bg-brand-teal/10 px-3 py-1 text-sm font-medium text-brand-teal transition"
+                              : "rounded-full border border-input px-3 py-1 text-sm text-muted-foreground transition hover:border-brand-teal/50 hover:text-foreground"
+                          }
+                        >
+                          {spec.label}
+                        </button>
+                      );
+                    },
+                  )}
+                </div>
+              </Field>
+            )}
+
             <Field
               id="specific-major"
-              label="Specific intended major"
-              hint="optional"
+              label="Exact program name"
+              hint="optional — if it isn't listed above"
             >
               <Input
                 id="specific-major"
                 type="text"
-                placeholder="e.g. Computational Biology, Finance, Architecture"
+                placeholder="e.g. Symbolic Systems, PPE, Computational Biology"
                 value={direction.specificMajor}
                 onChange={(e) => setDir("specificMajor", e.target.value)}
               />
@@ -276,39 +340,10 @@ export default function CareerDirectionPage() {
           </div>
         </div>
 
-        {/* Section: College goals */}
-        <div className="space-y-6 rounded-xl border border-border bg-card p-6 shadow-sm">
-          <div className="space-y-1">
-            <h2 className="font-semibold">College goals</h2>
-            <p className="text-sm text-muted-foreground">
-              What kind of schools are you targeting? This helps calibrate where
-              your profile currently stands relative to your goals.
-            </p>
-          </div>
-
-          <div className="space-y-5">
-            <Field
-              id="selectivity"
-              label="College goals / selectivity"
-              error={errors.selectivity}
-            >
-              <select
-                id="selectivity"
-                value={direction.selectivity}
-                onChange={(e) => setDir("selectivity", e.target.value)}
-                className={
-                  errors.selectivity ? SELECT_ERROR_CLASS : SELECT_CLASS
-                }
-              >
-                {SELECTIVITY_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </div>
-        </div>
+        {/* Section: College targets — add real colleges; they auto-import into
+            My Colleges after onboarding. Replaces the old generic selectivity
+            question. */}
+        <OnboardingCollegeTargets />
 
         {/* Navigation */}
         <div className="flex items-center justify-between">

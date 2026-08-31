@@ -18,10 +18,20 @@ export interface Course {
 }
 
 export interface CareerDirection {
+  /** Broad academic area key (taxonomy Level 1), e.g. "engineering". */
+  academicArea: string;
+  /** Specific major key (taxonomy Level 2), e.g. "aerospace-engineering". */
+  academicMajor: string;
+  /** Optional specialization keys (taxonomy Level 3) under the chosen major. */
+  academicInterests: string[];
+  /** Coarse field-fit key, auto-derived from the major for backward compat. */
   majorCategory: string;
+  /** Free-text escape hatch for a program not represented in the taxonomy. */
   specificMajor: string;
   careerInterest: string;
-  selectivity: string;
+  /** @deprecated Legacy onboarding selectivity tier — no longer collected or
+   * read by the analysis. Retained so old localStorage payloads still parse. */
+  selectivity?: string;
 }
 
 export interface Activity {
@@ -70,6 +80,37 @@ const KEY_STEP2 = "appgap:step2";
 const KEY_STEP3 = "appgap:step3";
 const KEY_SCHOOL = "appgap:school";
 const KEY_PS = "appgap:personal-statement";
+// Which account the cached onboarding data belongs to. localStorage is per-
+// DEVICE, so without this a new account on the same device would inherit the
+// previous account's pre-filled forms. See OnboardingStorageGuard.
+const KEY_OWNER = "appgap:owner";
+
+const ONBOARDING_KEYS = [KEY_STEP1, KEY_STEP2, KEY_STEP3, KEY_SCHOOL, KEY_PS];
+
+/** Wipe all cached onboarding step data from this device. */
+export function clearOnboardingStorage(): void {
+  try {
+    for (const key of ONBOARDING_KEYS) localStorage.removeItem(key);
+  } catch {
+    // Ignore — storage unavailable (private mode, etc.).
+  }
+}
+
+export function getStorageOwner(): string | null {
+  try {
+    return localStorage.getItem(KEY_OWNER);
+  } catch {
+    return null;
+  }
+}
+
+export function setStorageOwner(userId: string): void {
+  try {
+    localStorage.setItem(KEY_OWNER, userId);
+  } catch {
+    // Ignore.
+  }
+}
 
 function safeParse<T>(key: string): T | null {
   try {

@@ -11,6 +11,7 @@ import {
   type CollegeCycle,
   type CollegeDetail,
   type CollegeProfile,
+  type CollegeStats,
   type CollegeWithData,
   CURRENT_CYCLE_YEAR,
   type FieldResource,
@@ -111,22 +112,85 @@ export interface SavedCollege {
   collegeId: string;
   source: string;
   selectedRoundId: string | null;
+  /** Optional per-college target hierarchy (nullable — uncertainty allowed). */
+  schoolId: string | null;
+  programId: string | null;
+  intendedMajor: string | null;
+  degreeType: string | null;
 }
 
 export async function loadUserColleges(
   client: SupabaseClient,
   userId: string,
 ): Promise<SavedCollege[]> {
+  // select("*") so this tolerates envs where the target-hierarchy columns
+  // aren't migrated yet (they come back undefined rather than erroring).
   const { data } = await client
     .from("user_colleges")
-    .select("college_id, source, selected_round_id, created_at")
+    .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: true });
   return (data ?? []).map((r) => ({
     collegeId: r.college_id as string,
     source: (r.source as string) ?? "manual",
     selectedRoundId: (r.selected_round_id as string | null) ?? null,
+    schoolId: (r.school_id as string | null) ?? null,
+    programId: (r.program_id as string | null) ?? null,
+    intendedMajor: (r.intended_major as string | null) ?? null,
+    degreeType: (r.degree_type as string | null) ?? null,
   }));
+}
+
+/**
+ * Load school-level admission stats for specific (college, school) targets — the
+ * real-data path for program/school-specific chances (B2). Returns a map keyed
+ * `${collegeId}:${schoolId}` → CollegeStats, containing ONLY targets that
+ * actually have a school-level stats row. When the dataset has no school-level
+ * rows (the case today) the map is empty and callers fall back to the
+ * institution-level baseline — we NEVER fabricate a school-level rate.
+ */
+export async function loadSchoolLevelStats(
+  client: SupabaseClient,
+  targets: { collegeId: string; schoolId: string }[],
+): Promise<Map<string, CollegeStats>> {
+  const out = new Map<string, CollegeStats>();
+  const schoolIds = [...new Set(targets.map((t) => t.schoolId))];
+  if (schoolIds.length === 0) return out;
+
+  const { data } = await client
+    .from("college_admission_stats")
+    .select(
+      "college_id, school_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg",
+    )
+    .in("school_id", schoolIds);
+
+  // Most-recent row per (college, school).
+  const bestByKey = new Map<string, StatsRow & { school_id: string }>();
+  for (const row of (data ?? []) as (StatsRow & {
+    school_id: string | null;
+  })[]) {
+    if (!row.school_id) continue;
+    const key = `${row.college_id}:${row.school_id}`;
+    const prev = bestByKey.get(key);
+    if (!prev || (row.source_date ?? "") > (prev.source_date ?? "")) {
+      bestByKey.set(key, row as StatsRow & { school_id: string });
+    }
+  }
+  for (const [key, s] of bestByKey) {
+    out.set(key, {
+      admitRate: s.admit_rate,
+      satEbrw25: s.sat_ebrw_25,
+      satEbrw75: s.sat_ebrw_75,
+      satMath25: s.sat_math_25,
+      satMath75: s.sat_math_75,
+      satTotal25: s.sat_total_25,
+      satTotal75: s.sat_total_75,
+      actComposite25: s.act_composite_25,
+      actComposite75: s.act_composite_75,
+      gpaAvg: s.gpa_avg,
+    });
+  }
+  return out;
 }
 
 /** The user's intended-field key (profiles.major_category), or null. */

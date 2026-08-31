@@ -117,6 +117,17 @@ export async function POST() {
 
     const analysisId = (insertData as { id: string } | null)?.id ?? null;
 
+    // Generating the diagnostic is the terminal step of onboarding — mark it
+    // complete so the dashboard gate lets the student in. Only sets the stamp
+    // the first time (preserves the original completion time); best-effort, and
+    // authoritative over the grade_level/major_category heuristic in
+    // isOnboardingComplete (which can be null for profiles filled in out of order).
+    await admin
+      .from("profiles")
+      .update({ onboarding_completed_at: new Date().toISOString() })
+      .eq("id", user.id)
+      .is("onboarding_completed_at", null);
+
     // Record a "Jump In" activity event (best-effort; never blocks the response).
     await recordEvent(
       admin,

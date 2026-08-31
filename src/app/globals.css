@@ -77,6 +77,30 @@
   }
 }
 
+/* Chance reveal — the single estimated percentage pops in gently while a soft
+   circular "bubble" expands and fades behind it. Tasteful, not gamified. */
+@keyframes chance-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes chance-bubble {
+  from {
+    opacity: 0.5;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
 /* ── Utility animation classes ────────────────────────────────────────────── */
 
 @utility animate-fade-up {
@@ -85,6 +109,14 @@
 
 @utility animate-fade-in {
   animation: fade-in 0.6s ease-out both;
+}
+
+@utility animate-chance-pop {
+  animation: chance-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-chance-bubble {
+  animation: chance-bubble 0.9s ease-out both;
 }
 
 /* ── Scroll-driven reveal (progressive enhancement) ──────────────────────── */
@@ -102,10 +134,16 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
   .animate-fade-in,
+  .animate-chance-pop,
   .scroll-reveal {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+  /* The decorative bubble is purely motion — hide it entirely when reduced. */
+  .animate-chance-bubble {
+    animation: none;
+    opacity: 0;
   }
 }
 

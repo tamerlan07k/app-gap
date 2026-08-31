@@ -1,3 +1,4 @@
+import { areaForMajor, fieldKeyForMajor } from "~/lib/academic-interests";
 import type {
   AcademicInfo,
   Activity,
@@ -82,20 +83,22 @@ export async function loadStep2FromDb(): Promise<CareerDirection | null> {
     const { data: p } = await supabase
       .from("profiles")
       .select(
-        "id, major_category, specific_major, career_interest, selectivity",
+        "id, major_category, academic_major, academic_interests, specific_major, career_interest",
       )
       .eq("id", user.id)
       .maybeSingle();
 
     if (!p) return null;
     // No career data saved yet — defer to localStorage
-    if (!p.major_category && !p.selectivity) return null;
+    if (!p.major_category && !p.academic_major) return null;
 
     return {
+      academicArea: areaForMajor(p.academic_major) ?? "",
+      academicMajor: (p.academic_major as string | null) ?? "",
+      academicInterests: (p.academic_interests as string[] | null) ?? [],
       majorCategory: p.major_category ?? "",
       specificMajor: p.specific_major ?? "",
       careerInterest: p.career_interest ?? "",
-      selectivity: p.selectivity ?? "",
     };
   } catch {
     return null;
@@ -361,18 +364,46 @@ export async function saveStep2ToDb(data: CareerDirection): Promise<void> {
   } = await supabase.auth.getUser();
   if (!user) return;
 
+  // major_category is DERIVED from the chosen major (never chosen directly), so
+  // the college field-fit layer and AI label maps keep working unchanged.
+  const derivedFieldKey = data.academicMajor
+    ? fieldKeyForMajor(data.academicMajor)
+    : data.majorCategory || null;
+
+  // Legacy-compatible fields that exist in every environment.
+  const base = {
+    id: user.id,
+    major_category: derivedFieldKey,
+    specific_major: data.specificMajor || null,
+    career_interest: data.careerInterest || null,
+    updated_at: new Date().toISOString(),
+  };
+
   const { error } = await supabase.from("profiles").upsert(
     {
-      id: user.id,
-      major_category: data.majorCategory || null,
-      specific_major: data.specificMajor || null,
-      career_interest: data.careerInterest || null,
-      selectivity: data.selectivity || null,
-      updated_at: new Date().toISOString(),
+      ...base,
+      academic_major: data.academicMajor || null,
+      academic_interests: data.academicInterests ?? [],
     },
     { onConflict: "id" },
   );
-  if (error) throw new Error(error.message);
+
+  // If the new columns aren't migrated yet (PGRST204 / undefined column), fall
+  // back to the legacy columns so onboarding still completes. The granular
+  // direction persists once the migration is applied.
+  if (error) {
+    const missingColumn =
+      error.code === "PGRST204" ||
+      /academic_(major|interests)/.test(error.message);
+    if (missingColumn) {
+      const { error: fallbackError } = await supabase
+        .from("profiles")
+        .upsert(base, { onConflict: "id" });
+      if (fallbackError) throw new Error(fallbackError.message);
+      return;
+    }
+    throw new Error(error.message);
+  }
 }
 
 export async function saveStep3ToDb(
