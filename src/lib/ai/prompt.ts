@@ -1,3 +1,5 @@
+import { majorLabel, specializationLabel } from "~/lib/academic-interests";
+
 export interface FullProfile {
   gradeLevel: string;
   unweightedGpa: number | null;
@@ -12,9 +14,12 @@ export interface FullProfile {
     apExamScore: string;
   }>;
   majorCategory: string;
+  /** Precise major key from the taxonomy (src/lib/academic-interests.ts). */
+  academicMajor: string;
+  /** Optional specialization keys under the chosen major. */
+  academicInterests: string[];
   specificMajor: string;
   careerInterest: string;
-  selectivity: string;
   activities: Array<{
     name: string;
     category: string;
@@ -70,15 +75,6 @@ const MAJOR_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-const SELECTIVITY_LABELS: Record<string, string> = {
-  "highly-selective":
-    "Highly selective (top 10–20 universities, e.g. Ivies, MIT, Stanford)",
-  competitive: "Competitive target schools (top 30–50 universities)",
-  balanced: "Balanced mix of reach, target, and safety schools",
-  safer: "Mostly safer / likely schools",
-  unsure: "Unsure about target school selectivity",
-};
-
 const COURSE_TYPE_LABELS: Record<string, string> = {
   ap: "AP",
   honors: "Honors",
@@ -110,21 +106,75 @@ const AWARD_LEVEL_LABELS: Record<string, string> = {
   international: "International",
 };
 
-// ─── Score benchmarks by selectivity tier ────────────────────────────────────
+// ─── Absolute test-score context (national percentiles) ──────────────────────
+// The AppGap score reflects the ABSOLUTE strength of the student's application,
+// so test scores are contextualized against fixed, published national
+// percentiles — deterministic from the student's own score and nothing else
+// (never a target tier, never their college list). This keeps the score stable
+// regardless of which colleges the student adds to My Colleges.
+//
+// Descending [score, percentile] tables; we take the highest bucket the score
+// meets. Approximate to published SAT/ACT national percentile ranks.
 
-const SAT_BENCHMARKS: Record<string, { median: number; range: string }> = {
-  "highly-selective": { median: 1510, range: "1480–1580" },
-  competitive: { median: 1380, range: "1300–1460" },
-  balanced: { median: 1200, range: "1100–1320" },
-  safer: { median: 1050, range: "950–1150" },
-};
+const SAT_PERCENTILES: Array<[number, number]> = [
+  [1560, 99],
+  [1510, 98],
+  [1450, 96],
+  [1400, 94],
+  [1350, 91],
+  [1300, 87],
+  [1250, 82],
+  [1200, 75],
+  [1150, 67],
+  [1100, 58],
+  [1050, 49],
+  [1000, 40],
+  [950, 31],
+  [900, 23],
+  [850, 16],
+  [800, 10],
+  [750, 5],
+  [700, 2],
+];
 
-const ACT_BENCHMARKS: Record<string, { median: number; range: string }> = {
-  "highly-selective": { median: 34, range: "33–36" },
-  competitive: { median: 31, range: "29–33" },
-  balanced: { median: 26, range: "23–28" },
-  safer: { median: 22, range: "19–24" },
-};
+const ACT_PERCENTILES: Array<[number, number]> = [
+  [35, 99],
+  [34, 99],
+  [33, 98],
+  [32, 96],
+  [31, 95],
+  [30, 93],
+  [29, 90],
+  [28, 88],
+  [27, 85],
+  [26, 81],
+  [25, 77],
+  [24, 73],
+  [23, 67],
+  [22, 62],
+  [21, 56],
+  [20, 48],
+  [19, 41],
+  [18, 34],
+  [17, 28],
+  [16, 22],
+  [15, 16],
+  [14, 10],
+  [13, 6],
+  [12, 3],
+];
+
+// Fixed reference band for elite selective admissions — a CONSTANT for the LLM's
+// calibration, never derived from the student or their college list.
+const ELITE_REFERENCE =
+  "for reference, the most selective universities admit from a ~1500–1580 SAT / 34–36 ACT middle-50%";
+
+function percentileFor(score: number, table: Array<[number, number]>): number {
+  for (const [threshold, pct] of table) {
+    if (score >= threshold) return pct;
+  }
+  return 1;
+}
 
 // ─── Timeline helpers (server-side only) ─────────────────────────────────────
 
@@ -157,41 +207,26 @@ function getTimelineStage(gradeLevel: string, month: number): string {
 
 // ─── Pre-computed intelligence signals ───────────────────────────────────────
 
-function computeScoreSignal(profile: FullProfile): string {
-  const { satScore: sat, actScore: act, selectivity } = profile;
+export function computeScoreSignal(profile: FullProfile): string {
+  // Absolute, list-independent: contextualize the student's own score against
+  // fixed national percentiles. Deliberately takes NO selectivity/tier/college
+  // input, so the AppGap score never shifts with the student's college list.
+  const { satScore: sat, actScore: act } = profile;
   if (!sat && !act)
     return "No test scores — advise on test-optional strategy or whether testing is worthwhile.";
 
   const parts: string[] = [];
-  if (sat && selectivity && SAT_BENCHMARKS[selectivity]) {
-    const b = SAT_BENCHMARKS[selectivity];
-    const gap = b.median - sat;
-    if (gap > 150)
-      parts.push(
-        `SAT ${sat} is ${gap} pts below the ~${b.median} median (${b.range}) — MAJOR GAP, retake strongly warranted`,
-      );
-    else if (gap > 50)
-      parts.push(
-        `SAT ${sat} is ${gap} pts below the ~${b.median} median — retake may be worthwhile`,
-      );
-    else if (gap > 0)
-      parts.push(`SAT ${sat} is slightly below ~${b.median} median`);
-    else parts.push(`SAT ${sat} meets or exceeds ~${b.median} median`);
+  if (sat) {
+    parts.push(
+      `SAT ${sat} ≈ ${percentileFor(sat, SAT_PERCENTILES)}th percentile nationally`,
+    );
   }
-  if (act && selectivity && ACT_BENCHMARKS[selectivity]) {
-    const b = ACT_BENCHMARKS[selectivity];
-    const gap = b.median - act;
-    if (gap > 4)
-      parts.push(
-        `ACT ${act} is ${gap} pts below ~${b.median} median (${b.range}) — MAJOR GAP`,
-      );
-    else if (gap > 1)
-      parts.push(
-        `ACT ${act} is below ~${b.median} median — retake may be worthwhile`,
-      );
-    else if (gap > 0) parts.push(`ACT ${act} is slightly below ~${b.median}`);
-    else parts.push(`ACT ${act} meets or exceeds ~${b.median} median`);
+  if (act) {
+    parts.push(
+      `ACT ${act} ≈ ${percentileFor(act, ACT_PERCENTILES)}th percentile nationally`,
+    );
   }
+  parts.push(ELITE_REFERENCE);
   return parts.join(" | ");
 }
 
@@ -281,7 +316,7 @@ export const SYSTEM_PROMPT = `You are AppGap's senior admissions strategist — 
 
 **Timeline-gated recommendations.** A rising senior in July needs essay drafts, college list finalization, and recommendation letters. A sophomore needs extracurricular depth and junior-year course planning. If a student cannot act on advice in the next 6 months, deprioritize it. The profile includes the current date and admissions stage — use them.
 
-**Be honest.** If this student has a significant gap relative to their stated selectivity, say so clearly in gapScoreExplanation and topGaps. Then explain the path forward in nextSteps and roadmap. Vague encouragement wastes their time.
+**Be honest.** If this student has a significant gap relative to competitive-admissions norms, say so clearly in gapScoreExplanation and topGaps. Then explain the path forward in nextSteps and roadmap. Vague encouragement wastes their time.
 
 **Essay advice must be nuanced.** Never automatically recommend writing the Common App essay about the student's biggest extracurricular. The strongest essays reveal character, not accomplishments. Instead: identify experiences, challenges, values, relationships, or moments of growth that naturally developed the skills and qualities that appear in their strongest activities. An activity can inspire an essay without being the essay topic itself. When suggesting essay angles, frame it as: "Your strongest narrative centers on X — your personal statement does not need to be about your Y accomplishment. Instead, consider telling the story that developed the resilience, curiosity, or leadership that ultimately led you there."
 
@@ -297,7 +332,7 @@ Before generating scores, reason about the application as a single story:
 
 1. **Standout quality**: What one identity will admissions officers remember after reading this file? Choose or identify a precise label such as: Entrepreneurial Problem Solver, Scientific Researcher, Community Leader, Creative Artist, Future Physician, Public Policy Advocate, Builder, Educator, Innovator. Do NOT simply restate the intended major — infer the identity from what the activities actually demonstrate.
 2. **Narrative cohesion**: Do the activities reinforce one another and point toward one central theme? Identify which activities strengthen the story and whether any dilute it.
-3. **Admissions perspective**: How will an officer at this selectivity tier actually perceive this file? Be specific about what impression the application creates.
+3. **Admissions perspective**: How will a selective-admissions officer actually perceive this file? Be specific about what impression the application creates.
 4. **Narrative gaps**: What important story elements are missing? (Examples: CS major but no formal CS projects, leadership roles without measurable outcomes, strong research but no communication activities, strong academics but no major-aligned extracurriculars)
 
 Keep each narrative analysis section concise — 1–3 sentences per field.
@@ -318,7 +353,7 @@ You do NOT set the final gapScore directly. AppGap computes it deterministically
 
 Score each component 0–100, honestly and independently:
 
-- **academics** (0–100): GPA × course rigor × test scores, measured against the selectivity target and the student's school context (adjust fairly for Early College / Homeschool / Magnet-STEM).
+- **academics** (0–100): GPA × course rigor × test scores, measured on an absolute scale against selective-admissions norms and the student's school context (adjust fairly for Early College / Homeschool / Magnet-STEM).
 - **activities** (0–100): the depth, quality, consistency, leadership, and sustained impact of the extracurricular profile AS A WHOLE — this is the heaviest component. One extraordinary activity with little around it is NOT high; reward multi-year commitment, leadership with real outcomes, and a coherent body of involvement over a single prestigious line.
 - **awards** (0–100): the strength, level, and external validation of awards/honors (school → regional → state/national → international). No awards is low; a few school-level honors is modest; genuine external distinction is high.
 
@@ -343,14 +378,14 @@ This is the single most important prose field. It must read like an experienced 
 - **Describe the profile as a whole.** Lead with the overall shape of the application (e.g. "a cohesive, sustained profile with strong academics but limited breadth" or "a single standout achievement without a supporting body of work"), then connect that to the score.
 - **Name the real drivers.** Emphasize whichever concepts actually shaped this profile: sustained commitment, depth, breadth, consistency, cohesion, intellectual curiosity, major alignment, long-term growth. If the profile is cohesive, say why; if scattered, say why; if it shows multi-year growth, mention it; if it is thin or one-dimensional, say that plainly.
 - **Do NOT default to "missing extracurriculars for the intended major."** Only make major alignment the central point if weak alignment genuinely drove the score. Otherwise mention it in passing, if at all.
-- Cite specifics (their actual GPA, scores, activities, selectivity target), stay qualitative about the number itself (do not assert a figure), and keep it to 2–3 sentences.
+- Cite specifics (their actual GPA, scores, activities), stay qualitative about the number itself (do not assert a figure), and keep it to 2–3 sentences.
 
 ## Required JSON structure:
 {
   "gapScore": <integer 0–100>,
   "gapScoreExplanation": "<2–3 sentences — holistic, admissions-officer voice per the rules above: justify the overall standing by weighing strengths and weaknesses across the whole profile, not a checklist of missing items>",
   "componentScores": {
-    "academics": { "score": <integer 0–100>, "explanation": "<1 sentence on GPA, rigor, and test scores vs. the selectivity target and school context>" },
+    "academics": { "score": <integer 0–100>, "explanation": "<1 sentence on GPA, rigor, and test scores against selective-admissions norms and school context>" },
     "activities": { "score": <integer 0–100>, "explanation": "<1 sentence on the depth, consistency, leadership, and impact of the activity profile as a whole>" },
     "awards": { "score": <integer 0–100>, "explanation": "<1 sentence on the level and external validation of awards/honors>" }
   },
@@ -440,7 +475,7 @@ Analyze the application as a single coherent story — think like an admissions 
 
 1. **Standout quality**: What one identity will stick in an admissions officer's memory after reading this file? Be precise (e.g., "Entrepreneurial Problem Solver", "Scientific Researcher", "Community Leader", "Creative Artist", "Future Physician", "Public Policy Advocate", "Builder", "Educator", "Innovator"). Do NOT restate the intended major. The identity must emerge naturally from what the activities, awards, and trajectory actually demonstrate. Explain WHY this identity is believable and what evidence in the profile supports it.
 2. **Narrative cohesion**: Evaluate whether the activities, awards, and academic choices reinforce one another and converge on one central theme. Identify which specific activities strengthen the story and name any that feel unrelated — explain whether those dilute the narrative or simply add harmless breadth.
-3. **Admissions perception**: Explain precisely how an admissions officer at the stated selectivity tier would read this file. Be specific about what impression is created, what the officer would remember, and what questions might be left unanswered.
+3. **Admissions perception**: Explain precisely how a selective-admissions officer would read this file. Be specific about what impression is created, what the officer would remember, and what questions might be left unanswered.
 4. **Narrative gaps**: Identify important story elements that are absent and weaken the narrative (e.g., technical projects without community impact, strong leadership without measurable outcomes, CS major but no formal CS coursework, strong research but weak communication activities). Name what's missing, explain why it matters for this specific narrative, and what it signals.
 
 ## JSON output structure
@@ -458,7 +493,7 @@ You do NOT set the final gapScore directly. AppGap computes it deterministically
 **AppGap Score = 0.35 × Academics + 0.45 × Activities + 0.20 × Awards**
 
 Score each component 0–100, honestly and independently:
-- **academics**: GPA × rigor × test scores vs. the selectivity target and school context.
+- **academics**: GPA × rigor × test scores against selective-admissions norms and school context.
 - **activities**: the depth, quality, consistency, leadership, and sustained impact of the extracurricular profile as a whole — the heaviest component. One extraordinary activity with little around it is NOT high.
 - **awards**: the level and external validation of awards/honors (school → international).
 
@@ -472,7 +507,7 @@ Still provide a \`gapScore\` field as your holistic estimate — AppGap replaces
 
 **gapScoreExplanation — holistic, admissions-officer voice.** This is the most important prose field. Write it the way an experienced admissions officer would summarize the ENTIRE application after reading the file — never a checklist of missing items, and never built around one absent activity.
 - Justify the overall standing by weighing the profile's strengths and weaknesses TOGETHER across the three components you scored (academics, activities, awards) and how the application reads as a story.
-- Open with the overall shape of the application (e.g. "a tightly cohesive, multi-year profile with strong academics but limited breadth" or "one prestigious achievement without a supporting body of work"), then connect that shape to where the application stands relative to the target selectivity.
+- Open with the overall shape of the application (e.g. "a tightly cohesive, multi-year profile with strong academics but limited breadth" or "one prestigious achievement without a supporting body of work"), then connect that shape to where the application stands relative to selective-admissions norms.
 - Emphasize whichever concepts actually drove this profile: sustained commitment, depth, breadth, consistency, cohesion, intellectual curiosity, major alignment, long-term growth. If the profile is cohesive, explain why; if scattered, explain why; if it shows multi-year growth, name it; if it is thin or one-dimensional, say so plainly.
 - Do NOT default to "missing extracurriculars for the intended major." Make weak major alignment the central point ONLY if it genuinely drove the score; otherwise mention it in passing, if at all.
 - Then name the single most important lever for improvement. 3–4 sentences, citing their actual GPA, scores, and activities — never generic, and do not assert a specific numeric score.
@@ -504,9 +539,9 @@ Provide a deep narrative analysis of how the application reads as a unified stor
 - narrativeCohesion score (0–100): How unified and purposeful the application story feels — 100 means every element reinforces the same theme; scattered profiles score low even if individual pieces are strong
 - applicationDepth score (0–100): How complete and multi-dimensional the profile is across several substantive involvements — one extraordinary activity with little around it is LOW depth
 - majorAlignment score (0–100): How strongly activities, courses, and awards support the intended major
-- memorability score (0–100): How distinctively memorable this application is relative to similar profiles at the same selectivity tier — this is where prestige counts, and it can be HIGH while every other score stays low
+- memorability score (0–100): How distinctively memorable this application is relative to similar profiles applying to selective universities — this is where prestige counts, and it can be HIGH while every other score stays low
 - cohesionAnalysis: 3–4 sentences analyzing which activities reinforce one another, what the central theme is, whether any activities dilute the narrative, and how leadership positions contribute to (or complicate) the story
-- admissionsPerception: 2–3 sentences on how an officer at this selectivity tier will likely read this application — specific to what that tier values, what impression is created, and what would stand out positively or raise questions
+- admissionsPerception: 2–3 sentences on how a selective-admissions officer will likely read this application — specific to what selective programs value, what impression is created, and what would stand out positively or raise questions
 - narrativeGaps: 2–4 items identifying missing story elements that weaken the application — explain what each gap signals and why it matters for this specific narrative
 
 ## Required JSON structure:
@@ -514,7 +549,7 @@ Provide a deep narrative analysis of how the application reads as a unified stor
   "gapScore": <integer 0–100>,
   "gapScoreExplanation": "<3–4 sentences — holistic, admissions-officer voice per the rules above: weigh the whole profile's strengths and weaknesses together to justify the overall standing, then name the top lever. Not a checklist of missing items>",
   "componentScores": {
-    "academics": { "score": <integer 0–100>, "explanation": "<1–2 sentences on GPA, rigor, and test scores vs. the selectivity target and school context>" },
+    "academics": { "score": <integer 0–100>, "explanation": "<1–2 sentences on GPA, rigor, and test scores against selective-admissions norms and school context>" },
     "activities": { "score": <integer 0–100>, "explanation": "<1–2 sentences on the depth, consistency, leadership, and impact of the activity profile as a whole>" },
     "awards": { "score": <integer 0–100>, "explanation": "<1–2 sentences on the level and external validation of awards/honors>" }
   },
@@ -650,18 +685,26 @@ export function buildProfilePrompt(profile: FullProfile): string {
     lines.push("\n### Coursework\nNo courses added.");
   }
 
-  // Career direction
+  // Career direction. The precise major (from the taxonomy) is preferred; the
+  // coarse category is the fallback for legacy profiles. No target-selectivity
+  // line — the AppGap score is absolute and must not depend on target schools.
   lines.push("\n### Career Direction");
-  lines.push(
-    `Intended Major: ${MAJOR_LABELS[profile.majorCategory] ?? (profile.majorCategory || "Not specified")}`,
-  );
+  const intendedMajor = profile.academicMajor
+    ? majorLabel(profile.academicMajor)
+    : (MAJOR_LABELS[profile.majorCategory] ??
+      (profile.majorCategory || "Not specified"));
+  lines.push(`Intended Major: ${intendedMajor}`);
+  if (profile.academicMajor && profile.academicInterests.length > 0) {
+    lines.push(
+      `Specializations of interest: ${profile.academicInterests
+        .map((k) => specializationLabel(profile.academicMajor, k))
+        .join(", ")}`,
+    );
+  }
   if (profile.specificMajor)
     lines.push(`Specific Major: ${profile.specificMajor}`);
   if (profile.careerInterest)
     lines.push(`Career Goal: ${profile.careerInterest}`);
-  lines.push(
-    `Target School Selectivity: ${SELECTIVITY_LABELS[profile.selectivity] ?? (profile.selectivity || "Not specified")}`,
-  );
 
   // Activities
   if (profile.activities.length > 0) {

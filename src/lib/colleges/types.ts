@@ -225,6 +225,14 @@ export interface CollegeDetail extends CollegeWithData {
 
 // ─── Composed match ───────────────────────────────────────────────────────────
 
+/** The user's optional per-college academic target (all nullable). */
+export interface CollegeTarget {
+  schoolId: string | null;
+  programId: string | null;
+  degreeType: string | null;
+  intendedMajor: string | null;
+}
+
 /** A saved college evaluated on both dimensions, plus the user's plan choice. */
 export interface CollegeMatch {
   college: CollegeWithData;
@@ -234,4 +242,6 @@ export interface CollegeMatch {
   source: string;
   /** The application_rounds.id the user selected (finalized phase), or null. */
   selectedRoundId: string | null;
+  /** The user's optional school/program/degree target for this college. */
+  target: CollegeTarget;
 }

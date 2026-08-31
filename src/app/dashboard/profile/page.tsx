@@ -2,6 +2,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "~/components/ui/button";
+import { majorLabel, specializationLabel } from "~/lib/academic-interests";
 import { type Analysis, analysisSchema } from "~/lib/ai/schema";
 import { COMPONENT_WEIGHTS } from "~/lib/ai/score";
 import {
@@ -12,7 +13,6 @@ import {
   labelFor,
   MAJOR_LABELS,
   SCHOOL_TYPE_LABELS,
-  SELECTIVITY_LABELS,
 } from "~/lib/profile-labels";
 import { createClient } from "~/lib/supabase/server";
 
@@ -160,9 +160,10 @@ export default async function ProfileOverviewPage() {
     await Promise.all([
       supabase
         .from("profiles")
-        .select(
-          "grade_level, unweighted_gpa, sat_score, act_score, school_type, major_category, specific_major, career_interest, selectivity",
-        )
+        // select("*") so the page tolerates envs where the newer academic-
+        // direction columns aren't migrated yet (missing columns are simply
+        // undefined rather than erroring the whole query).
+        .select("*")
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -249,16 +250,27 @@ export default async function ProfileOverviewPage() {
           rows={[
             {
               label: "Intended major",
-              value: labelFor(MAJOR_LABELS, profile?.major_category),
+              value: profile?.academic_major
+                ? majorLabel(profile.academic_major)
+                : labelFor(MAJOR_LABELS, profile?.major_category),
             },
+            ...(profile?.academic_interests &&
+            (profile.academic_interests as string[]).length > 0
+              ? [
+                  {
+                    label: "Specializations",
+                    value: (profile.academic_interests as string[])
+                      .map((k) =>
+                        specializationLabel(profile.academic_major, k),
+                      )
+                      .join(", "),
+                  },
+                ]
+              : []),
             { label: "Specific major", value: profile?.specific_major || "—" },
             {
               label: "Career interest",
               value: profile?.career_interest || "—",
-            },
-            {
-              label: "Target selectivity",
-              value: labelFor(SELECTIVITY_LABELS, profile?.selectivity),
             },
           ]}
         />

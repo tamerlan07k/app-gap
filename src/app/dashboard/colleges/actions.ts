@@ -204,3 +204,72 @@ export async function selectRound(
   revalidatePath("/dashboard/colleges");
   return { ok: true };
 }
+
+/**
+ * Set (or clear) the per-college academic target: undergraduate school, program,
+ * degree pathway, and/or a free-text intended major. All fields optional —
+ * uncertainty ("Not sure yet" → null) is a legitimate state. `schoolId` /
+ * `programId`, when provided, are validated to actually belong to the college so
+ * a stale/foreign id can never be written. Choosing a school clears a program
+ * that no longer belongs to it.
+ */
+export async function setCollegeTarget(
+  collegeId: string,
+  target: {
+    schoolId?: string | null;
+    programId?: string | null;
+    degreeType?: string | null;
+    intendedMajor?: string | null;
+  },
+): Promise<ActionResult> {
+  if (!collegeId) return { ok: false, error: "Missing college." };
+  const { supabase, userId } = await currentUserId();
+  if (!userId) return { ok: false, error: "Not signed in." };
+
+  const schoolId = target.schoolId || null;
+  const programId = target.programId || null;
+
+  if (schoolId) {
+    const { data: school } = await supabase
+      .from("college_schools")
+      .select("id")
+      .eq("id", schoolId)
+      .eq("college_id", collegeId)
+      .maybeSingle();
+    if (!school)
+      return { ok: false, error: "That school isn't part of this college." };
+  }
+
+  if (programId) {
+    const { data: program } = await supabase
+      .from("college_programs")
+      .select("id, school_id")
+      .eq("id", programId)
+      .eq("college_id", collegeId)
+      .maybeSingle();
+    if (!program)
+      return { ok: false, error: "That program isn't part of this college." };
+    // If a school is also chosen, the program must belong to it (when scoped).
+    if (schoolId && program.school_id && program.school_id !== schoolId) {
+      return { ok: false, error: "That program isn't in the chosen school." };
+    }
+  }
+
+  const degreeType = target.degreeType?.trim() || null;
+  const intendedMajor = target.intendedMajor?.trim() || null;
+
+  const { error } = await supabase
+    .from("user_colleges")
+    .update({
+      school_id: schoolId,
+      program_id: programId,
+      degree_type: degreeType,
+      intended_major: intendedMajor,
+    })
+    .eq("user_id", userId)
+    .eq("college_id", collegeId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard/colleges");
+  return { ok: true };
+}

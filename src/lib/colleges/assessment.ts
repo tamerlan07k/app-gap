@@ -496,3 +496,14 @@ export function formatChanceRange(range: {
 }): string {
   return `${pct(range.low)}–${pct(range.high)}`;
 }
+
+/**
+ * Format a single representative chance for display, e.g. "12%" (or "<1%").
+ * This is the user-facing AppGap estimate — one number, not a range. Uncertainty
+ * is still communicated separately via `confidence` and the drivers, so the UI
+ * stays honest without implying false precision.
+ */
+export function formatChance(chance: number | null): string {
+  if (chance == null) return "—";
+  return pct(chance);
+}

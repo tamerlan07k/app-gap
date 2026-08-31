@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
+import { majorLabel, specializationLabel } from "~/lib/academic-interests";
 import {
   loadAdditionalContextFromDb,
   loadSchoolTypeFromDb,
@@ -60,14 +61,6 @@ const MAJOR_LABELS: Record<string, string> = {
   law: "Pre-Law / Legal Studies",
   undecided: "Undecided",
   other: "Other",
-};
-
-const SELECTIVITY_LABELS: Record<string, string> = {
-  "highly-selective": "Highly selective / reach schools",
-  competitive: "Competitive target schools",
-  balanced: "Balanced mix",
-  safer: "Mostly safer / likely schools",
-  unsure: "Not sure yet",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -159,6 +152,11 @@ export default function ReviewPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
+  // Completeness is gated on what's actually SAVED TO THE ACCOUNT (the DB), not
+  // on localStorage — otherwise a device with a previous account's cached forms
+  // could generate an analysis on data that was never saved to this account.
+  const [dbStep1Complete, setDbStep1Complete] = useState(false);
+  const [dbStep2Complete, setDbStep2Complete] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -170,26 +168,35 @@ export default function ReviewPage() {
           loadStep3FromDb(),
           loadAdditionalContextFromDb(),
         ]);
+      // Display prefers the DB, falling back to localStorage so a resumed
+      // session still shows the student's in-progress entries.
       setStep1(dbStep1 ?? loadStep1());
       setSchoolInfo(dbSchool ?? loadSchoolInfo());
       setStep2(dbStep2 ?? loadStep2());
       setStep3(dbStep3 ?? loadStep3());
       if (dbContext) setAdditionalContext(dbContext);
+      // Gate strictly on the DB — data must be persisted to THIS account.
+      setDbStep1Complete(
+        !!dbStep1?.info.gradeLevel && !!dbStep1?.info.unweightedGpa,
+      );
+      setDbStep2Complete(!!(dbStep2?.academicMajor || dbStep2?.majorCategory));
       setIsLoaded(true);
     }
     load();
   }, []);
 
-  const step1Complete = !!step1?.info.gradeLevel && !!step1?.info.unweightedGpa;
-  const step2Complete = !!step2?.majorCategory && !!step2?.selectivity;
+  const step1Complete = dbStep1Complete;
+  const step2Complete = dbStep2Complete;
   const allComplete = step1Complete && step2Complete;
 
   const missingItems: string[] = [];
   if (!step1Complete)
-    missingItems.push("Academic Profile — grade level and GPA required");
+    missingItems.push(
+      "Academic Profile — open it and press Continue to save your grade level and GPA to your account",
+    );
   if (!step2Complete)
     missingItems.push(
-      "Career Direction — intended major and college goals required",
+      "Career Direction — open it and press Continue to save your intended major to your account",
     );
 
   async function handleGenerate() {
@@ -399,18 +406,26 @@ export default function ReviewPage() {
           <div className="space-y-2.5">
             <Row
               label="Intended major"
-              value={MAJOR_LABELS[step2?.majorCategory ?? ""] ?? ""}
+              value={
+                step2?.academicMajor
+                  ? majorLabel(step2.academicMajor)
+                  : (MAJOR_LABELS[step2?.majorCategory ?? ""] ?? "")
+              }
             />
+            {step2?.academicInterests && step2.academicInterests.length > 0 && (
+              <Row
+                label="Specializations"
+                value={step2.academicInterests
+                  .map((k) => specializationLabel(step2.academicMajor, k))
+                  .join(", ")}
+              />
+            )}
             {step2?.specificMajor && (
               <Row label="Specific major" value={step2.specificMajor} />
             )}
             {step2?.careerInterest && (
               <Row label="Career goal" value={step2.careerInterest} />
             )}
-            <Row
-              label="College goals"
-              value={SELECTIVITY_LABELS[step2?.selectivity ?? ""] ?? ""}
-            />
           </div>
         </div>
 

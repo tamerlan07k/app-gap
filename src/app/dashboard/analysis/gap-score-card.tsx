@@ -147,6 +147,14 @@ export function GapScoreCard({
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
           AppGap Score
         </p>
+        {!compact && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            A 0–100 measure of your overall application strength right now —
+            based on your profile against selective-admissions norms, not on
+            which colleges you&apos;re targeting. See per-college estimates
+            below.
+          </p>
+        )}
       </div>
       <div className="space-y-6 p-6">
         {/* Overall score */}

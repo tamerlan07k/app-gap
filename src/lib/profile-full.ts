@@ -40,9 +40,10 @@ export async function loadFullProfile(
     act_score: number | null;
     school_type: string | null;
     major_category: string | null;
+    academic_major: string | null;
+    academic_interests: string[] | null;
     specific_major: string | null;
     career_interest: string | null;
-    selectivity: string | null;
     additional_context: string | null;
     personal_statement_draft: string | null;
   };
@@ -69,9 +70,10 @@ export async function loadFullProfile(
       }),
     ),
     majorCategory: p.major_category ?? "",
+    academicMajor: p.academic_major ?? "",
+    academicInterests: p.academic_interests ?? [],
     specificMajor: p.specific_major ?? "",
     careerInterest: p.career_interest ?? "",
-    selectivity: p.selectivity ?? "",
     additionalContext: p.additional_context ?? null,
     personalStatementDraft: p.personal_statement_draft ?? null,
     activities: (activitiesRes.data ?? []).map(

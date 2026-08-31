@@ -8,11 +8,19 @@ import { neutralStrength } from "./strength";
 import type {
   ApplicantStrength,
   CollegeMatch,
+  CollegeTarget,
   CollegeWithData,
   FieldResource,
   FieldStrengthRecord,
   MatchProfile,
 } from "./types";
+
+const NO_TARGET: CollegeTarget = {
+  schoolId: null,
+  programId: null,
+  degreeType: null,
+  intendedMajor: null,
+};
 
 // `normalizeTestPolicy` now lives in matching.ts so generation and display share
 // one implementation; re-exported here for existing importers of this module.
@@ -33,6 +41,9 @@ export function evaluateCollege(args: {
   fieldData: CollegeFieldData;
   source: string;
   selectedRoundId: string | null;
+  /** Optional per-college target; drives the school/program display + (with real
+   * data) the school-level baseline the caller may have applied to college.stats. */
+  target?: CollegeTarget;
 }): CollegeMatch {
   const admission = classifyAdmission(
     args.profile,
@@ -51,5 +62,6 @@ export function evaluateCollege(args: {
     fieldFit,
     source: args.source,
     selectedRoundId: args.selectedRoundId,
+    target: args.target ?? NO_TARGET,
   };
 }

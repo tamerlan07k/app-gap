@@ -43,7 +43,7 @@ export default async function DashboardLayout({
     // so existing users keep their access with no migration dependency.
     const { data: profile } = await supabase
       .from("profiles")
-      .select("grade_level, major_category")
+      .select("grade_level, major_category, onboarding_completed_at")
       .eq("id", user.id)
       .maybeSingle();
 

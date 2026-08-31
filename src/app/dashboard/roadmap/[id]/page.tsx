@@ -5,6 +5,7 @@ import { analysisSchema } from "~/lib/ai/schema";
 import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
 import { checkFeatureAllowance } from "~/lib/feature-usage";
 import { createClient } from "~/lib/supabase/server";
+import { CollegeChancesCard } from "../../analysis/college-chances-card";
 import { GapScoreCard } from "../../analysis/gap-score-card";
 import { NarrativeCard } from "../../analysis/narrative-card";
 import { PersonalStatementCard } from "../../analysis/personal-statement-card";
@@ -100,6 +101,9 @@ export default async function RoadmapResultPage({
       {analysis.personalStatement && (
         <PersonalStatementCard diagnostic={analysis.personalStatement} />
       )}
+
+      {/* Per-college AppGap estimates for the student's saved list. */}
+      <CollegeChancesCard userId={user.id} />
 
       {/* Advisor note */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
