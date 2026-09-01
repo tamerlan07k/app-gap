@@ -1,21 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import {
+  hasSchoolLayer,
+  isSelectorRelevant,
+  type SelectorProgram,
+  type SelectorSchool,
+  visibleProgramsForSchool,
+} from "~/lib/colleges/program-selection";
 import { createClient } from "~/lib/supabase/client";
 import { setCollegeTarget } from "./actions";
-
-interface School {
-  id: string;
-  name: string;
-  admitsSeparately: boolean;
-}
-interface Program {
-  id: string;
-  name: string;
-  schoolId: string | null;
-  /** Verified degree this school-program grants (e.g. "B.S."), or null. */
-  degree: string | null;
-}
+import { ProgramCombobox } from "./program-combobox";
 
 // Common undergraduate degree pathways offered as manual choices. The verified
 // degree for the selected program (when known) is added on top and pre-selected.
@@ -37,12 +32,18 @@ const SELECT_CLASS =
   "h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 dark:bg-input/30";
 
 /**
- * Conditional per-college target selector: undergraduate school → program →
- * degree. Renders NOTHING unless the college has meaningful separately-admitting
- * schools (e.g. Cornell's colleges) — most universities need no such
- * specificity, so most students never see this. Data-driven: options come only
- * from verified college_schools / college_programs rows; "Not sure yet" is
- * always available. Never fabricates structure a college doesn't have.
+ * Per-college target selector: undergraduate school → program → degree. Renders
+ * in two data-driven modes and NOTHING when a college has neither a school layer
+ * nor any verified program:
+ *
+ *   • School-layer colleges (Cornell, Penn, Michigan, …): School → Program →
+ *     Degree with school-scoped native dropdowns — UNCHANGED from before.
+ *   • Single-admission colleges (the 531 Tier-A ones): a searchable/typeahead
+ *     Program picker → Degree, with no invented school layer.
+ *
+ * Options come only from verified college_schools / college_programs rows;
+ * "Not sure yet" is always available; no structure or degree is fabricated. This
+ * never feeds chancing/scoring — it only records the student's application target.
  */
 export function ProgramSelector({
   collegeId,
@@ -55,8 +56,8 @@ export function ProgramSelector({
   initialProgramId: string | null;
   initialDegreeType: string | null;
 }) {
-  const [schools, setSchools] = useState<School[]>([]);
-  const [programs, setPrograms] = useState<Program[]>([]);
+  const [schools, setSchools] = useState<SelectorSchool[]>([]);
+  const [programs, setPrograms] = useState<SelectorProgram[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [schoolId, setSchoolId] = useState(initialSchoolId ?? "");
   const [programId, setProgramId] = useState(initialProgramId ?? "");
@@ -67,6 +68,8 @@ export function ProgramSelector({
     let cancelled = false;
     async function load() {
       const supabase = createClient();
+      // Programs are queried for THIS college only (never the full 20k+ table),
+      // so even a 100+-program college loads a small list.
       const [schoolsRes, programsRes] = await Promise.all([
         supabase
           .from("college_schools")
@@ -113,17 +116,13 @@ export function ProgramSelector({
     };
   }, [collegeId]);
 
-  // Only relevant when the college has separately-admitting (or multiple) schools.
-  const isRelevant =
-    schools.some((s) => s.admitsSeparately) || schools.length > 1;
+  const schoolLayer = hasSchoolLayer(schools);
+  const relevant = isSelectorRelevant(schools, programs);
 
-  const visiblePrograms = useMemo(() => {
-    if (!schoolId) return programs;
-    // Programs scoped to the chosen school, plus college-wide (null) programs.
-    return programs.filter(
-      (p) => p.schoolId === schoolId || p.schoolId == null,
-    );
-  }, [programs, schoolId]);
+  const visiblePrograms = useMemo(
+    () => visibleProgramsForSchool(programs, schoolId),
+    [programs, schoolId],
+  );
 
   const selectedProgram = useMemo(
     () => programs.find((p) => p.id === programId) ?? null,
@@ -179,10 +178,17 @@ export function ProgramSelector({
     persist({ schoolId, programId, degreeType: value });
   }
 
-  if (!loaded || !isRelevant) return null;
+  if (!loaded || !relevant) return null;
 
   return (
-    <div className="relative z-10 mt-3 space-y-2 rounded-lg border border-border/70 bg-muted/20 p-3">
+    // z-20 (not z-10): the searchable-program dropdown is an absolutely-
+    // positioned panel trapped in this wrapper's stacking context. Sibling card
+    // elements ("Visit official website", the rounds section) are `relative
+    // z-10` and come later in the DOM, so at an equal z-10 they'd paint OVER the
+    // panel and show through it. Lifting the wrapper to z-20 keeps the open
+    // dropdown above them. (Native <select> dropdowns render in the browser's
+    // top layer, so the school-layer mode never had this issue.)
+    <div className="relative z-20 mt-3 space-y-2 rounded-lg border border-border/70 bg-muted/20 p-3">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
         Program at this college{" "}
         <span className="font-normal normal-case tracking-normal">
@@ -191,38 +197,52 @@ export function ProgramSelector({
       </p>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <label className="block text-xs">
-          <span className="mb-1 block text-muted-foreground">School</span>
-          <select
-            value={schoolId}
-            onChange={(e) => onSchool(e.target.value)}
-            className={SELECT_CLASS}
-          >
-            <option value="">Not sure yet</option>
-            {schools.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        {schoolLayer ? (
+          <>
+            {/* School-layer mode — UNCHANGED native School → Program dropdowns. */}
+            <label className="block text-xs">
+              <span className="mb-1 block text-muted-foreground">School</span>
+              <select
+                value={schoolId}
+                onChange={(e) => onSchool(e.target.value)}
+                className={SELECT_CLASS}
+              >
+                <option value="">Not sure yet</option>
+                {schools.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+            </label>
 
-        {visiblePrograms.length > 0 && (
-          <label className="block text-xs">
-            <span className="mb-1 block text-muted-foreground">Program</span>
-            <select
-              value={programId}
-              onChange={(e) => onProgram(e.target.value)}
-              className={SELECT_CLASS}
-            >
-              <option value="">Not sure yet</option>
-              {visiblePrograms.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </label>
+            {visiblePrograms.length > 0 && (
+              <label className="block text-xs">
+                <span className="mb-1 block text-muted-foreground">
+                  Program
+                </span>
+                <select
+                  value={programId}
+                  onChange={(e) => onProgram(e.target.value)}
+                  className={SELECT_CLASS}
+                >
+                  <option value="">Not sure yet</option>
+                  {visiblePrograms.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </>
+        ) : (
+          // Single-admission mode — searchable/typeahead program picker.
+          <ProgramCombobox
+            programs={programs}
+            value={programId}
+            onChange={onProgram}
+          />
         )}
 
         {(schoolId || programId) && (
