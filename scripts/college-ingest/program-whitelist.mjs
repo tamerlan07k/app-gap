@@ -70,6 +70,7 @@ export const CIP_WHITELIST = {
   1419: "Mechanical Engineering",
   1420: "Materials Engineering",
   1421: "Mining & Mineral Engineering",
+  1422: "Naval Architecture & Marine Engineering",
   1425: "Petroleum Engineering",
   1427: "Systems Engineering",
   1435: "Industrial Engineering",
