@@ -2033,4 +2033,240 @@ export const COLLEGE_ROUNDS = [
   { name: "Western Illinois University", verified: false, rounds: ["ROLLING"] },
   { name: "Angelo State University", verified: false, rounds: ["ROLLING"] },
   { name: "Troy University", verified: false, rounds: ["ROLLING"] },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V7 expansion (+100). ROUND STRUCTURE ONLY, all `verified: false`. Same rule
+  // as V2–V6: best-effort round TYPES per institution (deadlines are never
+  // stored here — the loader writes them null/pending), left unverified until a
+  // human confirms each against the official admissions page and sets
+  // `verified: true`. Names must match the V7 seeds in seed-colleges.mjs exactly.
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Liberal arts colleges ──────────────────────────────────────────────────
+  { name: "St. John's College", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Bennington College",
+    verified: false,
+    rounds: ["ED", "ED_II", "RD"],
+  },
+  { name: "Hampshire College", verified: false, rounds: ["ED", "EA", "RD"] },
+  {
+    name: "College of the Atlantic",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  { name: "Guilford College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Lake Forest College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Ripon College", verified: false, rounds: ["ROLLING"] },
+  { name: "Albion College", verified: false, rounds: ["ROLLING"] },
+  { name: "Alma College", verified: false, rounds: ["ROLLING"] },
+  { name: "Saint Norbert College", verified: false, rounds: ["ROLLING"] },
+  { name: "Wartburg College", verified: false, rounds: ["ROLLING"] },
+  { name: "Whittier College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Westmont College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Soka University of America", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "University of Puget Sound",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  { name: "Whitworth University", verified: false, rounds: ["ROLLING"] },
+  { name: "Eckerd College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Washington College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "McDaniel College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Augustana College", verified: false, rounds: ["ROLLING"] },
+
+  // ── Women's colleges ───────────────────────────────────────────────────────
+  { name: "Salem College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Sweet Briar College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Stephens College", verified: false, rounds: ["ROLLING"] },
+
+  // ── HBCUs ──────────────────────────────────────────────────────────────────
+  { name: "Bennett College", verified: false, rounds: ["ROLLING"] },
+  { name: "Tougaloo College", verified: false, rounds: ["ROLLING"] },
+  { name: "Claflin University", verified: false, rounds: ["ROLLING"] },
+  { name: "Wilberforce University", verified: false, rounds: ["ROLLING"] },
+  { name: "Lincoln University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Elizabeth City State University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Virginia Union University", verified: false, rounds: ["ROLLING"] },
+  { name: "Talladega College", verified: false, rounds: ["ROLLING"] },
+
+  // ── Catholic / Christian universities ──────────────────────────────────────
+  { name: "Manhattan University", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Spring Hill College", verified: false, rounds: ["ROLLING"] },
+  { name: "Saint Anselm College", verified: false, rounds: ["EA", "RD"] },
+  { name: "Benedictine College", verified: false, rounds: ["ROLLING"] },
+  { name: "University of Detroit Mercy", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Mount St. Mary's University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Franciscan University of Steubenville",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Lipscomb University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Saint Edward's University", verified: false, rounds: ["EA", "RD"] },
+
+  // ── Strong / distinctive public universities ───────────────────────────────
+  {
+    name: "University of Missouri-St Louis",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Colorado Colorado Springs",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Wisconsin-Stout",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Minnesota-Morris",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "University of Michigan-Dearborn",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "California State Polytechnic University-Humboldt",
+    verified: false,
+    rounds: ["RD"],
+  },
+  { name: "SUNY Polytechnic Institute", verified: false, rounds: ["EA", "RD"] },
+  { name: "Fort Lewis College", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "University of Wisconsin-Green Bay",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Emporia State University", verified: false, rounds: ["ROLLING"] },
+  { name: "Pittsburg State University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "St. Mary's College of Maryland",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  { name: "Georgia Gwinnett College", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "The University of Texas at Tyler",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── Specialized STEM institutes ────────────────────────────────────────────
+  { name: "Webb Institute", verified: false, rounds: ["ED", "RD"] },
+  {
+    name: "DigiPen Institute of Technology",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Florida Polytechnic University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Vaughn College of Aeronautics and Technology",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+
+  // ── Audition / portfolio conservatories & art schools ──────────────────────
+  { name: "The Juilliard School", verified: false, rounds: ["RD"] },
+  { name: "Curtis Institute of Music", verified: false, rounds: ["RD"] },
+  { name: "Manhattan School of Music", verified: false, rounds: ["ED", "RD"] },
+  {
+    name: "San Francisco Conservatory of Music",
+    verified: false,
+    rounds: ["RD"],
+  },
+  {
+    name: "California College of the Arts",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Otis College of Art and Design",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  {
+    name: "Massachusetts College of Art and Design",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Cleveland Institute of Art", verified: false, rounds: ["EA", "RD"] },
+
+  // ── Regional / comprehensive universities ──────────────────────────────────
+  { name: "Roger Williams University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Suffolk University", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Merrimack College", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Western New England University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Endicott College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Iona University", verified: false, rounds: ["EA", "RD"] },
+  { name: "St. John Fisher University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Wagner College", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Nazareth University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Rider University", verified: false, rounds: ["EA", "RD"] },
+  { name: "Monmouth University", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "Arcadia University", verified: false, rounds: ["ED", "EA", "RD"] },
+  { name: "La Salle University", verified: false, rounds: ["ROLLING"] },
+  { name: "Widener University", verified: false, rounds: ["ROLLING"] },
+  { name: "Marywood University", verified: false, rounds: ["ROLLING"] },
+  { name: "Bradley University", verified: false, rounds: ["ROLLING"] },
+  { name: "North Central College", verified: false, rounds: ["ROLLING"] },
+  { name: "Elmhurst University", verified: false, rounds: ["ROLLING"] },
+  { name: "Millikin University", verified: false, rounds: ["ROLLING"] },
+  { name: "Baldwin Wallace University", verified: false, rounds: ["ROLLING"] },
+  { name: "Otterbein University", verified: false, rounds: ["ROLLING"] },
+  { name: "Ohio Northern University", verified: false, rounds: ["ROLLING"] },
+  { name: "University of Evansville", verified: false, rounds: ["ROLLING"] },
+  { name: "Drury University", verified: false, rounds: ["ROLLING"] },
+  { name: "Webster University", verified: false, rounds: ["ROLLING"] },
+  { name: "Carroll University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "High Point University",
+    verified: false,
+    rounds: ["ED", "EA", "RD"],
+  },
+  {
+    name: "Queens University of Charlotte",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
+  { name: "Union University", verified: false, rounds: ["ROLLING"] },
+  {
+    name: "Christian Brothers University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  {
+    name: "Palm Beach Atlantic University",
+    verified: false,
+    rounds: ["ROLLING"],
+  },
+  { name: "Dallas Baptist University", verified: false, rounds: ["ROLLING"] },
+  { name: "Seattle Pacific University", verified: false, rounds: ["EA", "RD"] },
+  {
+    name: "Pacific Lutheran University",
+    verified: false,
+    rounds: ["EA", "RD"],
+  },
 ];

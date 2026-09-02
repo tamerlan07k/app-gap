@@ -87,6 +87,35 @@ admissions sites, with per-fact confidence and source. **Everything in it is
 also flags where the seeded structure was wrong (`structure_match: false`) and
 where official pages conflicted or still showed the prior cycle.
 
+### Verified schools/programs & application tracks
+
+`ingest-schools-programs.mjs` loads the curated undergraduate **school → program →
+degree** structure for institutions where the school genuinely matters for the
+application (Cornell, Penn, …, and the audition-divisions of The Juilliard
+School). It now supports a preview:
+
+```bash
+node scripts/college-ingest/ingest-schools-programs.mjs --dry-run  # reads schema, writes nothing
+node scripts/college-ingest/ingest-schools-programs.mjs            # live upsert (idempotent)
+```
+
+`ingest-tracks.mjs` loads verified **application tracks** into
+`college_application_tracks` — audition/portfolio, honors, direct-admit-major,
+coordinated-dual-degree, or A.B.-vs-B.S.E. degree tracks — the application-
+relevant distinctions that are **not** separately-admitting schools. Each track
+can be scoped to a school (`school_id`) so the future Supplemental Essays system
+can target `college_id → school_id → program_id → track_id`. Rows are written
+**pending** (`verified_at` null) and **never** feed the chance engine.
+
+```bash
+node scripts/college-ingest/ingest-tracks.mjs --dry-run   # reads schema, writes nothing
+node scripts/college-ingest/ingest-tracks.mjs             # live upsert (idempotent)
+```
+
+Run tracks **after** the colleges (and, for school-scoped tracks, their schools)
+are ingested. A slug that isn't present yet is skipped with a warning — nothing
+is fabricated.
+
 ## What each source fills
 
 | Layer | Source | This pipeline |

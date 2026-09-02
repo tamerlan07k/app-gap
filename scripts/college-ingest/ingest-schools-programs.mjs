@@ -2443,7 +2443,54 @@ const DATA = {
       programs: [{ name: "Nursing", degree: "B.S." }],
     },
   ],
+
+  // ── V7: The Juilliard School ────────────────────────────────────────────────
+  // A genuine school-layer conservatory: the Music, Dance, and Drama divisions
+  // each admit separately by audition (you apply to one program in one division)
+  // and grant different verified degrees (B.M. vs B.F.A.). Program list is a
+  // representative, verified subset of undergraduate offerings. Audition entry is
+  // modeled as college_application_tracks (ingest-tracks.mjs), not here.
+  "the-juilliard-school": [
+    {
+      school: "Music",
+      defaultDegree: "B.M.",
+      programs: [
+        "Composition",
+        "Piano",
+        "Organ",
+        "Harp",
+        "Guitar",
+        "Violin",
+        "Viola",
+        "Cello",
+        "Double Bass",
+        "Flute",
+        "Oboe",
+        "Clarinet",
+        "Bassoon",
+        "Horn",
+        "Trumpet",
+        "Trombone",
+        "Tuba",
+        "Percussion",
+        "Voice",
+        "Jazz Studies",
+      ],
+    },
+    {
+      school: "Dance",
+      programs: [{ name: "Dance", degree: "B.F.A." }],
+    },
+    {
+      school: "Drama",
+      programs: [{ name: "Acting", degree: "B.F.A." }],
+    },
+  ],
 };
+
+// --dry-run: READ the live schema (colleges/schools/programs) to compute exactly
+// what WOULD be inserted/updated, but write NOTHING. Safe to run anywhere.
+const DRY_RUN = process.argv.slice(2).includes("--dry-run");
 
 function loadEnv() {
   const env = {};
@@ -2502,53 +2549,67 @@ async function main() {
       const { school, defaultDegree, programs } = entry;
       let schoolId = schoolIdByName.get(school);
       if (!schoolId) {
-        const { data: ins, error } = await sb
-          .from("college_schools")
-          .insert({
-            college_id: college.id,
-            name: school,
-            admits_separately: true,
-          })
-          .select("id")
-          .single();
-        if (error) throw error;
-        schoolId = ins.id;
-        schoolIdByName.set(school, schoolId);
+        if (DRY_RUN) {
+          // Simulate the new school without writing; a null id is fine because a
+          // brand-new school has no existing programs to look up.
+          schoolId = null;
+          schoolIdByName.set(school, `dryrun:${school}`);
+        } else {
+          const { data: ins, error } = await sb
+            .from("college_schools")
+            .insert({
+              college_id: college.id,
+              name: school,
+              admits_separately: true,
+            })
+            .select("id")
+            .single();
+          if (error) throw error;
+          schoolId = ins.id;
+          schoolIdByName.set(school, schoolId);
+        }
         schoolsAdded++;
         uniSchools++;
       }
 
-      const { data: existingPrograms } = await sb
-        .from("college_programs")
-        .select("id, name, degree")
-        .eq("college_id", college.id)
-        .eq("school_id", schoolId);
-      const existingByName = new Map(
-        (existingPrograms ?? []).map((p) => [p.name, p]),
-      );
+      // For an existing school, look up its current programs; a just-simulated
+      // (dry-run) or freshly-created school has none yet.
+      const existingByName = new Map();
+      if (schoolId) {
+        const { data: existingPrograms } = await sb
+          .from("college_programs")
+          .select("id, name, degree")
+          .eq("college_id", college.id)
+          .eq("school_id", schoolId);
+        for (const p of existingPrograms ?? []) existingByName.set(p.name, p);
+      }
 
       for (const raw of programs) {
         const { name, degree } = normalizeProgram(raw, defaultDegree);
         const existing = existingByName.get(name);
         if (!existing) {
-          const { error } = await sb.from("college_programs").insert({
-            college_id: college.id,
-            school_id: schoolId,
-            name,
-            degree,
-            offered: true,
-          });
-          if (error) throw error;
+          if (!DRY_RUN) {
+            const { error } = await sb.from("college_programs").insert({
+              college_id: college.id,
+              school_id: schoolId,
+              name,
+              degree,
+              offered: true,
+            });
+            if (error) throw error;
+          }
           programsAdded++;
           uniPrograms++;
           if (degree) degreesSet++;
         } else if ((existing.degree ?? null) !== (degree ?? null)) {
           // Backfill/correct the degree on an already-ingested program.
-          const { error } = await sb
-            .from("college_programs")
-            .update({ degree })
-            .eq("id", existing.id);
-          if (error) throw error;
+          if (!DRY_RUN) {
+            const { error } = await sb
+              .from("college_programs")
+              .update({ degree })
+              .eq("id", existing.id);
+            if (error) throw error;
+          }
           if (degree) degreesSet++;
         }
       }
@@ -2559,10 +2620,14 @@ async function main() {
     );
   }
 
-  console.log("Ingestion complete.");
+  console.log(
+    DRY_RUN ? "[DRY RUN] no writes performed." : "Ingestion complete.",
+  );
   console.log(summary.join("\n"));
   console.log(
-    `TOTAL: ${schoolsAdded} schools, ${programsAdded} programs added; ${degreesSet} degrees written.`,
+    `TOTAL: ${schoolsAdded} schools, ${programsAdded} programs ` +
+      `${DRY_RUN ? "would be added" : "added"}; ${degreesSet} degrees ` +
+      `${DRY_RUN ? "would be written" : "written"}.`,
   );
 }
 
