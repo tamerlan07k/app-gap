@@ -1,5 +1,5 @@
-// College seed list (681 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
-// V6 +100 + V7 +100).
+// College seed list (781 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
+// V6 +100 + V7 +100 + V8 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -3032,5 +3032,418 @@ export const SEED_COLLEGES = [
     name: "Pacific Lutheran University",
     state: "WA",
     notes: "regional private; Lutheran",
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // V8 expansion (+100). Same rules as V1–V7: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Chosen to (a) deepen categories
+  // the set exercises — distinctive/specialized institutions (a deaf-education
+  // university, a public arts conservatory, music/art/design colleges, maritime
+  // academies), more women's colleges and HBCUs, additional Catholic/Christian
+  // universities — and (b) keep widening the target/likely/safety band with
+  // strong small LACs, regional privates, and public campuses that fill state
+  // gaps. `notes` records the selectivity band + why the school is here, never
+  // application facts. Names are best-effort Scorecard canonical names, corrected
+  // by the --dry-run no-match/ambiguous report before the live run. State
+  // disambiguates deliberate collisions the schema handles: Augustana University
+  // (SD) vs the existing Augustana College (IL); Monmouth College (IL) vs the
+  // existing Monmouth University (NJ); Wesleyan College (GA, women's) vs the
+  // existing Wesleyan University (CT); St. Mary's University (TX) vs the existing
+  // Saint Mary's colleges (IN/CA).
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // ── Distinctive / specialized institutions ─────────────────────────────────
+  {
+    name: "Gallaudet University",
+    state: "DC",
+    notes: "distinctive; university for deaf & hard-of-hearing students",
+  },
+  {
+    name: "University of North Carolina School of the Arts",
+    state: "NC",
+    notes: "public arts conservatory; audition/portfolio admission",
+  },
+  {
+    name: "Cleveland Institute of Music",
+    state: "OH",
+    notes: "music conservatory; audition admission",
+  },
+  {
+    name: "Marymount Manhattan College",
+    state: "NY",
+    notes: "distinctive; performing & visual arts-strong urban college",
+  },
+  {
+    name: "Minneapolis College of Art and Design",
+    state: "MN",
+    notes: "art & design college; portfolio admission",
+  },
+  {
+    name: "Kansas City Art Institute",
+    state: "MO",
+    notes: "art & design college; portfolio admission",
+  },
+  {
+    name: "Columbus College of Art & Design",
+    state: "OH",
+    notes: "art & design college; portfolio admission",
+  },
+  {
+    name: "College for Creative Studies",
+    state: "MI",
+    notes: "art & design college; portfolio admission",
+  },
+  {
+    name: "Milwaukee Institute of Art & Design",
+    state: "WI",
+    notes: "art & design college; portfolio admission",
+  },
+  {
+    name: "Moore College of Art and Design",
+    state: "PA",
+    notes: "art & design college; women's undergraduate; portfolio",
+  },
+  {
+    name: "Cal Poly Maritime Academy",
+    state: "CA",
+    notes: "maritime academy; specialized (Cal State Maritime, now Cal Poly)",
+  },
+  {
+    name: "Maine Maritime Academy",
+    state: "ME",
+    notes: "public maritime academy; specialized",
+  },
+  {
+    name: "Lesley University",
+    state: "MA",
+    notes: "regional private; arts & education focus",
+  },
+  {
+    name: "New York Institute of Technology",
+    state: "NY",
+    notes: "regional private; STEM/tech-focused",
+  },
+
+  // ── Women's colleges ───────────────────────────────────────────────────────
+  {
+    name: "Wesleyan College",
+    state: "GA",
+    notes: "women's college; oldest chartered women's college",
+  },
+  {
+    name: "College of Saint Benedict",
+    state: "MN",
+    notes: "women's college; Catholic (Benedictine)",
+  },
+  {
+    name: "Mississippi University for Women",
+    state: "MS",
+    notes: "public historically-women's university",
+  },
+  {
+    name: "Trinity Washington University",
+    state: "DC",
+    notes: "women's undergraduate; Catholic",
+  },
+  {
+    name: "Notre Dame of Maryland University",
+    state: "MD",
+    notes: "women's undergraduate; Catholic",
+  },
+  {
+    name: "Cedar Crest College",
+    state: "PA",
+    notes: "women's college",
+  },
+  {
+    name: "Converse University",
+    state: "SC",
+    notes: "women's undergraduate; regional private",
+  },
+  {
+    name: "Brenau University",
+    state: "GA",
+    notes: "women's undergraduate; regional private",
+  },
+
+  // ── HBCUs ──────────────────────────────────────────────────────────────────
+  { name: "Coppin State University", state: "MD", notes: "HBCU; public" },
+  {
+    name: "University of Maryland Eastern Shore",
+    state: "MD",
+    notes: "HBCU; public land-grant",
+  },
+  {
+    name: "West Virginia State University",
+    state: "WV",
+    notes: "HBCU; public",
+  },
+  {
+    name: "Cheyney University of Pennsylvania",
+    state: "PA",
+    notes: "HBCU; public; oldest HBCU",
+  },
+  { name: "Shaw University", state: "NC", notes: "HBCU; private" },
+  { name: "Benedict College", state: "SC", notes: "HBCU; private" },
+  { name: "Miles College", state: "AL", notes: "HBCU; private" },
+  { name: "Stillman College", state: "AL", notes: "HBCU; private" },
+  { name: "Wiley University", state: "TX", notes: "HBCU; private" },
+  {
+    name: "Harris-Stowe State University",
+    state: "MO",
+    notes: "HBCU; public",
+  },
+
+  // ── Strong small LACs & selective privates ─────────────────────────────────
+  { name: "Illinois Wesleyan University", state: "IL", notes: "LAC" },
+  { name: "Transylvania University", state: "KY", notes: "LAC" },
+  { name: "Austin College", state: "TX", notes: "LAC" },
+  { name: "Southwestern University", state: "TX", notes: "LAC" },
+  { name: "Drew University", state: "NJ", notes: "LAC" },
+  { name: "Hartwick College", state: "NY", notes: "LAC" },
+  { name: "Elmira College", state: "NY", notes: "LAC" },
+  { name: "Hanover College", state: "IN", notes: "LAC" },
+  {
+    name: "Goshen College",
+    state: "IN",
+    notes: "LAC; Mennonite heritage",
+  },
+  {
+    name: "Taylor University",
+    state: "IN",
+    notes: "LAC; Christian (interdenominational)",
+  },
+  {
+    name: "Augustana University",
+    state: "SD",
+    notes: "LAC (distinct from Augustana College IL)",
+  },
+  { name: "Central College", state: "IA", notes: "LAC" },
+  { name: "Simpson College", state: "IA", notes: "LAC" },
+  { name: "Carthage College", state: "WI", notes: "LAC; Lutheran heritage" },
+  {
+    name: "Monmouth College",
+    state: "IL",
+    notes: "LAC (distinct from Monmouth University NJ)",
+  },
+  {
+    name: "William Jewell College",
+    state: "MO",
+    notes: "LAC",
+  },
+  { name: "Oglethorpe University", state: "GA", notes: "LAC" },
+  {
+    name: "Presbyterian College",
+    state: "SC",
+    notes: "LAC; Presbyterian heritage",
+  },
+
+  // ── Catholic / Christian universities ──────────────────────────────────────
+  {
+    name: "Saint Vincent College",
+    state: "PA",
+    notes: "regional private; Catholic (Benedictine)",
+  },
+  {
+    name: "Saint Francis University",
+    state: "PA",
+    notes: "regional private; Catholic (Franciscan)",
+  },
+  {
+    name: "DeSales University",
+    state: "PA",
+    notes: "regional private; Catholic",
+  },
+  {
+    name: "Bellarmine University",
+    state: "KY",
+    notes: "regional private; Catholic",
+  },
+  {
+    name: "University of the Incarnate Word",
+    state: "TX",
+    notes: "regional private; Catholic",
+  },
+  {
+    name: "St. Mary's University",
+    state: "TX",
+    notes: "regional private; Catholic (Marianist), San Antonio",
+  },
+  {
+    name: "Dominican University",
+    state: "IL",
+    notes: "regional private; Catholic (Dominican)",
+  },
+  {
+    name: "Lewis University",
+    state: "IL",
+    notes: "regional private; Catholic (Lasallian)",
+  },
+  {
+    name: "Niagara University",
+    state: "NY",
+    notes: "regional private; Catholic (Vincentian)",
+  },
+  {
+    name: "St Bonaventure University",
+    state: "NY",
+    notes: "regional private; Catholic (Franciscan)",
+  },
+
+  // ── Regional publics (fill state gaps) ─────────────────────────────────────
+  {
+    name: "Youngstown State University",
+    state: "OH",
+    notes: "regional public",
+  },
+  {
+    name: "Eastern Illinois University",
+    state: "IL",
+    notes: "regional public",
+  },
+  {
+    name: "Northern Kentucky University",
+    state: "KY",
+    notes: "regional public",
+  },
+  { name: "Morehead State University", state: "KY", notes: "regional public" },
+  {
+    name: "Austin Peay State University",
+    state: "TN",
+    notes: "regional public",
+  },
+  {
+    name: "Jacksonville State University",
+    state: "AL",
+    notes: "regional public",
+  },
+  {
+    name: "University of North Alabama",
+    state: "AL",
+    notes: "regional public",
+  },
+  {
+    name: "Francis Marion University",
+    state: "SC",
+    notes: "regional public",
+  },
+  { name: "Augusta University", state: "GA", notes: "regional public" },
+  {
+    name: "Indiana University-Indianapolis",
+    state: "IN",
+    notes: "regional public (Indiana University Indianapolis, formerly IUPUI)",
+  },
+  {
+    name: "Southeast Missouri State University",
+    state: "MO",
+    notes: "regional public",
+  },
+  {
+    name: "Northwest Missouri State University",
+    state: "MO",
+    notes: "regional public",
+  },
+  { name: "Washburn University", state: "KS", notes: "regional public" },
+  {
+    name: "University of Wisconsin-Platteville",
+    state: "WI",
+    notes: "regional public",
+  },
+  {
+    name: "University of Wisconsin-River Falls",
+    state: "WI",
+    notes: "regional public",
+  },
+  {
+    name: "Minnesota State University Moorhead",
+    state: "MN",
+    notes: "regional public",
+  },
+  { name: "Bemidji State University", state: "MN", notes: "regional public" },
+  {
+    name: "Framingham State University",
+    state: "MA",
+    notes: "regional public",
+  },
+  { name: "Westfield State University", state: "MA", notes: "regional public" },
+  { name: "Fitchburg State University", state: "MA", notes: "regional public" },
+  { name: "Worcester State University", state: "MA", notes: "regional public" },
+  {
+    name: "Massachusetts College of Liberal Arts",
+    state: "MA",
+    notes: "public liberal-arts college",
+  },
+  {
+    name: "Western Connecticut State University",
+    state: "CT",
+    notes: "regional public",
+  },
+  {
+    name: "Eastern Connecticut State University",
+    state: "CT",
+    notes: "regional public",
+  },
+  { name: "Plymouth State University", state: "NH", notes: "regional public" },
+  {
+    name: "University of Southern Maine",
+    state: "ME",
+    notes: "regional public",
+  },
+  { name: "Frostburg State University", state: "MD", notes: "regional public" },
+  { name: "Southern Oregon University", state: "OR", notes: "regional public" },
+
+  // ── Regional privates ──────────────────────────────────────────────────────
+  { name: "The University of Tampa", state: "FL", notes: "regional private" },
+  { name: "Jacksonville University", state: "FL", notes: "regional private" },
+  {
+    name: "Nova Southeastern University",
+    state: "FL",
+    notes: "regional private",
+  },
+  {
+    name: "Florida Southern College",
+    state: "FL",
+    notes: "regional private",
+  },
+  {
+    name: "Campbell University",
+    state: "NC",
+    notes: "regional private; Christian (Baptist)",
+  },
+  {
+    name: "Wingate University",
+    state: "NC",
+    notes: "regional private",
+  },
+  {
+    name: "Carson-Newman University",
+    state: "TN",
+    notes: "regional private; Christian (Baptist)",
+  },
+  {
+    name: "California Lutheran University",
+    state: "CA",
+    notes: "regional private; Lutheran heritage",
+  },
+  {
+    name: "University of La Verne",
+    state: "CA",
+    notes: "regional private",
+  },
+  {
+    name: "Point Loma Nazarene University",
+    state: "CA",
+    notes: "regional private; Christian (Nazarene)",
+  },
+  {
+    name: "Linfield University",
+    state: "OR",
+    notes: "regional private",
+  },
+  {
+    name: "George Fox University",
+    state: "OR",
+    notes: "regional private; Christian (Quaker heritage)",
   },
 ];
