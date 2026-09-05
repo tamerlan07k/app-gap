@@ -5,7 +5,7 @@ import { gateway } from "../client";
 import { AI_FEATURES } from "../config";
 import type { FullProfile } from "../prompt";
 import { COACH_BOUNDARIES } from "./boundaries";
-import { DIAGNOSTIC_LENSES } from "./lenses";
+import { ESSAY_SCORING_LENSES } from "./lenses";
 
 // Graded evaluation engine — scores a draft on the four-category framework
 // (Voice & Authenticity, Depth & Reflection, Storytelling & Structure,
@@ -42,11 +42,16 @@ const CATEGORY_BLOCK = SCORE_CATEGORIES.map(
   (c) => `- **${c.key}** (${c.label}): ${c.blurb}`,
 ).join("\n");
 
-const SYSTEM_PROMPT = `You are AppGap's personal-statement evaluator. You score one draft of a Common App personal statement on four equally-weighted categories, each out of 100, and explain each score so the student understands it. You are a diagnostic coach, not an admissions office.
+export const SYSTEM_PROMPT = `You are AppGap's personal-statement evaluator. You score one draft of a Common App personal statement on four equally-weighted categories, each out of 100, and explain each score so the student understands it. You are a diagnostic coach, not an admissions office.
 
 ${COACH_BOUNDARIES}
 
-## The four categories (score each 0–100)
+## Scoring vs. feedback — a HARD separation (read first)
+Your response has two jobs, and they use different inputs:
+- **SCORING** — the four category scores — evaluates the ESSAY TEXT ALONE. Judge the writing purely on its own merits. The student's intended field, activities, and leadership roles (given below the draft) are NOT scoring input. You MUST NOT raise or lower any of the four scores because the essay overlaps with, repeats, matches, or diverges from anything already on the student's application. An essay about an activity the student already lists (e.g. their sport, club, or role) is scored EXACTLY as it would be if that activity were not on the application — never penalized for the overlap.
+- **FEEDBACK** — the "overview" and the per-category "improvements" — MAY use the application context. If the essay mostly restates what the application already shows, you SHOULD note it as feedback, e.g. "this adds little beyond what your application already shows — consider revealing a different dimension of the experience." Phrase it as guidance the student can act on. This observation MUST NOT change any of the four scores.
+
+## The four categories (score each 0–100 from the essay text alone)
 ${CATEGORY_BLOCK}
 
 ## Creativity is NOT vocabulary
@@ -63,7 +68,7 @@ For every category: the 0–100 score, a one-line summary of WHY, up to three sp
 ## Honesty
 This is a diagnostic to guide revision — NOT an admissions probability, chance, or official score. Never say an essay is "Ivy-worthy", never guarantee or estimate admission, and never claim a college would accept it.
 
-${DIAGNOSTIC_LENSES}
+${ESSAY_SCORING_LENSES}
 
 ## Output format
 Respond with ONLY valid JSON in this exact shape — no markdown, no code fences, no commentary:
@@ -76,26 +81,41 @@ Respond with ONLY valid JSON in this exact shape — no markdown, no code fences
 Include all four categories exactly once. Do NOT include an overall score — it is computed as the average of the four.`;
 
 // ─── Prompt builder ──────────────────────────────────────────────────────────
+//
+// The prompt is built from two DELIBERATELY SEPARATE blocks so the boundary
+// between scoring and feedback is structural, not just a sentence in the system
+// prompt:
+//   • buildEssayBlock  — the SCORING input: the prompt + the draft, and nothing
+//     about the profile. Identical for the same essay on any account, so the
+//     four category scores cannot vary with the student's activities/field.
+//   • buildContextBlock — the FEEDBACK-only application context (intended field
+//     + activity names/roles). Present only so overlap can be surfaced as
+//     guidance; the system prompt forbids it from moving any score.
 
-function buildPrompt(
-  content: string,
-  promptText: string,
-  profile: FullProfile,
-): string {
+/** The scoring input: prompt + draft. Takes NO profile — the four category
+ *  scores are a function of the essay text alone. */
+export function buildEssayBlock(content: string, promptText: string): string {
   const lines: string[] = [];
 
   lines.push("# The prompt this essay answers");
   lines.push(promptText || "(no prompt selected)");
   lines.push("");
 
-  lines.push("# The draft to score");
+  lines.push("# The draft to score (SCORE THIS TEXT ALONE)");
   lines.push('"""');
   lines.push(content.trim() || "(the draft is empty)");
   lines.push('"""');
-  lines.push("");
+
+  return lines.join("\n");
+}
+
+/** The feedback-only application context. NEVER a scoring input — used solely
+ *  so the evaluator can note overlap with the rest of the application. */
+export function buildContextBlock(profile: FullProfile): string {
+  const lines: string[] = [];
 
   lines.push(
-    "# Application context (for coherence only — do NOT summarize it)",
+    "# Application context — FEEDBACK ONLY, NOT a scoring input (do NOT summarize it, do NOT let it change any score)",
   );
   const field =
     profile.specificMajor || profile.majorCategory || profile.careerInterest;
@@ -109,12 +129,22 @@ function buildPrompt(
   } else {
     lines.push("Activities already on their application: (none listed)");
   }
-  lines.push("");
 
-  lines.push(
-    "Score the draft and respond with ONLY the JSON described in your instructions.",
-  );
   return lines.join("\n");
+}
+
+export function buildPrompt(
+  content: string,
+  promptText: string,
+  profile: FullProfile,
+): string {
+  return [
+    buildEssayBlock(content, promptText),
+    "",
+    buildContextBlock(profile),
+    "",
+    "Score the draft from its text alone, use the application context only for feedback, and respond with ONLY the JSON described in your instructions.",
+  ].join("\n");
 }
 
 // ─── Generate ────────────────────────────────────────────────────────────────

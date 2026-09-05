@@ -61,11 +61,14 @@ export const AI_FEATURES = {
   },
   // The expensive, nuance-heavy Personal Statement operations (sentence-level
   // line-by-line feedback + the graded evaluation). Opus 5 via the gateway; the
-  // per-tier model still comes from FEATURE_ACCESS. Low temperature — this is
-  // careful diagnosis, not ideation.
+  // per-tier model still comes from FEATURE_ACCESS. Temperature 0 — the graded
+  // evaluation produces a 0–100 score, so it must be as deterministic as the
+  // model allows: the same essay should not drift run-to-run. (Seed is not set;
+  // Anthropic models via the gateway do not honor it. Line-by-line shares this
+  // config and is likewise deterministic, which only makes its marks steadier.)
   personalStatementDeepCoach: {
     model: "anthropic/claude-opus-5",
-    temperature: 0.3,
+    temperature: 0,
     description:
       "Personal Statement deep coaching — line-by-line feedback and graded evaluation (Opus)",
   },
