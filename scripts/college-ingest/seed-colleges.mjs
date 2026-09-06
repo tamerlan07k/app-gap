@@ -1,5 +1,5 @@
-// College seed list (781 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
-// V6 +100 + V7 +100 + V8 +100).
+// College seed list (885 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
+// V6 +100 + V7 +100 + V8 +100 + V9 +104).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -3445,5 +3445,548 @@ export const SEED_COLLEGES = [
     name: "George Fox University",
     state: "OR",
     notes: "regional private; Christian (Quaker heritage)",
+  },
+
+  // ══════════════════════════════════════════════════════════════════════════════════
+  // V9 expansion (+104). Same rules as V1–V8: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Chosen to keep widening the
+  // target/likely/safety band toward the full U.S. 4-yr universe with an admit
+  // rate: state-system regional publics (Texas A&M / Purdue / UT / CSU / SUNY /
+  // UW / UH campuses and state-gap fills), Catholic/Jesuit and Christian
+  // universities, liberal-arts colleges, and a few distinctive/specialized
+  // institutions (School of Visual Arts, Laguna College of Art and Design,
+  // Shenandoah, LeTourneau). Adds thin states (OR, ND, MT, WA, IA). All 104
+  // dry-run-validated to a unique unitid with a published admit rate; 0 dupes.
+  // Names are exact Scorecard canonical names (several recent renames applied,
+  // e.g. Texas A&M-Commerce → East Texas A&M University; Mississippi College →
+  // Mississippi Christian University; Edgewood College → Edgewood University).
+  // State disambiguates deliberate collisions the schema handles: Anderson
+  // University (SC) vs Anderson University (IN, not seeded); Carroll College (MT)
+  // vs the existing Carroll University (WI); Regis College (MA) vs the existing
+  // Regis University (CO). Lincoln University (MO) was intentionally NOT added
+  // (its canonical name collides with the existing Lincoln University (PA) and
+  // Scorecard reports no admit rate).
+  // ═══════════════════════════════════════════════════════════════════════════════════
+
+  {
+    name: "School of Visual Arts",
+    state: "NY",
+    notes: "art & design college (illustration, film, animation, fine arts)",
+  },
+  {
+    name: "Laguna College of Art and Design",
+    state: "CA",
+    notes: "art & design college; small studio-based",
+  },
+  {
+    name: "Shenandoah University",
+    state: "VA",
+    notes: "conservatory + comprehensive; performing-arts strong",
+  },
+  {
+    name: "LeTourneau University",
+    state: "TX",
+    notes: "STEM-focused Christian polytechnic (engineering/aviation)",
+  },
+  {
+    name: "Trine University",
+    state: "IN",
+    notes: "engineering & professional-focused private",
+  },
+  {
+    name: "St Catherine University",
+    state: "MN",
+    notes: "largest U.S. women's university; Catholic",
+  },
+  {
+    name: "Regis College",
+    state: "MA",
+    notes: "Catholic (Weston, MA); health-professions strong",
+  },
+  {
+    name: "Emmanuel College",
+    state: "MA",
+    notes: "Catholic liberal arts (Boston)",
+  },
+  {
+    name: "Gannon University",
+    state: "PA",
+    notes: "Catholic (Erie); health & professional programs",
+  },
+  {
+    name: "Mercyhurst University",
+    state: "PA",
+    notes: "Catholic (Mercy); intelligence-studies distinctive",
+  },
+  {
+    name: "King's College",
+    state: "PA",
+    notes: "Catholic (Holy Cross), Wilkes-Barre PA",
+  },
+  {
+    name: "Walsh University",
+    state: "OH",
+    notes: "Catholic (Brothers of Christian Instruction)",
+  },
+  {
+    name: "Benedictine University",
+    state: "IL",
+    notes: "Catholic (Lisle, IL); sciences/health strong",
+  },
+  {
+    name: "Saint Joseph's College of Maine",
+    state: "ME",
+    notes: "Catholic liberal arts",
+  },
+  {
+    name: "Marymount University",
+    state: "VA",
+    notes: "Catholic (Arlington VA)",
+  },
+  {
+    name: "University of Mary",
+    state: "ND",
+    notes: "Catholic (Benedictine), Bismarck ND",
+  },
+  {
+    name: "Carroll College",
+    state: "MT",
+    notes: "Catholic diocesan, Helena MT; health/pre-professional",
+  },
+  {
+    name: "Saint Martin's University",
+    state: "WA",
+    notes: "Catholic (Benedictine), Lacey WA",
+  },
+  {
+    name: "North Park University",
+    state: "IL",
+    notes: "Christian (Evangelical Covenant), Chicago",
+  },
+  {
+    name: "Grove City College",
+    state: "PA",
+    notes: "Christian liberal arts; independent, low-cost",
+  },
+  {
+    name: "Messiah University",
+    state: "PA",
+    notes: "Christian (Anabaptist/Pietist) liberal arts",
+  },
+  {
+    name: "Gordon College",
+    state: "MA",
+    notes: "Christian nondenominational liberal arts",
+  },
+  {
+    name: "Bethel University",
+    state: "MN",
+    notes: "Christian (Converge), St. Paul MN",
+  },
+  {
+    name: "Augsburg University",
+    state: "MN",
+    notes: "Lutheran (ELCA), Minneapolis; urban",
+  },
+  {
+    name: "Concordia College at Moorhead",
+    state: "MN",
+    notes: "Lutheran (ELCA) liberal arts",
+  },
+  {
+    name: "California Baptist University",
+    state: "CA",
+    notes: "Christian (Baptist), Riverside; large",
+  },
+  {
+    name: "Concordia University-Irvine",
+    state: "CA",
+    notes: "Lutheran (LCMS) liberal arts",
+  },
+  {
+    name: "Lee University",
+    state: "TN",
+    notes: "Christian (Church of God), Cleveland TN",
+  },
+  {
+    name: "Trevecca Nazarene University",
+    state: "TN",
+    notes: "Christian (Nazarene), Nashville",
+  },
+  {
+    name: "Freed-Hardeman University",
+    state: "TN",
+    notes: "Christian (Churches of Christ)",
+  },
+  {
+    name: "Anderson University",
+    state: "SC",
+    notes: "Christian (Baptist), Anderson SC",
+  },
+  {
+    name: "Erskine College",
+    state: "SC",
+    notes: "Christian (ARP) liberal arts; oldest in SC",
+  },
+  {
+    name: "William Carey University",
+    state: "MS",
+    notes: "Christian (Baptist), Hattiesburg",
+  },
+  {
+    name: "Mississippi Christian University",
+    state: "MS",
+    notes: "Christian (Baptist); formerly Mississippi College",
+  },
+  {
+    name: "Oklahoma Baptist University",
+    state: "OK",
+    notes: "Christian (Baptist) liberal arts",
+  },
+  {
+    name: "Oklahoma Christian University",
+    state: "OK",
+    notes: "Christian (Churches of Christ)",
+  },
+  {
+    name: "John Brown University",
+    state: "AR",
+    notes: "Christian interdenominational, Siloam Springs",
+  },
+  {
+    name: "Evangel University",
+    state: "MO",
+    notes: "Christian (Assemblies of God), Springfield",
+  },
+  {
+    name: "Roberts Wesleyan University",
+    state: "NY",
+    notes: "Christian (Free Methodist), Rochester",
+  },
+  {
+    name: "Houghton University",
+    state: "NY",
+    notes: "Christian (Wesleyan) liberal arts",
+  },
+  {
+    name: "University of Redlands",
+    state: "CA",
+    notes: "liberal arts; Johnston self-designed program",
+  },
+  {
+    name: "Moravian University",
+    state: "PA",
+    notes: "liberal arts; one of oldest U.S. colleges",
+  },
+  {
+    name: "Lebanon Valley College",
+    state: "PA",
+    notes: "liberal arts (Annville PA)",
+  },
+  {
+    name: "Elizabethtown College",
+    state: "PA",
+    notes: "liberal arts (Brethren heritage)",
+  },
+  {
+    name: "Albright College",
+    state: "PA",
+    notes: "liberal arts (Reading PA)",
+  },
+  {
+    name: "Illinois College",
+    state: "IL",
+    notes: "liberal arts (Jacksonville IL); 2nd-oldest in IL",
+  },
+  {
+    name: "Marietta College",
+    state: "OH",
+    notes: "liberal arts (Marietta OH); petroleum eng. distinctive",
+  },
+  {
+    name: "Muskingum University",
+    state: "OH",
+    notes: "liberal arts (New Concord OH)",
+  },
+  {
+    name: "Heidelberg University",
+    state: "OH",
+    notes: "liberal arts (Tiffin OH)",
+  },
+  {
+    name: "University of Mount Union",
+    state: "OH",
+    notes: "liberal arts (Alliance OH)",
+  },
+  {
+    name: "Capital University",
+    state: "OH",
+    notes: "Lutheran liberal arts (Columbus OH)",
+  },
+  {
+    name: "Ashland University",
+    state: "OH",
+    notes: "liberal arts/professional (Ashland OH)",
+  },
+  {
+    name: "Adrian College",
+    state: "MI",
+    notes: "liberal arts (Methodist heritage)",
+  },
+  {
+    name: "Aquinas College",
+    state: "MI",
+    notes: "Catholic liberal arts (Grand Rapids MI)",
+  },
+  {
+    name: "Hamline University",
+    state: "MN",
+    notes: "liberal arts; oldest university in MN",
+  },
+  {
+    name: "Buena Vista University",
+    state: "IA",
+    notes: "liberal arts (Storm Lake IA)",
+  },
+  {
+    name: "Emory & Henry University",
+    state: "VA",
+    notes: "liberal arts (Emory VA); Methodist heritage",
+  },
+  {
+    name: "Bridgewater College",
+    state: "VA",
+    notes: "liberal arts (Brethren heritage)",
+  },
+  {
+    name: "University of Lynchburg",
+    state: "VA",
+    notes: "liberal arts/professional (Lynchburg VA)",
+  },
+  {
+    name: "Newberry College",
+    state: "SC",
+    notes: "Lutheran liberal arts (Newberry SC)",
+  },
+  {
+    name: "Franklin Pierce University",
+    state: "NH",
+    notes: "liberal arts (Rindge NH)",
+  },
+  {
+    name: "New England College",
+    state: "NH",
+    notes: "liberal arts (Henniker NH)",
+  },
+  {
+    name: "Curry College",
+    state: "MA",
+    notes: "liberal arts; learning-differences support (PAL)",
+  },
+  {
+    name: "Wilkes University",
+    state: "PA",
+    notes: "liberal arts/professional (Wilkes-Barre PA)",
+  },
+  {
+    name: "Daemen University",
+    state: "NY",
+    notes: "health-sciences-strong private (Amherst NY)",
+  },
+  {
+    name: "Utica University",
+    state: "NY",
+    notes: "professional-focused private (Utica NY)",
+  },
+  {
+    name: "Manhattanville University",
+    state: "NY",
+    notes: "liberal arts (Purchase NY)",
+  },
+  {
+    name: "University of Indianapolis",
+    state: "IN",
+    notes: "comprehensive private (Indianapolis)",
+  },
+  {
+    name: "Cumberland University",
+    state: "TN",
+    notes: "liberal arts/professional (Lebanon TN)",
+  },
+  {
+    name: "Husson University",
+    state: "ME",
+    notes: "professional-focused private (Bangor ME)",
+  },
+  {
+    name: "Aurora University",
+    state: "IL",
+    notes: "professional-focused private (Aurora IL)",
+  },
+  {
+    name: "Pacific University",
+    state: "OR",
+    notes: "comprehensive (Forest Grove OR); health strong",
+  },
+  {
+    name: "West Texas A & M University",
+    state: "TX",
+    notes: "public regional (Canyon TX); Texas A&M System",
+  },
+  {
+    name: "East Texas A&M University",
+    state: "TX",
+    notes: "public (Commerce TX); formerly Texas A&M-Commerce",
+  },
+  {
+    name: "Texas A&M University-San Antonio",
+    state: "TX",
+    notes: "public regional; Texas A&M System",
+  },
+  {
+    name: "Midwestern State University",
+    state: "TX",
+    notes: "public liberal-arts-focused; Texas Tech System",
+  },
+  {
+    name: "University of Houston-Downtown",
+    state: "TX",
+    notes: "public access university (Houston)",
+  },
+  {
+    name: "University of Houston-Clear Lake",
+    state: "TX",
+    notes: "public (Houston metro)",
+  },
+  {
+    name: "The University of Texas Permian Basin",
+    state: "TX",
+    notes: "public regional (Odessa TX)",
+  },
+  {
+    name: "Nicholls State University",
+    state: "LA",
+    notes: "public regional (Thibodaux LA)",
+  },
+  {
+    name: "McNeese State University",
+    state: "LA",
+    notes: "public regional (Lake Charles LA)",
+  },
+  {
+    name: "Southeastern Louisiana University",
+    state: "LA",
+    notes: "public regional (Hammond LA)",
+  },
+  {
+    name: "Northwestern State University of Louisiana",
+    state: "LA",
+    notes: "public regional (Natchitoches LA)",
+  },
+  {
+    name: "University of Southern Indiana",
+    state: "IN",
+    notes: "public regional (Evansville IN)",
+  },
+  {
+    name: "Purdue University Fort Wayne",
+    state: "IN",
+    notes: "public regional; Purdue System",
+  },
+  {
+    name: "Purdue University Northwest",
+    state: "IN",
+    notes: "public regional; Purdue System",
+  },
+  {
+    name: "Saginaw Valley State University",
+    state: "MI",
+    notes: "public regional (University Center MI)",
+  },
+  {
+    name: "Northern Michigan University",
+    state: "MI",
+    notes: "public regional (Marquette MI)",
+  },
+  {
+    name: "University of Illinois Springfield",
+    state: "IL",
+    notes: "public; University of Illinois System",
+  },
+  {
+    name: "Colorado Mesa University",
+    state: "CO",
+    notes: "public regional (Grand Junction CO)",
+  },
+  {
+    name: "Western Colorado University",
+    state: "CO",
+    notes: "public regional (Gunnison CO)",
+  },
+  {
+    name: "Colorado State University Pueblo",
+    state: "CO",
+    notes: "public regional; CSU System",
+  },
+  {
+    name: "University of Wisconsin-Parkside",
+    state: "WI",
+    notes: "public regional; UW System",
+  },
+  {
+    name: "Edgewood University",
+    state: "WI",
+    notes: "Catholic (Madison WI); formerly Edgewood College",
+  },
+  {
+    name: "SUNY Old Westbury",
+    state: "NY",
+    notes: "public liberal-arts; SUNY (Long Island)",
+  },
+  {
+    name: "Clayton State University",
+    state: "GA",
+    notes: "public regional (Morrow GA); USG",
+  },
+  {
+    name: "Columbus State University",
+    state: "GA",
+    notes: "public regional (Columbus GA); USG",
+  },
+  {
+    name: "University of West Alabama",
+    state: "AL",
+    notes: "public regional (Livingston AL)",
+  },
+  {
+    name: "Auburn University at Montgomery",
+    state: "AL",
+    notes: "public regional; Auburn System",
+  },
+  {
+    name: "Arkansas Tech University",
+    state: "AR",
+    notes: "public regional (Russellville AR)",
+  },
+  {
+    name: "University of Central Oklahoma",
+    state: "OK",
+    notes: "public regional (Edmond OK)",
+  },
+  {
+    name: "Missouri Southern State University",
+    state: "MO",
+    notes: "public regional (Joplin MO)",
+  },
+  {
+    name: "Delta State University",
+    state: "MS",
+    notes: "public regional (Cleveland MS)",
+  },
+  {
+    name: "The University of Tennessee-Martin",
+    state: "TN",
+    notes: "public regional; UT System",
   },
 ];
