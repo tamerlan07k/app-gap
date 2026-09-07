@@ -11,6 +11,7 @@ export type FeatureKey =
   | "profileAnalysis" // the AppGap diagnostic / gap analysis
   | "applicationWriting" // activity descriptions + Additional Information help
   | "activitiesAnalysis" // Activities workspace: analysis + verdicts + recommendations
+  | "courseworkAnalysis" // Coursework workspace: academic-path interpretation (profile-only, never scores)
   | "personalStatementCoach" // Personal Statement: brainstorm/topic/draft/revision (Gemini)
   | "personalStatementDeepCoach" // Personal Statement: line-by-line + graded evaluation (Opus, higher cost)
   | "personalStatementChat" // Personal Statement: GapCoach live chat while writing (Gemini, metered per message)
@@ -47,6 +48,17 @@ export const AI_FEATURES = {
     temperature: 0.4,
     description:
       "Analyzes existing activities (strength, field alignment, continue/deepen verdicts) and generates realistic, timeline-aware activity recommendations",
+  },
+  // Coursework workspace — interprets what the student's academic path
+  // communicates (rigor, major preparation, gaps vs. opportunities). Iterative
+  // like Activities (re-run as courses/availability change), so the same cheap
+  // Gemini default applies; this is a PROFILE-ANALYSIS feature and never feeds
+  // the AppGap Score or chancing engine.
+  courseworkAnalysis: {
+    model: "openai/gpt-4o-mini",
+    temperature: 0.3,
+    description:
+      "Interprets a student's coursework — academic rigor, major/field preparation, and genuine gaps vs. opportunities vs. unavailable courses — as a profile-analysis feature (never a score)",
   },
   // Personal Statement — the Gemini-tier coaching operations (brainstorm, topic,
   // draft, revision). The per-tier model actually used comes from FEATURE_ACCESS
@@ -152,9 +164,9 @@ export const FEATURE_ACCESS: Record<
       model: "google/gemini-2.5-pro",
     },
   },
-  // Activity descriptions + Additional Information writing help. NOT enforced yet
-  // (feature is unbuilt); these values pre-define the intended entitlement so the
-  // architecture is ready — Free 1/week, Pro a bounded higher monthly allowance.
+  // Activity descriptions + Additional Information writing help. Enforced in the
+  // application-writing route (metered like the other AI features) — Free 1/week,
+  // Pro a bounded 50/month allowance to cap worst-case AI spend.
   applicationWriting: {
     free: {
       enabled: true,
@@ -164,7 +176,7 @@ export const FEATURE_ACCESS: Record<
     },
     pro: {
       enabled: true,
-      limit: 100,
+      limit: 50,
       window: "month",
       model: "google/gemini-2.5-pro",
     },
@@ -174,6 +186,23 @@ export const FEATURE_ACCESS: Record<
   // allowance is a weekly refresh rather than a one-shot lifetime cap, and Pro
   // gets a bounded monthly allowance. Tune here to control AI cost.
   activitiesAnalysis: {
+    free: {
+      enabled: true,
+      limit: 1,
+      window: "week",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 30,
+      window: "month",
+      model: "google/gemini-2.5-pro",
+    },
+  },
+  // Coursework workspace analysis. Available the same general way as the other My
+  // Profile core features (Activities): Free gets a weekly refresh, Pro a bounded
+  // monthly allowance — both counted from the append-only feature_usage ledger.
+  courseworkAnalysis: {
     free: {
       enabled: true,
       limit: 1,
