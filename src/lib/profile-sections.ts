@@ -44,9 +44,9 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "coursework",
     label: "Coursework",
-    locked: true,
+    locked: false,
     description:
-      "Keep your current and planned courses, AP/IB/dual-enrollment rigor, and academic profile up to date.",
+      "Analyze what your academic path communicates — rigor, major preparation, school opportunity context, and genuine gaps vs. opportunities.",
   },
   {
     slug: "awards",

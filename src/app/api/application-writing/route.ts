@@ -1,16 +1,21 @@
 import { analyzeWriting } from "~/lib/ai/analyze-writing";
-import { SUBSCRIPTION_TIERS } from "~/lib/ai/config";
-import { type EntitlementProfile, resolveEntitlement } from "~/lib/entitlement";
+import { SUBSCRIPTION_TIERS, type TierKey } from "~/lib/ai/config";
+import {
+  type EntitlementProfile,
+  reconcileExpiredOverride,
+  resolveEntitlement,
+} from "~/lib/entitlement";
+import { checkFeatureAllowance, recordFeatureUsage } from "~/lib/feature-usage";
 import { loadFullProfile } from "~/lib/profile-full";
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 
-// Application Writing analysis endpoint.
-//
-// Deliberately NOT gated by the monthly roadmap-generation ledger: writing
-// feedback is iterative, so refreshing it must never consume a roadmap
-// generation. It uses the tier's model (free vs pro) and caches the latest
-// result in writing_analyses so the report page doesn't recompute on every load.
+// Application Writing analysis endpoint. Metered under the "applicationWriting"
+// feature (Free 1/week, Pro 50/month — see FEATURE_ACCESS), following the same
+// 7-step flow as analyze-activities: auth → admin load → reconcile+resolve
+// entitlement → feature allowance check [503 on error, 429 on limit] → generate →
+// record usage FIRST → cache. Iterative writing feedback still never consumes a
+// roadmap generation — this is its own per-feature ledger.
 export async function POST() {
   const supabase = await createClient();
   const {
@@ -49,15 +54,51 @@ export async function POST() {
     );
   }
 
-  // Effective tier selects the model, matching the gap-analysis behavior.
+  // Effective tier: reconcile a lapsed admin override, then resolve with priority
+  // active-override > Stripe > free.
+  await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
   const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
-  const tierConfig = SUBSCRIPTION_TIERS[entitlement.tier];
+  const tier: TierKey = entitlement.tier;
+
+  // Feature-based access check BEFORE any AI request.
+  let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
+  try {
+    allowance = await checkFeatureAllowance(
+      admin,
+      user.id,
+      "applicationWriting",
+      tier,
+    );
+  } catch (err) {
+    // Fail closed: if we can't verify usage we must NOT allow a free generation.
+    console.error(
+      "[API] Failed to verify entitlement usage:",
+      err instanceof Error ? err.message : String(err),
+    );
+    return Response.json(
+      { error: "Couldn't verify your plan usage. Please try again." },
+      { status: 503 },
+    );
+  }
+  if (!allowance.allowed) {
+    const error =
+      tier === "free"
+        ? "You've used your Application Writing feedback for this week. It refreshes in a few days, or upgrade to Pro for more."
+        : "You've reached your Application Writing limit for this month. It resets at the start of next month.";
+    return Response.json({ error }, { status: 429 });
+  }
+
+  const model = allowance.model ?? SUBSCRIPTION_TIERS[tier].model;
 
   try {
     const { analysis, promptTokens, completionTokens } = await analyzeWriting(
       profile,
-      tierConfig.model,
+      model,
     );
+
+    // Record the consumed use in the append-only ledger FIRST — authoritative,
+    // decoupled from the cached row below.
+    await recordFeatureUsage(admin, user.id, "applicationWriting", tier);
 
     // Cache the result as the user's single latest analysis (upsert in place on
     // user_id — see migration 20260814000000). A failed write is non-fatal; we
@@ -68,7 +109,7 @@ export async function POST() {
         {
           user_id: user.id,
           analysis,
-          model: tierConfig.model,
+          model,
           prompt_tokens: promptTokens,
           completion_tokens: completionTokens,
           updated_at: new Date().toISOString(),
