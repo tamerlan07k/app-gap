@@ -1,5 +1,6 @@
-// College seed list (885 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
-// V6 +100 + V7 +100 + V8 +100 + V9 +104).
+// College seed list (985 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
+// V6 +100 + V7 +100 + V8 +100 + V9 +104 +
+// V10 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -3989,4 +3990,420 @@ export const SEED_COLLEGES = [
     state: "TN",
     notes: "public regional; UT System",
   },
+
+  // ══════════════════════════════════════════════════════════════════════════════════
+  // V10 expansion (+100). Same rules as V1-V9: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Selected from the authoritative
+  // Scorecard remainder (predominantly-bachelor's, operating, with a published
+  // admit rate) minus the existing 885, so every name is a verbatim Scorecard
+  // canonical name -- all 100 probe-validated to a unique unitid with a published
+  // admit rate, 0 dupes/collisions with existing, 0 for-profit. Composition:
+  // 14 HBCUs/minority-serving, 34 regional publics (incl. system branch campuses:
+  // Rutgers-Camden, U-M Flint, IU South Bend, UConn Stamford, UW Tacoma, Pitt
+  // Johnstown, three Penn State campuses, CUNY/SUNY colleges), 30 Catholic/
+  // Christian/other private universities, 15 liberal-arts colleges, and 7
+  // specialized schools (pharmacy, art & design, architecture, music). Admit
+  // spread 29%-100%, median 79% (deliberate target/likely/safety deepening; 0
+  // sub-25% reaches). Note: "Texas A & M International University" carries spaces
+  // around the ampersand in Scorecard (the Corpus Christi/Kingsville spacing
+  // lesson). State disambiguates same-name collisions the schema handles (e.g.
+  // Westminster College MO vs the existing Westminster PA; Marian University IN).
+  // ══════════════════════════════════════════════════════════════════════════════════
+  {
+    name: "Oakwood University",
+    state: "AL",
+    notes: "private HBCU (Adventist)",
+  },
+  {
+    name: "University of Arkansas at Pine Bluff",
+    state: "AR",
+    notes: "public HBCU; land-grant",
+  },
+  {
+    name: "Huston-Tillotson University",
+    state: "TX",
+    notes: "private HBCU (Austin)",
+  },
+  { name: "Paul Quinn College", state: "TX", notes: "private HBCU (Dallas)" },
+  {
+    name: "Saint Augustine's University",
+    state: "NC",
+    notes: "private HBCU (Raleigh)",
+  },
+  {
+    name: "Livingstone College",
+    state: "NC",
+    notes: "private HBCU (AME Zion)",
+  },
+  { name: "Rust College", state: "MS", notes: "private HBCU (UMC)" },
+  {
+    name: "Mississippi Valley State University",
+    state: "MS",
+    notes: "public HBCU",
+  },
+  { name: "Paine College", state: "GA", notes: "private HBCU (Augusta)" },
+  {
+    name: "Edward Waters University",
+    state: "FL",
+    notes: "private HBCU (Jacksonville)",
+  },
+  {
+    name: "Southern University at New Orleans",
+    state: "LA",
+    notes: "public HBCU; SU System",
+  },
+  {
+    name: "Chicago State University",
+    state: "IL",
+    notes: "public; predominantly Black",
+  },
+  {
+    name: "Le Moyne-Owen College",
+    state: "TN",
+    notes: "private HBCU (Memphis)",
+  },
+  {
+    name: "Allen University",
+    state: "SC",
+    notes: "private HBCU (AME, Columbia)",
+  },
+  {
+    name: "Rutgers University-Camden",
+    state: "NJ",
+    notes: "public; Rutgers System campus",
+  },
+  {
+    name: "University of Michigan-Flint",
+    state: "MI",
+    notes: "public; U-M regional",
+  },
+  {
+    name: "Indiana University-South Bend",
+    state: "IN",
+    notes: "public; IU regional",
+  },
+  {
+    name: "University of Connecticut-Stamford",
+    state: "CT",
+    notes: "public; UConn regional",
+  },
+  {
+    name: "University of Washington-Tacoma Campus",
+    state: "WA",
+    notes: "public; UW campus",
+  },
+  {
+    name: "University of Pittsburgh-Johnstown",
+    state: "PA",
+    notes: "public; Pitt regional",
+  },
+  {
+    name: "Pennsylvania State University-Penn State Erie-Behrend College",
+    state: "PA",
+    notes: "public; Penn State Behrend",
+  },
+  {
+    name: "Pennsylvania State University-Penn State Harrisburg",
+    state: "PA",
+    notes: "public; Penn State campus",
+  },
+  {
+    name: "Pennsylvania State University-Penn State Abington",
+    state: "PA",
+    notes: "public; Penn State campus",
+  },
+  {
+    name: "CUNY York College",
+    state: "NY",
+    notes: "public; CUNY senior college",
+  },
+  {
+    name: "CUNY Medgar Evers College",
+    state: "NY",
+    notes: "public; CUNY (Brooklyn)",
+  },
+  {
+    name: "CUNY New York City College of Technology",
+    state: "NY",
+    notes: "public; CUNY City Tech",
+  },
+  {
+    name: "SUNY College of Technology at Canton",
+    state: "NY",
+    notes: "public; SUNY Canton",
+  },
+  {
+    name: "University of Minnesota-Rochester",
+    state: "MN",
+    notes: "public; UMN health-sciences campus",
+  },
+  {
+    name: "Southwest Minnesota State University",
+    state: "MN",
+    notes: "public regional",
+  },
+  {
+    name: "Northeastern Illinois University",
+    state: "IL",
+    notes: "public; HSI (Chicago)",
+  },
+  { name: "Governors State University", state: "IL", notes: "public regional" },
+  { name: "East Central University", state: "OK", notes: "public regional" },
+  {
+    name: "Southeastern Oklahoma State University",
+    state: "OK",
+    notes: "public regional",
+  },
+  {
+    name: "Northeastern State University",
+    state: "OK",
+    notes: "public; large Cherokee-heritage",
+  },
+  {
+    name: "Texas A & M International University",
+    state: "TX",
+    notes: "public HSI; TAMU System (Scorecard spaces around &)",
+  },
+  {
+    name: "University of North Texas at Dallas",
+    state: "TX",
+    notes: "public; UNT System",
+  },
+  {
+    name: "University of South Carolina-Upstate",
+    state: "SC",
+    notes: "public regional",
+  },
+  {
+    name: "University of Hawaii at Hilo",
+    state: "HI",
+    notes: "public; UH campus",
+  },
+  {
+    name: "Nevada State University",
+    state: "NV",
+    notes: "public regional (Henderson)",
+  },
+  {
+    name: "University of Baltimore",
+    state: "MD",
+    notes: "public; USM upper-division",
+  },
+  { name: "New Jersey City University", state: "NJ", notes: "public; HSI" },
+  { name: "Eastern Oregon University", state: "OR", notes: "public regional" },
+  {
+    name: "University of Virginia's College at Wise",
+    state: "VA",
+    notes: "public LAC; UVA branch",
+  },
+  {
+    name: "Vermont State University",
+    state: "VT",
+    notes: "public; 2023 VSCS merger",
+  },
+  { name: "Shepherd University", state: "WV", notes: "public regional" },
+  {
+    name: "Dakota State University",
+    state: "SD",
+    notes: "public; tech/cyber focus",
+  },
+  {
+    name: "Middle Georgia State University",
+    state: "GA",
+    notes: "public regional",
+  },
+  { name: "Minot State University", state: "ND", notes: "public regional" },
+  { name: "Saint Leo University", state: "FL", notes: "private Catholic" },
+  { name: "Barry University", state: "FL", notes: "private Catholic (Miami)" },
+  {
+    name: "Molloy University",
+    state: "NY",
+    notes: "private Catholic (Long Island)",
+  },
+  {
+    name: "Long Island University",
+    state: "NY",
+    notes: "private; multi-campus",
+  },
+  {
+    name: "Mercy University",
+    state: "NY",
+    notes: "private; HSI (Westchester)",
+  },
+  {
+    name: "St. Joseph's University-New York",
+    state: "NY",
+    notes: "private Catholic",
+  },
+  {
+    name: "University of Mount Saint Vincent",
+    state: "NY",
+    notes: "private Catholic (Bronx)",
+  },
+  {
+    name: "Marian University",
+    state: "IN",
+    notes: "private Catholic (Indianapolis)",
+  },
+  { name: "Cedarville University", state: "OH", notes: "private Baptist" },
+  {
+    name: "The University of Findlay",
+    state: "OH",
+    notes: "private (Churches of God)",
+  },
+  {
+    name: "Oral Roberts University",
+    state: "OK",
+    notes: "private charismatic Christian",
+  },
+  { name: "Oklahoma City University", state: "OK", notes: "private Methodist" },
+  { name: "Campbellsville University", state: "KY", notes: "private Baptist" },
+  {
+    name: "University of the Cumberlands",
+    state: "KY",
+    notes: "private Baptist",
+  },
+  {
+    name: "Maryville University of Saint Louis",
+    state: "MO",
+    notes: "private",
+  },
+  { name: "Lindenwood University", state: "MO", notes: "private" },
+  {
+    name: "Andrews University",
+    state: "MI",
+    notes: "private Adventist flagship",
+  },
+  {
+    name: "Azusa Pacific University",
+    state: "CA",
+    notes: "private evangelical",
+  },
+  {
+    name: "Southern Adventist University",
+    state: "TN",
+    notes: "private Adventist",
+  },
+  {
+    name: "Lincoln Memorial University",
+    state: "TN",
+    notes: "private (Appalachia)",
+  },
+  { name: "Regent University", state: "VA", notes: "private Christian" },
+  { name: "Champlain College", state: "VT", notes: "private; career-focused" },
+  {
+    name: "University of New Haven",
+    state: "CT",
+    notes: "private; criminal-justice/eng",
+  },
+  {
+    name: "University of Hartford",
+    state: "CT",
+    notes: "private; comprehensive",
+  },
+  {
+    name: "Stevenson University",
+    state: "MD",
+    notes: "private; career-focused",
+  },
+  {
+    name: "York College of Pennsylvania",
+    state: "PA",
+    notes: "private; professional",
+  },
+  {
+    name: "Thomas Jefferson University",
+    state: "PA",
+    notes: "private; health + design (E. Falls)",
+  },
+  {
+    name: "Houston Christian University",
+    state: "TX",
+    notes: "private Baptist (was HBU)",
+  },
+  {
+    name: "University of Mary Hardin-Baylor",
+    state: "TX",
+    notes: "private Baptist",
+  },
+  { name: "Dordt University", state: "IA", notes: "private Reformed" },
+  {
+    name: "Flagler College",
+    state: "FL",
+    notes: "private LAC (St. Augustine)",
+  },
+  {
+    name: "Young Harris College",
+    state: "GA",
+    notes: "private LAC (Methodist)",
+  },
+  {
+    name: "Maryville College",
+    state: "TN",
+    notes: "private LAC (Presbyterian)",
+  },
+  {
+    name: "Warren Wilson College",
+    state: "NC",
+    notes: "private work-college LAC",
+  },
+  { name: "Hiram College", state: "OH", notes: "private LAC" },
+  {
+    name: "Antioch College",
+    state: "OH",
+    notes: "private LAC (Yellow Springs)",
+  },
+  { name: "Loras College", state: "IA", notes: "private Catholic LAC" },
+  {
+    name: "Nebraska Wesleyan University",
+    state: "NE",
+    notes: "private LAC (Methodist)",
+  },
+  { name: "Hastings College", state: "NE", notes: "private LAC" },
+  {
+    name: "Randolph College",
+    state: "VA",
+    notes: "private LAC (formerly R-M Woman's)",
+  },
+  { name: "Colby-Sawyer College", state: "NH", notes: "private LAC" },
+  {
+    name: "Centenary College of Louisiana",
+    state: "LA",
+    notes: "private LAC (Methodist)",
+  },
+  { name: "The College of Idaho", state: "ID", notes: "private LAC" },
+  { name: "Lyon College", state: "AR", notes: "private LAC (Presbyterian)" },
+  {
+    name: "Westminster College",
+    state: "MO",
+    notes: "private LAC (Fulton MO)",
+  },
+  {
+    name: "Massachusetts College of Pharmacy and Health Sciences",
+    state: "MA",
+    notes: "health-sciences",
+  },
+  {
+    name: "Albany College of Pharmacy and Health Sciences",
+    state: "NY",
+    notes: "pharmacy",
+  },
+  { name: "Maine College of Art & Design", state: "ME", notes: "art & design" },
+  {
+    name: "Pacific Northwest College of Art",
+    state: "OR",
+    notes: "art & design",
+  },
+  {
+    name: "Southern California Institute of Architecture",
+    state: "CA",
+    notes: "architecture (SCI-Arc)",
+  },
+  {
+    name: "VanderCook College of Music",
+    state: "IL",
+    notes: "music education",
+  },
+  { name: "Art Academy of Cincinnati", state: "OH", notes: "art & design" },
 ];
