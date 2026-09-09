@@ -1,6 +1,6 @@
-// College seed list (985 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
+// College seed list (1085 = V1 ~53 + V2 +128 + V3 +100 + V4 +100 + V5 +100 +
 // V6 +100 + V7 +100 + V8 +100 + V9 +104 +
-// V10 +100).
+// V10 +100 + V11 +100).
 //
 // Chosen to prove the whole pipeline end-to-end AND to exercise every edge case
 // the schema must handle, across the full selectivity range (so chancing can
@@ -4406,4 +4406,520 @@ export const SEED_COLLEGES = [
     notes: "music education",
   },
   { name: "Art Academy of Cincinnati", state: "OH", notes: "art & design" },
+  // V11 expansion (+100). Same rules as V1-V10: seeded by NAME + STATE only; the
+  // Scorecard ingester resolves each to an IPEDS unitid (exact canonical-name +
+  // state match) and logs it for verification. Selected from the authoritative
+  // Scorecard remainder (predominantly-bachelor's, operating, with a published
+  // admit rate) minus the existing 985, so every name is a verbatim Scorecard
+  // canonical name -- all 100 probe-validated to a unique unitid with a published
+  // admit rate, 0 dupes/collisions with existing, 0 for-profit, 0 ambiguous.
+  // Composition: 30 regional publics (incl. system/branch campuses: UPR Mayaguez
+  // & Rio Piedras, PASSHE mergers Commonwealth U & PennWest, UW Bothell, CSU
+  // Channel Islands, IU Southeast, Penn State Altoona, Pitt-Greensburg, LSU-A/
+  // Shreveport, TAMU-Victoria), 55 Catholic/Christian/other private universities,
+  // and 15 liberal-arts/specialized schools (architecture, STEM, art & design,
+  // women's colleges, Great Books & work colleges). Admit spread 12%-100%,
+  // median ~83% (deliberate target/likely/safety deepening). Seminaries,
+  // yeshivas, online-only mega-divisions and micro-schools deliberately skipped.
+  // ══════════════════════════════════════════════════════════════════════════════════
+  {
+    name: "University of Puerto Rico-Mayaguez",
+    state: "PR",
+    notes: "public flagship engineering campus",
+  },
+  {
+    name: "Commonwealth University of Pennsylvania",
+    state: "PA",
+    notes: "PASSHE (Bloomsburg/Lock Haven/Mansfield)",
+  },
+  {
+    name: "University of Puerto Rico-Rio Piedras",
+    state: "PR",
+    notes: "public flagship",
+  },
+  {
+    name: "Pennsylvania Western University",
+    state: "PA",
+    notes: "PASSHE (Cal U/Clarion/Edinboro)",
+  },
+  {
+    name: "Louisiana State University at Alexandria",
+    state: "LA",
+    notes: "public regional (LSU system)",
+  },
+  {
+    name: "Metropolitan State University",
+    state: "MN",
+    notes: "public urban (Twin Cities)",
+  },
+  {
+    name: "University of Washington-Bothell Campus",
+    state: "WA",
+    notes: "UW branch campus",
+  },
+  {
+    name: "California State University-Channel Islands",
+    state: "CA",
+    notes: "CSU campus",
+  },
+  {
+    name: "University of Arkansas at Little Rock",
+    state: "AR",
+    notes: "public metropolitan",
+  },
+  {
+    name: "East Stroudsburg University of Pennsylvania",
+    state: "PA",
+    notes: "PASSHE",
+  },
+  {
+    name: "Lander University",
+    state: "SC",
+    notes: "public regional",
+  },
+  {
+    name: "Eastern New Mexico University-Main Campus",
+    state: "NM",
+    notes: "public regional",
+  },
+  {
+    name: "Abraham Baldwin Agricultural College",
+    state: "GA",
+    notes: "public ag/technical",
+  },
+  {
+    name: "Indiana University-Southeast",
+    state: "IN",
+    notes: "IU regional campus",
+  },
+  {
+    name: "University of South Carolina Aiken",
+    state: "SC",
+    notes: "USC system campus",
+  },
+  {
+    name: "Southern Arkansas University Main Campus",
+    state: "AR",
+    notes: "public regional",
+  },
+  {
+    name: "Fairmont State University",
+    state: "WV",
+    notes: "public regional",
+  },
+  {
+    name: "University of Hawaii-West Oahu",
+    state: "HI",
+    notes: "UH campus",
+  },
+  {
+    name: "Texas A&M University-Victoria",
+    state: "TX",
+    notes: "A&M system campus",
+  },
+  {
+    name: "Lewis-Clark State College",
+    state: "ID",
+    notes: "public state college",
+  },
+  {
+    name: "Pennsylvania State University-Penn State Altoona",
+    state: "PA",
+    notes: "largest PSU branch campus",
+  },
+  {
+    name: "Louisiana State University-Shreveport",
+    state: "LA",
+    notes: "LSU system campus",
+  },
+  {
+    name: "Black Hills State University",
+    state: "SD",
+    notes: "public regional",
+  },
+  {
+    name: "University of Wisconsin-Superior",
+    state: "WI",
+    notes: "UW System campus",
+  },
+  {
+    name: "University of Minnesota-Crookston",
+    state: "MN",
+    notes: "UMN system campus",
+  },
+  {
+    name: "West Liberty University",
+    state: "WV",
+    notes: "public regional",
+  },
+  {
+    name: "Concord University",
+    state: "WV",
+    notes: "public regional",
+  },
+  {
+    name: "Sul Ross State University",
+    state: "TX",
+    notes: "public regional (Big Bend)",
+  },
+  {
+    name: "University of Pittsburgh-Greensburg",
+    state: "PA",
+    notes: "Pitt regional campus",
+  },
+  {
+    name: "University of Science and Arts of Oklahoma",
+    state: "OK",
+    notes: "public honors liberal arts",
+  },
+  {
+    name: "Southeastern University",
+    state: "FL",
+    notes: "Christian university (Assemblies of God)",
+  },
+  {
+    name: "National Louis University",
+    state: "IL",
+    notes: "private university (education/social sciences)",
+  },
+  {
+    name: "Touro University",
+    state: "NY",
+    notes: "Jewish-sponsored private university",
+  },
+  {
+    name: "Johnson & Wales University-Providence",
+    state: "RI",
+    notes: "hospitality/culinary/business",
+  },
+  {
+    name: "Harding University",
+    state: "AR",
+    notes: "Christian university (Churches of Christ)",
+  },
+  {
+    name: "Davenport University",
+    state: "MI",
+    notes: "private business/tech university",
+  },
+  {
+    name: "Saint Xavier University",
+    state: "IL",
+    notes: "Catholic (Mercy)",
+  },
+  {
+    name: "Concordia University-Saint Paul",
+    state: "MN",
+    notes: "Lutheran (LCMS)",
+  },
+  {
+    name: "Robert Morris University",
+    state: "PA",
+    notes: "private university (business focus)",
+  },
+  {
+    name: "Charleston Southern University",
+    state: "SC",
+    notes: "Baptist university",
+  },
+  {
+    name: "Brigham Young University-Hawaii",
+    state: "HI",
+    notes: "LDS-sponsored university",
+  },
+  {
+    name: "Lynn University",
+    state: "FL",
+    notes: "private university (international)",
+  },
+  {
+    name: "Roosevelt University",
+    state: "IL",
+    notes: "private urban university (Chicago)",
+  },
+  {
+    name: "Fairleigh Dickinson University-Metropolitan Campus",
+    state: "NJ",
+    notes: "FDU campus (Teaneck)",
+  },
+  {
+    name: "Olivet Nazarene University",
+    state: "IL",
+    notes: "Nazarene university",
+  },
+  {
+    name: "Holy Family University",
+    state: "PA",
+    notes: "Catholic university (Philadelphia)",
+  },
+  {
+    name: "Eastern University",
+    state: "PA",
+    notes: "Christian university",
+  },
+  {
+    name: "Hawaii Pacific University",
+    state: "HI",
+    notes: "private university (Honolulu)",
+  },
+  {
+    name: "Point Park University",
+    state: "PA",
+    notes: "private urban (Pittsburgh); performing arts",
+  },
+  {
+    name: "University of Charleston",
+    state: "WV",
+    notes: "private university",
+  },
+  {
+    name: "St. Thomas University",
+    state: "FL",
+    notes: "Catholic university (Miami)",
+  },
+  {
+    name: "Concordia University-Wisconsin",
+    state: "WI",
+    notes: "Lutheran (LCMS)",
+  },
+  {
+    name: "Alvernia University",
+    state: "PA",
+    notes: "Catholic (Franciscan)",
+  },
+  {
+    name: "University of New England",
+    state: "ME",
+    notes: "private university (health sciences)",
+  },
+  {
+    name: "Wayland Baptist University",
+    state: "TX",
+    notes: "Baptist university",
+  },
+  {
+    name: "Upper Iowa University",
+    state: "IA",
+    notes: "private university",
+  },
+  {
+    name: "Fairleigh Dickinson University-Florham Campus",
+    state: "NJ",
+    notes: "FDU campus (Madison)",
+  },
+  {
+    name: "Vanguard University of Southern California",
+    state: "CA",
+    notes: "Assemblies of God university",
+  },
+  {
+    name: "Saint Ambrose University",
+    state: "IA",
+    notes: "Catholic university",
+  },
+  {
+    name: "Gardner-Webb University",
+    state: "NC",
+    notes: "Baptist university",
+  },
+  {
+    name: "The College of Saint Scholastica",
+    state: "MN",
+    notes: "Catholic (Benedictine)",
+  },
+  {
+    name: "Springfield College",
+    state: "MA",
+    notes: "private (birthplace of basketball; PE/health)",
+  },
+  {
+    name: "Texas Wesleyan University",
+    state: "TX",
+    notes: "Methodist university (Fort Worth)",
+  },
+  {
+    name: "Mount Saint Mary's University",
+    state: "CA",
+    notes: "Catholic university (Los Angeles)",
+  },
+  {
+    name: "Chaminade University of Honolulu",
+    state: "HI",
+    notes: "Catholic (Marianist)",
+  },
+  {
+    name: "Delaware Valley University",
+    state: "PA",
+    notes: "private (agriculture/sciences)",
+  },
+  {
+    name: "Ouachita Baptist University",
+    state: "AR",
+    notes: "Baptist LAC",
+  },
+  {
+    name: "Caldwell University",
+    state: "NJ",
+    notes: "Catholic (Dominican)",
+  },
+  {
+    name: "University of Saint Francis-Fort Wayne",
+    state: "IN",
+    notes: "Catholic (Franciscan)",
+  },
+  {
+    name: "University of Bridgeport",
+    state: "CT",
+    notes: "private university",
+  },
+  {
+    name: "Seton Hill University",
+    state: "PA",
+    notes: "Catholic university",
+  },
+  {
+    name: "Methodist University",
+    state: "NC",
+    notes: "Methodist university (Fayetteville)",
+  },
+  {
+    name: "College of the Ozarks",
+    state: "MO",
+    notes: "distinctive work college (no tuition)",
+  },
+  {
+    name: "University of Northwestern-St Paul",
+    state: "MN",
+    notes: "Christian university",
+  },
+  {
+    name: "Alfred University",
+    state: "NY",
+    notes: "private (ceramics/engineering/art)",
+  },
+  {
+    name: "Asbury University",
+    state: "KY",
+    notes: "Christian university",
+  },
+  {
+    name: "Saint Johns University",
+    state: "MN",
+    notes: "Catholic (Benedictine; paired w/ St. Ben's)",
+  },
+  {
+    name: "Lenoir-Rhyne University",
+    state: "NC",
+    notes: "Lutheran university",
+  },
+  {
+    name: "Carlow University",
+    state: "PA",
+    notes: "Catholic (Mercy; Pittsburgh)",
+  },
+  {
+    name: "Thomas More University",
+    state: "KY",
+    notes: "Catholic university",
+  },
+  {
+    name: "Hardin-Simmons University",
+    state: "TX",
+    notes: "Baptist university (Abilene)",
+  },
+  {
+    name: "Belmont Abbey College",
+    state: "NC",
+    notes: "Catholic (Benedictine)",
+  },
+  {
+    name: "Virginia Wesleyan University",
+    state: "VA",
+    notes: "Methodist university",
+  },
+  {
+    name: "Chatham University",
+    state: "PA",
+    notes: "private university (Pittsburgh; sustainability)",
+  },
+  {
+    name: "Hood College",
+    state: "MD",
+    notes: "private LAC (Frederick)",
+  },
+  {
+    name: "Woodbury University",
+    state: "CA",
+    notes: "specialized: architecture/design/business",
+  },
+  {
+    name: "Menlo College",
+    state: "CA",
+    notes: "business-focused LAC (Silicon Valley)",
+  },
+  {
+    name: "Eastern Mennonite University",
+    state: "VA",
+    notes: "Mennonite university (peacebuilding)",
+  },
+  {
+    name: "Harrisburg University of Science and Technology",
+    state: "PA",
+    notes: "STEM-focused university",
+  },
+  {
+    name: "Paul Smiths College of Arts and Science",
+    state: "NY",
+    notes: "distinctive: forestry/hospitality (Adirondacks)",
+  },
+  {
+    name: "University of the Ozarks",
+    state: "AR",
+    notes: "Presbyterian LAC",
+  },
+  {
+    name: "Alverno College",
+    state: "WI",
+    notes: "women's college (ability-based curriculum)",
+  },
+  {
+    name: "Mount Mary University",
+    state: "WI",
+    notes: "women's Catholic university",
+  },
+  {
+    name: "Ursuline College",
+    state: "OH",
+    notes: "women's Catholic college",
+  },
+  {
+    name: "Eureka College",
+    state: "IL",
+    notes: "LAC (Reagan's alma mater)",
+  },
+  {
+    name: "Pennsylvania College of Art and Design",
+    state: "PA",
+    notes: "specialized art & design",
+  },
+  {
+    name: "Alice Lloyd College",
+    state: "KY",
+    notes: "distinctive Appalachian work college",
+  },
+  {
+    name: "Blackburn College",
+    state: "IL",
+    notes: "distinctive work college",
+  },
+  {
+    name: "Thomas Aquinas College",
+    state: "CA",
+    notes: "Great Books Catholic LAC",
+  },
+  {
+    name: "Lycoming College",
+    state: "PA",
+    notes: "private LAC (Williamsport)",
+  },
 ];
