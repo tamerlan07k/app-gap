@@ -355,6 +355,14 @@ async function main() {
         continue;
       }
       const mapped = mapRecord(match);
+      // Optional display-name override: used only to disambiguate distinct
+      // institutions that share a Scorecard name (e.g. Sterling College VT vs
+      // KS) — the slug (unique) derives from canonical_name, so an override
+      // keeps their pages/slugs distinct — and to normalize stray double spaces
+      // in a source name. Matching/fetch still use seed.name; when no override
+      // is given behavior is unchanged.
+      if (seed.canonicalOverride)
+        mapped.college.canonical_name = seed.canonicalOverride;
       const s = mapped.stats;
       const pct =
         s.admit_rate != null

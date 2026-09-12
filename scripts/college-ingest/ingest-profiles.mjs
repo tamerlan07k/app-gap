@@ -52,6 +52,11 @@ const strArg = (name, dflt) => {
 };
 const LIMIT = numArg("--limit", Infinity);
 const FILTER = strArg("--filter", null);
+// Optional pre-fetched { unitid: locale_code } map (JSON). When given, setting is
+// read from it instead of one Scorecard call per college — lets a large batch
+// stay within the api.data.gov hourly budget by bulk-pulling locale once. The
+// data written is identical (same LOCALE_LABEL / settingBucket mapping).
+const LOCALE_MAP_PATH = strArg("--locale-map", null);
 
 function loadEnvLocal() {
   const env = {};
@@ -174,8 +179,17 @@ async function fetchFoundedYears(unitids) {
   return out;
 }
 
+// Pre-fetched locale map (unitid → NCES locale code), when --locale-map is given.
+const LOCALE_MAP = LOCALE_MAP_PATH
+  ? JSON.parse(readFileSync(LOCALE_MAP_PATH, "utf8"))
+  : null;
+
 /** Scorecard `school.locale` for one unitid → { locale, setting } or nulls. */
 async function fetchSetting(unitid) {
+  if (LOCALE_MAP) {
+    const code = LOCALE_MAP[String(unitid)] ?? null;
+    return { locale: LOCALE_LABEL[code] ?? null, setting: settingBucket(code) };
+  }
   const url =
     `${SCORECARD_URL}?api_key=${encodeURIComponent(SCORECARD_KEY)}` +
     `&id=${encodeURIComponent(unitid)}&fields=id,school.locale`;

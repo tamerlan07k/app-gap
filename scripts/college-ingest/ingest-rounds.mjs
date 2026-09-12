@@ -368,14 +368,23 @@ async function main() {
   let skipped = 0;
   if (SKIP_EXISTING && db) {
     const loaded = new Set();
-    const { data, error } = await db
-      .from("application_cycles")
-      .select("college_id, colleges(canonical_name)")
-      .eq("cycle_year", CYCLE);
-    if (error) throw new Error(`load existing cycles: ${error.message}`);
-    for (const r of data ?? []) {
-      const n = r.colleges?.canonical_name;
-      if (n) loaded.add(n);
+    // Paginate: past 1000 existing cycles the default PostgREST page cap would
+    // silently truncate the skip set, causing already-loaded colleges to be
+    // reprocessed (and their rows re-touched) on an expansion run.
+    let from = 0;
+    for (;;) {
+      const { data, error } = await db
+        .from("application_cycles")
+        .select("college_id, colleges(canonical_name)")
+        .eq("cycle_year", CYCLE)
+        .range(from, from + 999);
+      if (error) throw new Error(`load existing cycles: ${error.message}`);
+      for (const r of data ?? []) {
+        const n = r.colleges?.canonical_name;
+        if (n) loaded.add(n);
+      }
+      if (!data || data.length < 1000) break;
+      from += 1000;
     }
     const before = entries.length;
     entries = entries.filter((e) => !loaded.has(e.name));
