@@ -1,0 +1,795 @@
+{
+  "_meta": {
+    "source_date": "2026-09-13",
+    "note": "Official supplemental-essay prompts per college for the current cycle, transcribed VERBATIM from each college's official admissions site (source_url on each prompt). Nothing paraphrased or invented. `verified: true` is set only after confirming the wording against the official source for cycle_year. Colleges not listed here have no verified prompt yet (manual/custom entry remains the fallback) — this includes colleges with no Common App supplement and colleges whose official prompts could not be retrieved from an official source at transcription time.",
+    "schema": {
+      "college": "colleges.slug or exact canonical_name",
+      "status": "optional per-college coverage state: 'has_supplements' (auto when prompts present), 'none_required' (verified NO supplement — set verified:true on the entry + a status_source_url), or 'pending'. Drives college_supplement_status.",
+      "status_source_url": "official URL confirming the status (esp. for none_required)",
+      "no_supplements": "shorthand boolean → status 'none_required'",
+      "notes": "free-text note stored on the status row (e.g. school-specific prompts not transcribed)",
+      "prompts[].is_required": "false = Optional (kept and labeled Optional in the UI; also used for choose-one/choose-two groups)",
+      "prompts[].word_limit": "integer max words, or null when the college sets no limit"
+    },
+    "pipeline": "node scripts/college-ingest/ingest-supplemental-prompts.mjs [--dry-run] loads this file; --seed-pending gives every college a pending status row; --report prints coverage. Idempotent; re-run each cycle after bumping cycle_year and refreshing prompts."
+  },
+  "cycle_year": "2026-2027",
+  "colleges": [
+    {
+      "college": "columbia-university-in-the-city-of-new-york",
+      "prompts": [
+        {
+          "prompt_text": "List the titles of texts, resources and outlets that have contributed to your intellectual development outside of academic courses, including but not limited to books, journals, websites, podcasts, essays, plays, presentations, videos, museums and other content that you enjoy. (Your response should be a list of items separated by commas or semicolons.)",
+          "word_limit": 100,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Tell us about an aspect of your life so far or your lived experience that is important to you, and describe how it has shaped the way you would learn from and contribute to Columbia's multidimensional and collaborative environment.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "At Columbia, students representing a wide range of perspectives are invited to live and learn together. In such a community, questions and debates naturally arise. Please describe a time when you did not agree with someone and discuss how you engaged with them and what you took away from the interaction.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "In college/university, students are often challenged in ways that they could not anticipate. Please describe a situation in which you have navigated through adversity and discuss how you changed as a result.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Why are you interested in attending Columbia University? We encourage you to consider the aspect(s) that you find unique and compelling about Columbia.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "What attracts you to your preferred areas of study at Columbia College or Columbia Engineering?",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://undergrad.admissions.columbia.edu/apply/process/columbia-questions",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "amherst-college",
+      "prompts": [
+        {
+          "prompt_text": "Amherst Writing Supplement — Option A (choose one quotation and respond to the question posed, in an essay of not more than 350 words): \"Hope and curiosity — these are qualities that are the foundation of what Amherst College means, of everything that we do here. Curiosity is at the core of a liberal arts education — a spirit of inquiry that shapes not only what our students do in the classroom, but also how they learn from and about each other.\" — Michael A. Elliott, 20th President of Amherst College, address at Amherst College's 203rd Commencement.\n\nWhat does curiosity mean to you? How do you experience curiosity in your own life?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://www.amherst.edu/admission/apply/firstyear/writingsupplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Amherst Writing Supplement — Option A (choose one quotation and respond to the question posed, in an essay of not more than 350 words): \"We seek an Amherst made stronger because it includes those whose experiences can enhance our understanding of our nation and our world. We do so in the faith that our humanity is an identity forged from diversity, and that our different perspectives enrich our inquiry, deepen our knowledge, strengthen our community, and prepare students to engage with an ever-changing world.\" — from the Trustee Statement on Diversity and Community.\n\nIn what ways could your unique experiences enhance our understanding of our nation and our world?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://www.amherst.edu/admission/apply/firstyear/writingsupplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Amherst Writing Supplement — Option A (choose one quotation and respond to the question posed, in an essay of not more than 350 words): \"We are working together to build a community that makes room for both true disagreement and true connection, one that practices the kind of recognition and robust negotiation that the everyday life of democracy requires, and one that explicitly prepares our students to work for the greater good in their professional and personal endeavors.\" — Presidential Priorities: Serving the Greater Good.\n\nTell us about a time that you engaged with a viewpoint different from your own. How did you enter that engagement, and what did you learn about yourself from it?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://www.amherst.edu/admission/apply/firstyear/writingsupplement",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "new-york-university",
+      "prompts": [
+        {
+          "prompt_text": "We are looking for students who want to be bridge builders—students who can connect people, groups, and ideas to span divides, foster understanding, and promote collaboration within a dynamic, interconnected, and vibrant global academic community. We are eager for you to tell us how your experiences have helped you understand what qualities and efforts are needed to bridge divides so that people can better learn and work together.\n\nPlease consider one or more of the following questions in your essay:\n1) Tell us about a time you encountered a perspective different from your own. What did you learn—about yourself, the other person, or the world?\n2) Tell us about an experience you've had working with others who have different perspectives. What role did you try to play in helping people to work together, and what did you learn from your efforts?\n3) Tell us about someone you've observed who does a particularly good job helping people think or work together. How does this person set the stage for common exploration or work? What qualities do you admire in this person?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://meet.nyu.edu/advice/application-tips/your-guide-to-the-nyu-supplemental-essay/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "yale-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.yale.edu/essay-topics",
+      "prompts": [
+        {
+          "prompt_text": "Tell us about a topic or idea that excites you and is related to one or more academic areas you selected above. Why are you drawn to it? (200 words or fewer)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "If you could teach any college course, write a book, or create an original piece of art of any kind, what would it be?",
+          "word_limit": 35,
+          "is_required": true,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "What is one aspect of yourself that you hope to grow or develop during college?",
+          "word_limit": 35,
+          "is_required": true,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "What is something about you that is not included anywhere else in your application?",
+          "word_limit": 35,
+          "is_required": true,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "Reflect on a time you discussed an issue important to you with someone holding an opposing view. Why did you find the experience meaningful? (Common Application and Coalition Application only: respond to one of three prompts in 400 words or fewer.)",
+          "word_limit": 400,
+          "is_required": false,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "Reflect on your membership in a community to which you feel connected. Why is this community meaningful to you? You may define community however you like. (Common Application and Coalition Application only: respond to one of three prompts in 400 words or fewer.)",
+          "word_limit": 400,
+          "is_required": false,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        },
+        {
+          "prompt_text": "Reflect on an element of your personal experience that you feel will enrich your college. How has it shaped you? (Common Application and Coalition Application only: respond to one of three prompts in 400 words or fewer.)",
+          "word_limit": 400,
+          "is_required": false,
+          "source_url": "https://admissions.yale.edu/essay-topics",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "dartmouth-college",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+      "prompts": [
+        {
+          "prompt_text": "As you seek admission to Dartmouth's Class of 2031, what aspects of the college's academic program, community, and/or campus environment attract your interest? How is Dartmouth a good fit for you?",
+          "word_limit": 100,
+          "is_required": true,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 2 (respond to one of the following in 250 words or fewer): There is a Quaker saying: Let your life speak. Describe the environment in which you were raised and the impact it has had on the person you are today.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 2 (respond to one of the following in 250 words or fewer): \"Be yourself,\" Oscar Wilde advised. \"Everyone else is taken.\" Introduce yourself.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): What excites you?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): Labor leader and civil rights activist Dolores Huerta recommended a life of purpose. \"We must use our lives to make the world a better place to live, not just to acquire things,\" she said. \"That is what we are put on the earth for.\" In what ways do you hope to make—or are you already making—an impact? Why? How?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): In an Instagram post, best-selling British author Matt Haig cheered the impact of reading. \"A good novel is the best invention humans have ever created for imagining other lives,\" he wrote. How have you experienced such insight from reading? What did you read and how did it alter the way you understand yourself and others?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): The social and family interactions of wild chimpanzees have been the focus of Dame Jane Goodall's research for decades. Her understanding of animal behavior prompted the English primatologist to see a lesson for human communities as well: \"Change happens by listening and then starting a dialogue with the people who are doing something you don't believe is right.\" Channel Dame Goodall: Tell us about a moment when you engaged in a difficult conversation or encountered someone with an opinion or perspective that was different from your own. How did you find common ground?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): Celebrate your nerdy side.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "Prompt 3 (respond to one of the following in 250 words or fewer): \"It's not easy being green…\" was the frequent refrain of Kermit the Frog. How has difference been a part of your life, and how have you embraced it as part of your identity, outlook, or sense of purpose?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.dartmouth.edu/glossary-term/writing-supplement",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-chicago",
+      "status": "has_supplements",
+      "status_source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+      "prompts": [
+        {
+          "prompt_text": "How does the University of Chicago, as you know it now, satisfy your desire for a particular kind of learning, community, and future? Please address with some specificity your own wishes and how they relate to UChicago.",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): Food for thought: How do thoughts eat?",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): The James Webb Space Telescope, launched in 2021, utilized origami-inspired techniques to compactly store and deploy its sunshield in space. Choose an artistic practice and use its principles to propose an elegant solution to a problem.",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): Sometimes metaphors get mixed up. For one reason or another, one could say, \"we'll burn that bridge when we get there\" or \"the world is your china shop\". Make up your own mixed metaphor. Explain how it could make sense, be understood, or even applied.",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): The Olympics have long celebrated the pinnacle of human athletic achievement. But what if they expanded to honor the mundane? Imagine a new Olympic event built around an everyday activity like speed dishwashing or competitive grocery bagging. How is it scored, officiated, and judged? Why is it a worthy addition?",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): AI: Allen Iverson. NASA, or the North American Saxophone Alliance. Share a potentially confounding, comedic, or captivating example of MIA (Mistaken Identity of Acronym) and tell us its backstory.",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Extended Essay (choose one): And, as always… the classic choose your own adventure option! In the spirit of adventurous inquiry, choose one of our past prompts (or create a question of your own). Be original, creative, thought provoking. Draw on your best qualities as a writer, thinker, visionary, social critic, sage, citizen of the world, or future citizen of the University of Chicago; take a little risk, and have fun!",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://collegeadmissions.uchicago.edu/apply/essay/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "brown-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admission.brown.edu/apply/how-apply",
+      "prompts": [
+        {
+          "prompt_text": "\"There is something distinctive about Brown students. It is a blend of intellectual curiosity, creativity, and humility. A commitment to collaboration. An openness to new ideas and perspectives. A desire to make the world better. And it is resilience: the ability to recover and thrive after experiencing difficulties.\" From President Christina Paxson's 2025 Convocation Address. How will you use these characteristics or others to shape your approach to the Open Curriculum? (150-250 words)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admission.brown.edu/apply/how-apply",
+          "verified": true
+        },
+        {
+          "prompt_text": "Students entering Brown often find that making their home on College Hill naturally invites reflection on where they came from. Share how an aspect of your growing up has inspired or challenged you, and what unique contributions this might allow you to make to the Brown community. (150-250 words)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admission.brown.edu/apply/how-apply",
+          "verified": true
+        },
+        {
+          "prompt_text": "If you could teach a class on any one thing, whether academic or otherwise, what would it be? (100-150 words)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admission.brown.edu/apply/how-apply",
+          "verified": true
+        },
+        {
+          "prompt_text": "Brown students care deeply about their work and the world around them. Students find contentment, satisfaction, and meaning in daily interactions and major discoveries. Whether big or small, mundane or spectacular, tell us about something that brings you joy. (100-150 words)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admission.brown.edu/apply/how-apply",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "massachusetts-institute-of-technology",
+      "status": "has_supplements",
+      "status_source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+      "prompts": [
+        {
+          "prompt_text": "What field of study appeals to you the most right now? (Note: Applicants select from a drop-down list.) Reflect on what has led you to this interest.",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "While some reach their goals following well-trodden paths, others blaze their own trails achieving the unexpected. In what ways have you done something different than what was expected in your educational journey?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "How have your personal and academic experiences influenced the types of problems you would want to tackle with an MIT education and the impact you aim to make on your community?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "How did you manage a situation or challenge that you didn't expect? What did you learn from it?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "What do you do just for fun?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Who is someone you admire, whether you know them personally or look up to them from afar? Tell us why.",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "What's a topic, academic or non-academic, that you could talk about for hours?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        },
+        {
+          "prompt_text": "MIT values both \"generalists\" with varied interests and \"specialists\" who focus deeply on one or a few passions. Which do you think best describes you, and why?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://mitadmissions.org/apply/firstyear/essays-activities-academics/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "princeton-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+      "prompts": [
+        {
+          "prompt_text": "For A.B. Degree Applicants or Those Who Are Undecided: As a research institution that also prides itself on its liberal arts curriculum, Princeton allows students to explore areas across the humanities and the arts, the natural sciences, and the social sciences. What academic areas most pique your curiosity, and how do the programs offered at Princeton suit your particular interests? (Please respond in 250 words or fewer.)",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "For B.S.E. Degree Applicants: Please describe why you are interested in studying engineering at Princeton. Include any of your experiences in or exposure to engineering, and how you think the programs offered at the University suit your particular interests. (Please respond in 250 words or fewer.)",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Princeton values community and encourages students, faculty, staff and leadership to engage in respectful conversations that can expand their perspectives and challenge their ideas and beliefs. As a prospective member of this community, reflect on how your lived experiences will impact the conversations you will have in the classroom, the dining hall or other campus spaces. What lessons have you learned in life thus far? What will your classmates learn from you? In short, how has your lived experience shaped you? (Please respond in 400-500 words.)",
+          "word_limit": 500,
+          "is_required": true,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Princeton has a longstanding commitment to understanding our responsibility to society through service and civic engagement. How does your own story intersect with these ideals? (Please respond in 250 words or fewer.)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "What is a new skill you would like to learn in college?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "What brings you joy?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        },
+        {
+          "prompt_text": "What song represents the soundtrack of your life at this moment?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_url": "https://admission.princeton.edu/apply/princeton-specific-questions",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-pennsylvania",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.upenn.edu/how-to-apply/preparing-your-application/essays-prompts",
+      "notes": "Two prompts required of all applicants shown here; Penn also requires one undergraduate-school-specific short-answer prompt (College of Arts and Sciences, Wharton, Nursing, or Engineering) not yet transcribed.",
+      "prompts": [
+        {
+          "prompt_text": "Write a short thank-you note to someone you have not yet thanked and would like to acknowledge. (We encourage you to share this note with that person, if possible, and reflect on the experience!) (50-200 words)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://admissions.upenn.edu/how-to-apply/preparing-your-application/essays-prompts",
+          "verified": true
+        },
+        {
+          "prompt_text": "How will you explore community at Penn? Consider how Penn will help shape your perspective, and how your experiences and perspective will help shape Penn. (50-200 words)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://admissions.upenn.edu/how-to-apply/preparing-your-application/essays-prompts",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "northwestern-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+      "prompts": [
+        {
+          "prompt_text": "We want to be sure we're considering your application in the context of your personal experiences: What aspects of your background (your identity, your school setting, your community, your household, etc.) have most shaped how you see yourself engaging in Northwestern's community, be it academically, extracurricularly, culturally, politically, socially, or otherwise?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "We encourage you to answer at least one and no more than two of the following (fewer than 200 words each): Painting \"The Rock\" is a tradition at Northwestern that invites all forms of expression—students promote campus events or extracurricular groups, support social or activist causes, show their Wildcat spirit (what we call \"Purple Pride\"), celebrate their culture, and more. What would you paint on The Rock, and why?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "We encourage you to answer at least one and no more than two of the following (fewer than 200 words each): Northwestern fosters a distinctively interdisciplinary culture. We believe discovery and innovation thrive at the intersection of diverse ideas, perspectives, and academic interests. Within this setting, if you could dream up an undergraduate class, research project, or creative effort (a start-up, a design prototype, a performance, etc.), what would it be? Who might be some ideal classmates or collaborators?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "We encourage you to answer at least one and no more than two of the following (fewer than 200 words each): Community and belonging matter at Northwestern. Tell us about one or more communities, networks, or student groups you see yourself connecting with on campus.",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "We encourage you to answer at least one and no more than two of the following (fewer than 200 words each): Northwestern's location is special: on the shore of Lake Michigan, steps from downtown Evanston, just a few miles from Chicago. What aspects of our location are most compelling to you, and why?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "We encourage you to answer at least one and no more than two of the following (fewer than 200 words each): Northwestern is a place where people with diverse backgrounds from all over the world can study, live, and talk with one another. This range of experiences and viewpoints immeasurably enriches learning. How might your individual background contribute to this diversity of perspectives in Northwestern's classrooms and around our campus?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.northwestern.edu/apply/requirements.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "rice-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admission.rice.edu/apply/first-year-domestic-applicants",
+      "prompts": [
+        {
+          "prompt_text": "Please explain what draws you to the academic areas you selected above and how you hope to explore them at Rice University. (150 word limit)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admission.rice.edu/apply/first-year-domestic-applicants",
+          "verified": true
+        },
+        {
+          "prompt_text": "Based upon your exploration of Rice University, what elements of the Rice experience appeal to you? (150 word limit)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admission.rice.edu/apply/first-year-domestic-applicants",
+          "verified": true
+        },
+        {
+          "prompt_text": "Please respond to one of the following prompts to explore how you will contribute to the Rice community: The Residential College System is at the heart of Rice student life and is heavily influenced by the particular cultural traditions and unique life experiences each student brings. What life experiences and/or unique perspectives are you looking forward to sharing with fellow Owls in the residential college system? (500 word limit)",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://admission.rice.edu/apply/first-year-domestic-applicants",
+          "verified": true
+        },
+        {
+          "prompt_text": "Please respond to one of the following prompts to explore how you will contribute to the Rice community: Rice is strengthened by its diverse community of learning and discovery that produces leaders and change agents across the spectrum of human endeavor. What perspectives shaped by your background, experiences, upbringing, and/or cultural identity inspire you to join our community of change agents at Rice? (500 word limit)",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://admission.rice.edu/apply/first-year-domestic-applicants",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "duke-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.duke.edu/apply/",
+      "prompts": [
+        {
+          "prompt_text": "Why Duke: What is your impression of Duke as a university and community, and why do you believe it is a good match for your goals, values, and interests? If there is something specific that attracts you to our academic offerings in Trinity College of Arts and Sciences or the Pratt School of Engineering, or to our co-curricular opportunities, feel free to include that, too.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admissions.duke.edu/apply/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Communities: We all belong to communities defined by place, faith, family, culture, interests or shared experience. Tell us about a community that has shaped who you are, any way it has set you apart, and what you've learned from being part of it that you hope to bring to Duke.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admissions.duke.edu/apply/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional (answer one of three if it adds something meaningful): Viewpoints and experiences — We believe a wide range of viewpoints and experiences is essential to maintaining Duke's vibrant living and learning community. Please share anything in this context that might help us better understand you and your potential contributions to Duke.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.duke.edu/apply/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional (answer one of three if it adds something meaningful): Difference of opinion — Meaningful dialogue often involves respectful disagreement. Provide an example of a difference of opinion you've had with someone you care about. What did you learn from it?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.duke.edu/apply/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional (answer one of three if it adds something meaningful): Something you are excited about — What's the last thing that you've been really excited about?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://admissions.duke.edu/apply/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "vanderbilt-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.vanderbilt.edu/apply/personal-essay-and-short-answer-prompts/",
+      "prompts": [
+        {
+          "prompt_text": "Vanderbilt University's motto, Crescere aude, is Latin for \"dare to grow.\" In your response, reflect on how one or more aspects of your identity, culture, or background has played a role in your personal growth, and how it will contribute to our campus community as you dare to grow at Vanderbilt.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admissions.vanderbilt.edu/apply/personal-essay-and-short-answer-prompts/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-notre-dame",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.nd.edu/apply/application-overview/",
+      "prompts": [
+        {
+          "prompt_text": "Everyone has different priorities when considering their higher education options and building their college or university list. Tell us about your \"non-negotiable\" factor(s) when searching for your future college home.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admissions.nd.edu/apply/application-overview/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Choose two of the following (50-100 words each): How does faith influence the decisions you make?",
+          "word_limit": 100,
+          "is_required": false,
+          "source_url": "https://admissions.nd.edu/apply/application-overview/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Choose two of the following (50-100 words each): What is distinctive about your personal experiences and development (eg, family support, culture, disability, personal background, community)? Why are these experiences important to you and how will you enrich the Notre Dame community?",
+          "word_limit": 100,
+          "is_required": false,
+          "source_url": "https://admissions.nd.edu/apply/application-overview/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Choose two of the following (50-100 words each): Notre Dame's undergraduate experience is characterized by a collective sense of care for every person. How do you foster service to others in your community?",
+          "word_limit": 100,
+          "is_required": false,
+          "source_url": "https://admissions.nd.edu/apply/application-overview/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Choose two of the following (50-100 words each): What would you fight for?",
+          "word_limit": 100,
+          "is_required": false,
+          "source_url": "https://admissions.nd.edu/apply/application-overview/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "johns-hopkins-university",
+      "status": "has_supplements",
+      "status_source_url": "https://apply.jhu.edu/hopkins-insider/advice-for-crafting-your-supplemental-essay/",
+      "prompts": [
+        {
+          "prompt_text": "At Johns Hopkins, community is built through dialogue, collaboration, and a willingness to engage across differences. Whether on campus or in the broader world, community depends on bridge builders who can listen to differing perspectives, challenge their own assumptions, or work together toward shared goals. Drawing on your own experiences, what have you learned about engaging across differences and how has it shaped the way you think about building bridges, enhancing community, and working with others? (350-word limit)",
+          "word_limit": 350,
+          "is_required": true,
+          "source_url": "https://apply.jhu.edu/hopkins-insider/advice-for-crafting-your-supplemental-essay/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "california-institute-of-technology",
+      "status": "has_supplements",
+      "status_source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+      "prompts": [
+        {
+          "prompt_text": "Required STEM Academic Interest Question: If you had to choose an area of interest or two today, what would you choose? (Note that you are under no obligation to follow this choice if admitted.) Why did you choose your proposed area of interest? If you selected 'other', what topics are you interested in pursuing? (Min: 150 / Max: 200 words)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Scholarly Character (choose one, max 200 words) — COLLABORATION: Tell us about a time your learning in STEM was shaped by another person or group — either because you needed help, offered help, changed your thinking through collaboration, or contributed to someone else's understanding. What did that experience teach you about learning and working with others?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Scholarly Character (choose one, max 200 words) — PROCESS: Tell us about a time your approach to a STEM problem, concept, or project mattered as much as the outcome. How did you work through uncertainty or persist creatively in tackling the problem? What would you still defend about your process, regardless of the outcome?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Scientific Drive (choose two, max 200 words each) — LEARNING: Regardless of your STEM interest listed above, take this opportunity to nerd out and talk to us about whatever STEM rabbit hole you have found yourself falling into. Be as specific or broad as you would like.",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Scientific Drive (choose two, max 200 words each) — PURSUING: Tell us about a STEM question, problem, idea, or project that has held your attention over time. What drew you to it, how have you pursued it, and what do you still want to understand?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Scientific Drive (choose two, max 200 words each) — MAKING: Tell us about something you created, tested, repaired, modeled, coded, built, or redesigned. What problem were you trying to solve and what did the process reveal to you?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Fun Question: Caltech students bring more than academic ability to the communities they join. What is something you would be excited to do, share, teach, make, start, or contribute as part of the Caltech community? (Min: 100 / Max: 150 words)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional Academic Short Answer Question: Caltech cares about context. Is there anything about your academic preparation, coursework, school context, or learning experiences that would help us better understand your readiness for Caltech?",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://www.admissions.caltech.edu/apply/first-year-applicants/supplemental-application-essays",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "tufts-university",
+      "status": "has_supplements",
+      "status_source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+      "notes": "Prompt #2 is program-specific; applicants answer the one for their intended school/program.",
+      "prompts": [
+        {
+          "prompt_text": "Please describe how you have learned about and engaged with Tufts during your college search process. (75-150 words)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Applicants to the School of Arts and Sciences (100-200 words): Tell us about one of your favorite school assignments in the past two years. What was the assignment and why did you enjoy it?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+          "verified": true,
+          "school": "School of Arts and Sciences"
+        },
+        {
+          "prompt_text": "Applicants to the School of Engineering (100-200 words): Tell us about an engineering or science-related project that you have helped build, design, create, or iterate in the past two years. What was the project and what was your role?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+          "verified": true,
+          "school": "School of Engineering"
+        },
+        {
+          "prompt_text": "Applicants to the Bachelor of Fine Arts (BFA) program (100-200 words): Tell us more about a specific piece in your portfolio. What were the ideas you intended to explore, and how did those ideas inform the process of making the piece?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Applicants to the Combined Degree (BFA+BA/BS) program (100-200 words): Tell us more about a specific piece in your portfolio. How did an academic course, project, or interest inspire the ideas that you explored in this piece? Or, how did making this piece influence your academic interests?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_url": "https://admissions.tufts.edu/apply/short-answer-questions/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "georgetown-university",
+      "status": "has_supplements",
+      "status_source_url": "https://uadmissions.georgetown.edu/apply/first-year-applicants/application-requirements-and-forms/",
+      "notes": "Georgetown also requires a 500-word school-specific Essay 2 (College of Arts & Sciences, Walsh School of Foreign Service, McDonough School of Business, School of Health, McCourt School of Public Policy, Earth Commons Institute, or Berkley School of Nursing) — not transcribed here.",
+      "prompts": [
+        {
+          "prompt_text": "Short Essay 1: Briefly discuss the significance to you of the school or summer activity in which you have been most involved. (250 Words)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://uadmissions.georgetown.edu/apply/first-year-applicants/application-requirements-and-forms/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Short Essay 2: In all our lives, we interact with people who hold different viewpoints than our own. Describe such an event you experienced. What did you learn from the experience? (250 Words)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://uadmissions.georgetown.edu/apply/first-year-applicants/application-requirements-and-forms/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Essay 1: As Georgetown is a diverse community, the Admissions Committee would like to know more about you in your own words. Please submit a brief personal or creative essay which you feel best describes you and reflects on your personal background and individual experiences, skills, and talents. (650 Words) If you believe that your Common App personal statement would fit with this prompt, you are welcome to use it here.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_url": "https://uadmissions.georgetown.edu/apply/first-year-applicants/application-requirements-and-forms/",
+          "verified": true
+        }
+      ]
+    }
+  ]
+}

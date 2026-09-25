@@ -42,3 +42,7 @@ next-env.d.ts
 
 # Supabase local CLI state
 supabase/.temp/
+
+# Supplemental-essay harvester checkpoints (generated, resumable — not source)
+scripts/college-ingest/harvest-results.json
+scripts/college-ingest/harvest-headless-results.json

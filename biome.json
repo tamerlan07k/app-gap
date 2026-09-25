@@ -1,7 +1,14 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.4.8/schema.json",
   "files": {
-    "includes": ["**", "!.next", "!.agents", "!.claude/worktrees"]
+    "includes": [
+      "**",
+      "!.next",
+      "!.agents",
+      "!.claude/worktrees",
+      "!scripts/college-ingest/harvest-results.json",
+      "!scripts/college-ingest/harvest-headless-results.json"
+    ]
   },
   "assist": {
     "actions": {

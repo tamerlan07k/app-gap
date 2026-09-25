@@ -23,9 +23,9 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "supplemental-essays",
     label: "Supplemental Essays",
-    locked: true,
+    locked: false,
     description:
-      "Track and draft your college-specific supplemental essays, with prompts, drafts, and deadlines per school.",
+      "Manage, write, and evaluate your college-specific supplemental essays — a prompt-first coach that checks whether you answered the prompt, stayed specific, and added something new.",
   },
   {
     slug: "activities",
