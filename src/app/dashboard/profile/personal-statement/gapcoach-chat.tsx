@@ -2,6 +2,7 @@
 
 import { Loader2, MessageCircle, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { FormattedMessage } from "~/components/formatted-message";
 import { GapCoachAvatar } from "~/components/gapcoach-avatar";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
@@ -133,8 +134,8 @@ export function GapCoachChat({
                   className="flex items-start gap-2"
                 >
                   <GapCoachAvatar className="size-6" />
-                  <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-tl-sm border border-border bg-muted px-3 py-2 text-sm leading-relaxed text-foreground">
-                    {m.content}
+                  <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-border bg-muted px-3 py-2 text-sm leading-relaxed text-foreground">
+                    <FormattedMessage text={m.content} />
                   </div>
                 </div>
               ),

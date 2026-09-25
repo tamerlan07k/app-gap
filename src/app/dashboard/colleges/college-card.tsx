@@ -17,6 +17,11 @@ import type {
   FieldRating,
   MatchCategory,
 } from "~/lib/colleges/types";
+import {
+  COLLEGE_SIGNAL_CLASSES,
+  COLLEGE_SIGNAL_LABELS,
+  type CollegeEssaySignal,
+} from "~/lib/supplemental/status";
 import { cn } from "~/lib/utils";
 import { CollegeLogo } from "./college-logo";
 import { PlanSelector } from "./plan-selector";
@@ -126,9 +131,13 @@ function RoundRow({ round }: { round: ApplicationRound }) {
 export function CollegeCard({
   match,
   finalized,
+  essaySignal,
 }: {
   match: CollegeMatch;
   finalized: boolean;
+  /** Qualitative supplemental-essay progress for this college (never chancing).
+   *  null when the student has no essays for it yet. */
+  essaySignal?: CollegeEssaySignal | null;
 }) {
   const { college, admission, fieldFit, selectedRoundId, target } = match;
   const rounds = college.cycle?.rounds ?? [];
@@ -236,6 +245,29 @@ export function CollegeCard({
             <span className="font-medium text-foreground/70">Field:</span>{" "}
             {fieldFit.rationale}
           </p>
+
+          {/* Supplemental-essay progress — a QUALITATIVE signal only (never a
+              chancing input). Links into the essay workspace for this college. */}
+          <Link
+            href={`/dashboard/profile/supplemental-essays/${college.id}`}
+            className="relative z-10 mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <span className="font-medium text-foreground/70">Supplements:</span>
+            {essaySignal ? (
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 font-medium",
+                  COLLEGE_SIGNAL_CLASSES[essaySignal],
+                )}
+              >
+                {COLLEGE_SIGNAL_LABELS[essaySignal]}
+              </span>
+            ) : (
+              <span className="underline decoration-dotted underline-offset-2">
+                Start writing
+              </span>
+            )}
+          </Link>
 
           {/* Conditional per-college school/program/degree — renders only for
               colleges with separately-admitting schools (e.g. Cornell). */}

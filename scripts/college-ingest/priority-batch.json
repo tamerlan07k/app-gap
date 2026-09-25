@@ -1,0 +1,2743 @@
+{
+  "_meta": {
+    "note": "Working checkpoint for the user's 2026-27 priority-list extraction (99 colleges). Each entry mirrors supplemental-prompts-candidates.json schema. Merged into that file + ingested in batches. Verbatim from official current-cycle sources only; verified:true gates verified_at.",
+    "source_date": "2026-09-23",
+    "cycle_year": "2026-2027"
+  },
+  "colleges": [
+    {
+      "college": "harvard-university",
+      "prompts": [
+        {
+          "prompt_text": "Harvard has long recognized the importance of enrolling a student body with a diversity of perspectives and experiences. How will the life experiences that shaped who you are today enable you to contribute to Harvard?",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://college.harvard.edu/admissions/apply/first-year-applicants/application-requirements",
+          "verified": true
+        },
+        {
+          "prompt_text": "Describe a time when you strongly disagreed with someone about an idea or issue. How did you communicate or engage with this person? What did you learn from this experience?",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://college.harvard.edu/admissions/apply/first-year-applicants/application-requirements",
+          "verified": true
+        },
+        {
+          "prompt_text": "Briefly describe any of your extracurricular activities, employment experience, travel, or family responsibilities that have shaped who you are.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://college.harvard.edu/admissions/apply/first-year-applicants/application-requirements",
+          "verified": true
+        },
+        {
+          "prompt_text": "How do you hope to use your Harvard education in the future?",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://college.harvard.edu/admissions/apply/first-year-applicants/application-requirements",
+          "verified": true
+        },
+        {
+          "prompt_text": "Top 3 things your roommates might like to know about you.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://college.harvard.edu/admissions/apply/first-year-applicants/application-requirements",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "bowdoin-college",
+      "prompts": [
+        {
+          "prompt_text": "Bowdoin Supplemental Essay (optional): Based on The Offer of the College, which represents Bowdoin's values, you have the option to reflect on any line of The Offer and how it has meaning to you. Which line from The Offer resonates most with you?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.bowdoin.edu/admissions/apply/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Navigating through Differences Essay (optional): Bowdoin believes that its broadly diverse and inclusive campus community prepares graduates to be contributing and useful citizens of the world. Every graduate of this institution should be confident in their preparation to be able to navigate through differences and in all sorts of situations. A Bowdoin education does not guarantee these skills, but it does impart a set of tools necessary to bravely enter unfamiliar conditions with the confidence to deal effectively with ambiguity. If you wish, you may share anything about the unique experiences and perspectives that you would bring with you to the Bowdoin campus and community or an experience you have had that required you to navigate across or through difference.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.bowdoin.edu/admissions/apply/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "claremont-mckenna-college",
+      "prompts": [
+        {
+          "prompt_text": "CMC's mission is to prepare students for thoughtful and productive lives and responsible leadership in business, government, and the professions. With this mission in mind, please explain why you want to attend Claremont McKenna College.",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://www.cmc.edu/admission/first-year-application-instructions",
+          "verified": true
+        },
+        {
+          "prompt_text": "A critical part of fulfilling our mission is living out the commitments of CMC's Open Academy: Freedom of Expression, Viewpoint Diversity, and Constructive Dialogue. We want to learn more about your commitment to listening and learning from others with different viewpoints, perspectives, and life experiences from your own. Describe a time when engaging with someone about a specific topic resulted in you changing your attitude, belief, or behavior, or you changed the belief or behavior of someone else. What was the change that occurred for you, and what facilitated that change? What did you learn from that experience, and how has it informed how you engage with others?",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://www.cmc.edu/admission/first-year-application-instructions",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "chapman-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No supplemental essay required for first-year applicants (2026-27). Application is Common App + a brief 'Panther Profile' of quick questions (not an essay). Creative-talent majors (College of Performing Arts, Dodge College of Film & Media Arts, Department of Art excluding Art History) submit a program-specific Creative Supplement.",
+      "status_source_url": "https://www.chapman.edu/admission/undergraduate/how-to-apply/first-year/index.aspx",
+      "prompts": []
+    },
+    {
+      "college": "university-of-colorado-boulder",
+      "prompts": [
+        {
+          "prompt_text": "What do you hope to study, and why, at CU Boulder? Or if you don't know quite yet, think about your studies so far, extracurricular/after-school activities, jobs, volunteering, future goals or anything else that has shaped your interests.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://www.colorado.edu/admissions/process/first-year/apply",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "sarah-lawrence-college",
+      "prompts": [
+        {
+          "prompt_text": "(Optional; respond to one of four, 250-500 words) Sarah Lawrence students are often described as hyphenates: filmmaker-sociologist-historian, environmentalist-photographer, psychologist-novelist, economist-poet. In 250-500 words, tell us about seemingly disparate interests you have brought together, or hope to bring together at Sarah Lawrence.",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://www.sarahlawrence.edu/admission/apply/first-year.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; respond to one of four, 250-500 words) Students at Sarah Lawrence are asked to design their own research questions directly with faculty, and then answer them through intensive semester-long projects that frequently inspire a blend of intellectual rigor and creativity. In 250-500 words, tell us about a text, problem, or topic you would love to explore over a semester or a year, and what you would hope to achieve through that work.",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://www.sarahlawrence.edu/admission/apply/first-year.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; respond to one of four, 250-500 words) Liberal arts and sciences colleges have a long and robust history of providing the educational foundation for the careers of influential politicians, financiers, entrepreneurs, artists, scientists, CEOs, and more. Many of them cite their liberal arts degree as foundational and transformative for how they took on challenges in the world and for shaping their lives after college. How do you see your upcoming college studies leading to your future career (or careers)?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://www.sarahlawrence.edu/admission/apply/first-year.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; respond to one of four, 250-500 words) In today's rapidly changing world, many social, political, and ethical issues spark intense debate and demand nuanced understanding. Choose a contemporary issue that you find both challenging and urgent—whether it relates to identity, justice, artificial intelligence, environment, or another area—and critically explore your perspective on it. How have your previous experiences, background, and/or values shaped your viewpoint? How do you envision engaging with this issue during your college education and beyond?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://www.sarahlawrence.edu/admission/apply/first-year.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "catawba-college",
+      "prompts": [
+        {
+          "prompt_text": "Catawba essay option (submit one essay of ~250-600 words on one prompt, or answer all three as ~100-250-word short answers): For over 173 years, Catawba College has been recognized for its rich legacy and traditions, sometimes even referred to as a best-kept secret. Could you please share how you first learned about Catawba and what motivated you to apply to our institution?",
+          "word_limit": 600,
+          "is_required": false,
+          "source_url": "https://www.catawba.edu/essayprompts/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Catawba essay option (submit one essay of ~250-600 words on one prompt, or answer all three as ~100-250-word short answers): What are your future plans, and why are you interested in the academic program or major you selected? If you are undecided, please share which academic areas you wish to explore at Catawba and why.",
+          "word_limit": 600,
+          "is_required": false,
+          "source_url": "https://www.catawba.edu/essayprompts/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Catawba essay option (submit one essay of ~250-600 words on one prompt, or answer all three as ~100-250-word short answers): Catawba is deeply invested in the greater good, cultivating a thriving and livable world for all. Our students, faculty, and staff learn, create, research, explore, and grow. Our good goes far. What \"good\" do you hope to make at Catawba and beyond?",
+          "word_limit": 600,
+          "is_required": false,
+          "source_url": "https://www.catawba.edu/essayprompts/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-massachusetts-amherst",
+      "prompts": [
+        {
+          "prompt_text": "Why do you want to attend UMass Amherst?",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://www.umass.edu/admissions/first-year-application-instructions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Why did you choose the major you did?",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://www.umass.edu/admissions/first-year-application-instructions",
+          "verified": true
+        },
+        {
+          "prompt_text": "Tell us about a community you are a part of and explain how, as a product of this group or community, you would enrich our campus.",
+          "word_limit": null,
+          "is_required": true,
+          "source_url": "https://www.umass.edu/admissions/first-year-application-instructions",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Commonwealth Honors College applicants) Why do you want to be part of Commonwealth Honors College?",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://www.umass.edu/admissions/first-year-application-instructions",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-massachusetts-lowell",
+      "prompts": [
+        {
+          "prompt_text": "Personal essay (250-650 words; choose a Common Application essay option or respond to one of these UMass Lowell prompts): What do you do in your spare time?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_url": "https://www.uml.edu/admissions/apply/default.aspx",
+          "verified": true
+        },
+        {
+          "prompt_text": "Personal essay (250-650 words; choose a Common Application essay option or respond to one of these UMass Lowell prompts): What is the greatest challenge your generation will face? What ideas do you have for dealing with this issue?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_url": "https://www.uml.edu/admissions/apply/default.aspx",
+          "verified": true
+        },
+        {
+          "prompt_text": "Personal essay (250-650 words; choose a Common Application essay option or respond to one of these UMass Lowell prompts): Formulate the perfect admissions essay question and answer it.",
+          "word_limit": 650,
+          "is_required": false,
+          "source_url": "https://www.uml.edu/admissions/apply/default.aspx",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-cincinnati-main-campus",
+      "prompts": [
+        {
+          "prompt_text": "What motivated you to choose your first-choice academic program? In your response, please share personal insights, interests, goals, or experiences—especially those not already included in your application.",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://www.admissions.uc.edu/apply/apply-tips/prompts.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-miami",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No supplemental essay required for first-year admission as of the 2026-2027 cycle (official UM Admission statement). Apply via the Common App; no UM-specific supplemental essay.",
+      "status_source_url": "https://news.miami.edu/admissions/stories/2026/07/does-the-university-of-miami-require-a-supplemental-essay.html",
+      "prompts": []
+    },
+    {
+      "college": "university-of-san-diego",
+      "prompts": [
+        {
+          "prompt_text": "How did you first learn about the University of San Diego, and what inspired you to apply?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_url": "https://www.sandiego.edu/admission-and-aid/undergraduate/apply/usd-member-questions.php",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Choose one of three) USD is committed to fostering a community where everyone feels a sense of belonging and purpose. What does community mean to you and how have you helped create a welcoming environment for others?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_url": "https://www.sandiego.edu/admission-and-aid/undergraduate/apply/usd-member-questions.php",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Choose one of three) As a Changemaker Campus, USD challenges students to utilize their learning to actively pursue a more just, sustainable and equitable world. What is a challenge facing humanity today and why does it matter to you?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_url": "https://www.sandiego.edu/admission-and-aid/undergraduate/apply/usd-member-questions.php",
+          "verified": true
+        },
+        {
+          "prompt_text": "(Choose one of three) As a contemporary Catholic university, students from all backgrounds and faith traditions are welcomed and celebrated. Share an experience that highlights the ways faith or spirituality–either your own or someone else's–have influenced your life.",
+          "word_limit": 300,
+          "is_required": false,
+          "source_url": "https://www.sandiego.edu/admission-and-aid/undergraduate/apply/usd-member-questions.php",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "providence-college",
+      "prompts": [
+        {
+          "prompt_text": "Optional Providence College Essay (choose one, 250-500 words): Providence College values each student's willingness to embrace and learn from those with different viewpoints. How will your unique background positively impact others at Providence College?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://admission.providence.edu/apply/review-process/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional Providence College Essay (choose one, 250-500 words): Providence College thrives on the energy of those who seek. How will you contribute to our vibrant campus life and intellectual culture in the years ahead?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_url": "https://admission.providence.edu/apply/review-process/",
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional Nursing Supplemental Essay (Nursing applicants, 150-300 words): Please share more about the experiences, skills, or talents that have led you to want to become a nurse, and how these will contribute to the community at Providence College and to your career as a nurse.",
+          "word_limit": 300,
+          "is_required": false,
+          "source_url": "https://admission.providence.edu/apply/review-process/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "purdue-university-main-campus",
+      "prompts": [
+        {
+          "prompt_text": "Why Purdue? How will opportunities at Purdue support your interests, both in and out of the classroom?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admissions.purdue.edu/apply/essay.php",
+          "verified": true
+        },
+        {
+          "prompt_text": "Why Purdue? Briefly discuss your reasons for choosing your major and your interest in studying at this campus location (Indianapolis or West Lafayette).",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://admissions.purdue.edu/apply/essay.php",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "dickinson-college",
+      "prompts": [
+        {
+          "prompt_text": "The Dickinson Supplement (optional; answer any, all, or none in 50 words or less each): What topic or idea could you write or converse about endlessly?",
+          "word_limit": 50,
+          "is_required": false,
+          "source_url": "https://www.dickinson.edu/info/20256/apply/1026/essay_writing_tips_and_prompts",
+          "verified": true
+        },
+        {
+          "prompt_text": "The Dickinson Supplement (optional; answer any, all, or none in 50 words or less each): What is something new that you'd like to experience, learn or try that might surprise your friends and family?",
+          "word_limit": 50,
+          "is_required": false,
+          "source_url": "https://www.dickinson.edu/info/20256/apply/1026/essay_writing_tips_and_prompts",
+          "verified": true
+        },
+        {
+          "prompt_text": "The Dickinson Supplement (optional; answer any, all, or none in 50 words or less each): What are the qualities that make you proud to be you?",
+          "word_limit": 50,
+          "is_required": false,
+          "source_url": "https://www.dickinson.edu/info/20256/apply/1026/essay_writing_tips_and_prompts",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "villanova-university",
+      "prompts": [
+        {
+          "prompt_text": "Villanova Writing Supplement (choose one of five, about 250 words): As Pope Leo XIV (Villanova Class of 1977) has said, \"no one can single-handedly bear the weight of the challenges the world is facing, just as no one is so weak that they cannot play their part.\" What have you done to play your part in advancing equity and justice in your community?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.villanova.edu/university/undergraduate-admission/applying-to-villanova/application-essays.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "Villanova Writing Supplement (choose one of five, about 250 words): What is a lesson in life that you have learned that you would want to share with others at Villanova?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.villanova.edu/university/undergraduate-admission/applying-to-villanova/application-essays.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "Villanova Writing Supplement (choose one of five, about 250 words): \"Villanova\" means \"new home.\" Why do you want to call Villanova your new home?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.villanova.edu/university/undergraduate-admission/applying-to-villanova/application-essays.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "Villanova Writing Supplement (choose one of five, about 250 words): Villanova embraces Artificial Intelligence (AI) with a commitment to thoughtful, ethical use rooted in our Augustinian mission and values. How do you see technology helping you to lead, serve, and contribute to the common good?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.villanova.edu/university/undergraduate-admission/applying-to-villanova/application-essays.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "Villanova Writing Supplement (choose one of five, about 250 words): At Villanova, we often say \"each of us strengthens all of us.\" Please detail a time when someone has borrowed some of your strength in their time of need.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.villanova.edu/university/undergraduate-admission/applying-to-villanova/application-essays.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-wisconsin-madison",
+      "prompts": [
+        {
+          "prompt_text": "Tell us why you would like to attend the University of Wisconsin–Madison. In addition, please include why you are interested in studying the major(s) you have selected. If you selected undecided, please describe your areas of possible academic interest.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_url": "https://admissions.wisc.edu/essays",
+          "verified": true
+        },
+        {
+          "prompt_text": "Each student is unique. Please tell us about the particular life experiences, talents, commitments, and/or interests you will bring to our campus. (Required if applying with the Universities of Wisconsin Application.)",
+          "word_limit": 650,
+          "is_required": false,
+          "source_url": "https://admissions.wisc.edu/essays",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "harvey-mudd-college",
+      "prompts": [
+        {
+          "prompt_text": "The problems that Harvey Mudd College students hope to tackle are shaped by their experiences, values, and communities. Through our intentionally interdisciplinary curriculum and our mission to develop \"a clear understanding of the impact of their work,\" Mudders develop the skills needed to address these complex challenges and contribute meaningfully to society. Share how an experience you've had or community you belong to has shaped the kinds of problems you want to solve and the impact you want to make.",
+          "word_limit": 500,
+          "is_required": true,
+          "source_url": "https://www.hmc.edu/admission/apply/first-year-students/",
+          "verified": true
+        },
+        {
+          "prompt_text": "No one succeeds alone, and at Harvey Mudd College, no one expects you to. In and out of the classroom, HMC students are encouraged to embrace challenges, collaborate with one another, and ask for support when they need it. Describe a time when asking for help made a difference in your work or wellbeing. What led you to reach out, and what did you take away from the experience?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_url": "https://www.hmc.edu/admission/apply/first-year-students/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "haverford-college",
+      "prompts": [
+        {
+          "prompt_text": "Tell us about a topic or issue that sparks your curiosity and gets you intellectually excited. How do you hope to engage with this topic or issue at Haverford? (Please limit your response to 150-200 words.)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://www.haverford.edu/admission/supplement",
+          "verified": true
+        },
+        {
+          "prompt_text": "We have highlighted for you some of the values that shape the Haverford community. What are some of the values you seek in your next community? How do Haverford's values, as demonstrated through our Honor Code, resonate with you? As you think about how to answer this question, you might draw from how you have been influenced by other communities you have been a part of, experiences you may have had within your communities, or opportunities you have had to shape or even change your communities. (Please limit your response to 150-200 words.)",
+          "word_limit": 200,
+          "is_required": true,
+          "source_url": "https://www.haverford.edu/admission/supplement",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "vassar-college",
+      "prompts": [
+        {
+          "prompt_text": "Your Space (optional): Your Space is your opportunity to allow the Committee on Admission to learn something about you that you have not addressed in another section of the application. For example, in the past, applicants have shared poetry, short stories, cartoons, digital images of art projects, photography, and collages, and/or links to videos, and short films. It is your space, so if you choose to complete it, send something that is a reflection of you!",
+          "word_limit": null,
+          "is_required": false,
+          "source_url": "https://www.vassar.edu/admission/apply/requirements/",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "pomona-college",
+      "prompts": [
+        {
+          "prompt_text": "Academic Interest Statement: What draws you to the subject(s) you selected as potential major(s)? If undecided, share more about one of your academic passions or interests.",
+          "word_limit": 150,
+          "is_required": true,
+          "source_url": "https://www.pomona.edu/admissions/apply/application-overview",
+          "verified": true
+        },
+        {
+          "prompt_text": "Short-Response Essay (respond to one of the following): Reflecting on a community that you are a part of, what values or perspectives from that community would you bring to Pomona?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.pomona.edu/admissions/apply/application-overview",
+          "verified": true
+        },
+        {
+          "prompt_text": "Short-Response Essay (respond to one of the following): Describe an experience you had outside the classroom that changed the way you think and/or how you engage with your peers. What was that experience and what did you learn from it?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.pomona.edu/admissions/apply/application-overview",
+          "verified": true
+        },
+        {
+          "prompt_text": "Short-Response Essay (respond to one of the following): Choose any person or group of people in your life and share how they would describe you.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_url": "https://www.pomona.edu/admissions/apply/application-overview",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-berkeley",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-davis",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-irvine",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-los-angeles",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-merced",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-riverside",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-san-diego",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-santa-barbara",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-california-santa-cruz",
+      "prompts": [
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe an example of your leadership experience in which you have positively influenced others, helped resolve disputes or contributed to group efforts over time.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Every person has a creative side, and it can be expressed in many ways: problem solving, original and innovative thinking, and artistically, to name a few. Describe how you express your creative side.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What would you say is your greatest talent or skill? How have you developed and demonstrated that talent over time?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe how you have taken advantage of a significant educational opportunity or worked to overcome an educational barrier you have faced.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Describe the most significant challenge you have faced and the steps you have taken to overcome this challenge. How has this challenge affected your academic achievement?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Think about an academic subject that inspires you. Describe how you have furthered this interest inside and/or outside of the classroom.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): What have you done to make your school or your community a better place?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        },
+        {
+          "prompt_text": "UC Personal Insight Question (respond to any 4 of the 8; maximum 350 words each): Beyond what has already been shared in your application, what do you believe makes you a strong candidate for admissions to the University of California?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_url": "https://admission.universityofcalifornia.edu/how-to-apply/applying-as-a-freshman/personal-insight-questions.html",
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "american-university",
+      "prompts": [
+        {
+          "prompt_text": "American University students identify as changemakers and describe themselves as passionate. Describe a belief, hobby, idea, issue, or topic about which you're excited.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "alvernia-university",
+      "prompts": [
+        {
+          "prompt_text": "Alvernia wants to make sure you've given your application some thought and that you're ready to hit the ground running. Please describe your interest in Alvernia University and how your academic goals fit with our offerings.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Please elaborate on an extracurricular activity, job, or community service initiative that has been particularly meaningful to you and explain why.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "appalachian-state-university",
+      "prompts": [
+        {
+          "prompt_text": "After reviewing our institutional mission statement focused on creating a sustainable future and global citizenship, please describe why you are interested in attending Appalachian State.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "babson-college",
+      "prompts": [
+        {
+          "prompt_text": "Tell us about your interest in studying business, including relevant experience or career aspirations, and how Babson can help prepare you to make an impact. (You may respond with a written essay or a one-minute video.)",
+          "word_limit": 500,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Share something about your background or viewpoint that speaks to your commitment to promoting understanding across differences or how you will contribute to Babson's collaborative community.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "boston-university",
+      "prompts": [
+        {
+          "prompt_text": "What about being a student at BU most excites you?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "bucknell-university",
+      "prompts": [
+        {
+          "prompt_text": "Explain your interest in your first-choice major/undecided status and second-choice major, and why you would choose Bucknell University.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "butler-university",
+      "prompts": [
+        {
+          "prompt_text": "Describe your reasons for selecting your intended major, and explain how academic offerings, faculty, or programs at Butler will help you achieve your goals.",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "capitol-technology-university",
+      "prompts": [
+        {
+          "prompt_text": "Why are you interested in Capitol Technology University? Refer specifically to academic programs, classes, professors, or organizations to show fit for your STEM education.",
+          "word_limit": 800,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "agnes-scott-college",
+      "prompts": [
+        {
+          "prompt_text": "Why apply to Agnes Scott College? (50–100 words)",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Describe a leadership quality you developed in high school and how you would apply it in the future through SUMMIT. (100 words maximum)",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Discuss an important global issue and how you would work to address it through SUMMIT. (100 words maximum)",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Describe a leader you admire and the influence they have had on you. (5–100 words)",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional: What is your dream travel destination, and why? (500 characters maximum)",
+          "word_limit": null,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Optional: What is your favorite book that was not assigned in school, and what does it mean to you? (500 characters maximum)",
+          "word_limit": null,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "carleton-college",
+      "prompts": [
+        {
+          "prompt_text": "Think about someone you connect with who's different from you. What do you find most meaningful about your interactions with them?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Anything missing? Do you want to share more with us? If so, use this space to fill any gaps you think would assist us in reviewing your application.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "carnegie-mellon-university",
+      "prompts": [
+        {
+          "prompt_text": "What passion or inspiration led you to choose your intended major or area of study, and how has that interest developed over time?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How do you define a successful college experience, and how will Carnegie Mellon help you achieve it?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What is something important about your application that you would like to emphasize, or something you haven't yet had the chance to share?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "centre-college",
+      "prompts": [
+        {
+          "prompt_text": "Why Centre? Tell us about the specific academic and community interests that draw you here and how you plan to engage on campus.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "clark-university",
+      "prompts": [
+        {
+          "prompt_text": "Complete the sentence: \"In Worcester, Massachusetts, I hope to discover ______________.\" (3–5 words)",
+          "word_limit": 5,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Tell us about a time you had an impact on a community, collaborated within one, or were influenced by a community you belong to.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Honors Program applicants) Describe a piece of media that captivated you, how you pursued that interest, and how you shared it with your peers.",
+          "word_limit": 350,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "clemson-university",
+      "prompts": [
+        {
+          "prompt_text": "Tell us about your academic interests, your professional goals, and the avenues you hope to explore to reach them.",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "coastal-carolina-university",
+      "prompts": [
+        {
+          "prompt_text": "Why Coastal Carolina?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Elaborate on an extracurricular activity or work experience that has been meaningful to you.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "college-of-charleston",
+      "prompts": [
+        {
+          "prompt_text": "Reflecting on the idea of \"Know Thyself,\" how have you discovered your unique purpose, identity, and goals?",
+          "word_limit": 350,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Honors College applicants) Which descriptor best captures your core identity — creator, doer, explorer, change agent, or seeker? Share examples and how you have developed in that role.",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "william-and-mary",
+      "prompts": [
+        {
+          "prompt_text": "(Optional; choose up to two of six) What communities are important to you, and how do they connect to William & Mary?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose up to two of six) What academic interest or career goal do you hope to pursue, and how will William & Mary help you pursue it?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose up to two of six) How have your family, culture, or background shaped your lived experience?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose up to two of six) What specifically interests you about William & Mary, and why is it a good fit for you?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose up to two of six) Describe a challenge or adversity you have faced. How did you respond, and what did you learn?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose up to two of six) If you were giving a tour of your town or neighborhood, what is one specific place you would take us, and why?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "colorado-school-of-mines",
+      "prompts": [
+        {
+          "prompt_text": "What element on the periodic table best represents you and why?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Why do you want to be an Oredigger? You can share what you want to study, your future involvement and activities, or anything else about the Mines experience that excites you.",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "the-cooper-union-for-the-advancement-of-science-and-art",
+      "prompts": [
+        {
+          "prompt_text": "What specific aspects of our community and resources excite you, and in what ways are you inspired to contribute to and benefit from our learning community?",
+          "word_limit": 350,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What drives your interest in pursuing your chosen major, and how do you envision engaging with Cooper's labs, research opportunities, and faculty?",
+          "word_limit": 350,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What is a challenge facing a community you identify with or care about, and how would your experiences and perspective influence your approach to addressing it?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "culver-stockton-college",
+      "prompts": [
+        {
+          "prompt_text": "What encouraged you to apply to Culver-Stockton College in terms of academic programs, campus features, or extracurricular opportunities?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "d-youville-university",
+      "prompts": [
+        {
+          "prompt_text": "In a single tweet (280 characters maximum), what is your top reason for choosing to apply to D'Youville University?",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "drexel-university",
+      "prompts": [
+        {
+          "prompt_text": "(Select/custom majors only) If you are applying to a custom or specialized major, what draws you to the field, what are your career aspirations, and how does Drexel's co-op model fit your timeline?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "earlham-college",
+      "prompts": [
+        {
+          "prompt_text": "Why does Earlham match your academic style, and how do you plan to contribute to the campus community?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "elon-university",
+      "prompts": [
+        {
+          "prompt_text": "What specific academic programs, campus environments, or strategic opportunities draw you to Elon?",
+          "word_limit": 150,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What aspect of your identity do you find most meaningful, and how does it shape who you are?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What three songs make up your perfect playlist, and why do they represent you?",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What would be your \"Top 5\" list on any theme of your choice, and why? (Include a brief explanatory statement.)",
+          "word_limit": 150,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "emerson-college",
+      "prompts": [
+        {
+          "prompt_text": "What experiences, stories, or professional influences led you to select your intended major or program?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose Option A or Option B) Option A: If your life story were a book, what would its title be, and why?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Optional; choose Option A or Option B) Option B: When have you worked collaboratively with others, and what was that experience like?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "cornell-university",
+      "prompts": [
+        {
+          "prompt_text": "College of Architecture, Art, and Planning — Architecture applicants (answer the AAP prompt matching your intended major): What is your interest in architecture, and how has it been formed by your personal history, culture, school, or community? Tell us what you hope to achieve through your architectural education at Cornell.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Architecture, Art, and Planning"
+        },
+        {
+          "prompt_text": "College of Architecture, Art, and Planning — Art applicants (answer the AAP prompt matching your intended major): How does your art reflect your view of the world? Describe how your artistic interests and practices align with the unique curriculum and resources offered by the Department of Art at Cornell.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Architecture, Art, and Planning"
+        },
+        {
+          "prompt_text": "College of Architecture, Art, and Planning — Urban and Regional Studies applicants (answer the AAP prompt matching your intended major): What social, economic, or environmental challenge in a community you know well inspires you to study urban and regional planning? How will the tools you acquire at Cornell help you tackle it?",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Architecture, Art, and Planning"
+        },
+        {
+          "prompt_text": "College of Arts and Sciences: At the College of Arts and Sciences, curiosity and a passion for learning are at the core of our community. How does your past academic journey reflect this spirit, and what specific areas of study or majors do you plan to explore? Explain how the flexible, interdisciplinary curriculum at Cornell will help you pursue your varied intellectual interests.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Arts and Sciences"
+        },
+        {
+          "prompt_text": "College of Agriculture and Life Sciences (CALS): Why are you drawn to your intended major, and how have your prior experiences—both inside and outside the classroom—prepared you to succeed in this field? Discuss your future professional goals and how a degree from CALS will empower you to achieve them.",
+          "word_limit": 350,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Agriculture and Life Sciences"
+        },
+        {
+          "prompt_text": "College of Agriculture and Life Sciences (CALS): The mission of CALS is to tackle real-world challenges through scientific discovery and hands-on purpose. Which specific resource, program, lab, or class unique to CALS aligns with your commitment to creating a sustainable public impact, and how?",
+          "word_limit": 350,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Agriculture and Life Sciences"
+        },
+        {
+          "prompt_text": "Cornell Engineering: What interests you about the engineering major you selected, including experiences, questions, and goals that influenced your choice?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Cornell Engineering: Why is the College of Engineering at Cornell the right place for your undergraduate education, and how do you plan to leverage its unique resources?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Cornell Engineering: When did you feel the joy of discovery or creativity while solving a problem or investigating a question? Describe that experience.",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Cornell Engineering: How will your worldview, background, or experiences bring value to the collaborative engineering community at Cornell?",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Cornell Engineering: What is a meaningful extracurricular activity or work responsibility from your high school years? Briefly elaborate.",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Cornell Engineering: What academic awards, honors, or distinctions have you received that best showcase your dedication to STEM?",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Engineering"
+        },
+        {
+          "prompt_text": "Charles H. Dyson School of Applied Economics and Management / Nolan School of Hotel Administration (SC Johnson College of Business): What experiences, trends, or global issues sparked your passion for business? Explain how your specific career aspirations align with the distinct business education model offered by either the Dyson School or the Nolan School, and how you will actively contribute to our collaborative campus community.",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "Cornell SC Johnson College of Business"
+        },
+        {
+          "prompt_text": "Brooks School of Public Policy: Why do you want to study Public Policy or Health Care Policy, and what personal experiences or societal issues drove this interest? How will the interdisciplinary resources and faculty at the Brooks School help you translate your academic passions into meaningful public service and policy action?",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "Brooks School of Public Policy"
+        },
+        {
+          "prompt_text": "College of Human Ecology: How has your personal background, worldview, or lived experience shaped your interest in human ecology? Describe how your academic goals connect directly to the College of Human Ecology's unique multi-disciplinary mission of using science and design to improve human lives and community well-being.",
+          "word_limit": 550,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "College of Human Ecology"
+        },
+        {
+          "prompt_text": "School of Industrial and Labor Relations (ILR): The ILR School explores the world of work through politics, law, history, psychology, and economics. What specific issue involving workers, organizations, or workplace equity matters to you, and how will the unique curriculum at the ILR School prepare you to address it?",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "School of Industrial and Labor Relations"
+        }
+      ]
+    },
+    {
+      "college": "emory-university",
+      "prompts": [
+        {
+          "prompt_text": "What academic areas do you want to explore at Emory University and why?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Emory second essay — required; choose one of four) How have you made an impact on a community that is important to you?",
+          "word_limit": 150,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Emory second essay — required; choose one of four) How has an experience shaped your cultural awareness or your understanding of people different from you?",
+          "word_limit": 150,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Emory second essay — required; choose one of four) How do you hope to contribute to Emory's mission of service to humanity?",
+          "word_limit": 150,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Emory second essay — required; choose one of four) When have you navigated a disagreement with someone, and what did you learn from it?",
+          "word_limit": 150,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "endicott-college",
+      "prompts": [
+        {
+          "prompt_text": "What specifically made you decide to apply to Endicott College, and how do you see yourself fitting into our unique academic programs or campus community?",
+          "word_limit": 100,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How do your individual background, identity, or unique personal interests influence your lived experiences and shape your contribution to the Endicott community?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "flagler-college",
+      "prompts": [
+        {
+          "prompt_text": "Why do you want to attend Flagler College, and what specific campus resources or unique environments draw you to our institution?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What are your primary reasons for pursuing your chosen academic major or program, and how do your past experiences connect to this path?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "fordham-university",
+      "prompts": [
+        {
+          "prompt_text": "(Fordham — optional; choose one of three) How would you embrace all that New York City has to offer as a Fordham student?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Fordham — optional; choose one of three) If you could send a message to your future senior-year self, what would it say?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Fordham — optional; choose one of three) What experience developed a new perspective for you?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "george-mason-university",
+      "prompts": [
+        {
+          "prompt_text": "What is your core motivation for seeking a higher education degree, and what specific reasons led you to choose George Mason University? (Required for test-optional applicants; optional otherwise.)",
+          "word_limit": 400,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Honors College — choose one of two) What question, challenge, or problem do you want to better understand or address during your time at George Mason, drawing on its status as a Tier-1 research institution?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Honors College — choose one of two) What compelling work (such as a book, speech, or artwork) inspired you or changed your perspective, and how has it influenced your future goals or the impact you hope to make?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "george-washington-university",
+      "prompts": [
+        {
+          "prompt_text": "(GW — optional; choose one of two) If you could change the course of history, what would you change and why?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(GW — optional; choose one of two) When have you engaged in a meaningful dialogue that challenged the status quo?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "hillsdale-college",
+      "prompts": [
+        {
+          "prompt_text": "What is your interest in Hillsdale's multidisciplinary classical liberal arts core curriculum?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What role do you see faith playing in your learning experience at Hillsdale?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Who do you hope to become as a result of your experiences and character growth at Hillsdale?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Hillsdale long essay — required; choose one) Who or what has been a specific influence on your life, and how?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Hillsdale long essay — required; choose one) What idea or topic makes you lose track of time, and why?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "georgia-state-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No school-specific supplemental essay for general first-year undergraduate admission this cycle (2026-27), per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "georgia-institute-of-technology-main-campus",
+      "status": "none_required",
+      "verified": true,
+      "notes": "Georgia Tech eliminated its first-year supplemental essay for 2026-27 (per applicant-provided current info). NOTE: GT's admissions site had previously referenced a Common App Writing Supplement — re-verify next cycle.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "hofstra-university",
+      "prompts": [
+        {
+          "prompt_text": "If you would like to provide more information about your interest in Hofstra University, what specific academic programs, campus features, or extracurricular opportunities draw you to our campus?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "howard-university",
+      "prompts": [
+        {
+          "prompt_text": "How have your background, lived experiences, and unique perspectives shaped your current identity, and in what ways will these elements enrich Howard University's diverse classroom and campus community?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What draws you to your first-choice and second-choice academic majors, what relevant experiences have prepared you for this path, and how will a Howard education help you achieve your future professional goals?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "indiana-university-bloomington",
+      "prompts": [
+        {
+          "prompt_text": "What are your specific reasons for choosing your intended major or area of study, and how will the academic programs, faculty, or resources at Indiana University Bloomington support your long-term personal and professional ambitions?",
+          "word_limit": 400,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "lehigh-university",
+      "prompts": [
+        {
+          "prompt_text": "How did you first learn about Lehigh University, and what specific motivations or unique factors led you to submit an application?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What is something great, joyful, or profoundly meaningful happening in your personal life right now that you want to celebrate with us?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How will your selected undergraduate college, academic program, major, or integrated dual-degree track allow you to achieve your specific educational or professional goals?",
+          "word_limit": 200,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "loyola-marymount-university",
+      "prompts": [
+        {
+          "prompt_text": "What specific aspects of Loyola Marymount University's mission, unique resources, or campus community inspire you to apply, and how does your intended major align with your past experiences or future aspirations?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "illinois-institute-of-technology",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general undergraduate supplemental essay for standard first-year admission this cycle (2026-27) beyond the Common App personal statement; per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "illinois-wesleyan-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No school-specific supplemental essay required for standard first-year undergraduate review this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "ithaca-college",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No writing supplements (required or optional) beyond standard Common App materials this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "loyola-university-maryland",
+      "prompts": [
+        {
+          "prompt_text": "How will you contribute your unique experiences, background, or personal interests to the diverse campus community at Loyola University Maryland, or how has a meaningful extracurricular activity prepared you to thrive in our Jesuit learning environment?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "mount-holyoke-college",
+      "prompts": [
+        {
+          "prompt_text": "(Mount Holyoke — optional; choose one of three, 250–400 words) What unique characteristic about Mount Holyoke makes you interested in attending?",
+          "word_limit": 400,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Mount Holyoke — optional; choose one of three, 250–400 words) How has the context of your upbringing and your community shaped the formation of your aspirations and your outlook on impact and courage?",
+          "word_limit": 400,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Mount Holyoke — optional; choose one of three, 250–400 words) What person, place, concept, idea, or theory do you find fascinating, and why?",
+          "word_limit": 400,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "manchester-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No separate undergraduate supplemental essay beyond the Common App personal statement for standard admission this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "marist-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general mandatory or optional writing supplement for standard first-year admission this cycle (2026-27). Specialized creative majors (e.g., Fashion Design, Studio Art) require a portfolio, not an essay. Per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "meredith-college",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No school-specific supplemental writing prompt for general first-year admission this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "moravian-university",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No mandatory or optional school-specific supplemental essay for first-year admission this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "reed-college",
+      "prompts": [
+        {
+          "prompt_text": "During Paideia, Reed students teach classes on topics they love. What would you teach to contribute to the Reed community?",
+          "word_limit": 500,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "rensselaer-polytechnic-institute",
+      "prompts": [
+        {
+          "prompt_text": "Why are you interested in Rensselaer Polytechnic Institute?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Which extracurricular activity or experience would you like to elaborate on, and why is it meaningful to you?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "smith-college",
+      "prompts": [
+        {
+          "prompt_text": "Smith's residential life is organized around a system of 41 houses. How do you hope to engage with and contribute to community and residential life at Smith?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "southern-methodist-university",
+      "prompts": [
+        {
+          "prompt_text": "What draws you to SMU, and why do you want to attend?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How will your unique experiences and perspectives enhance the SMU campus community?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "syracuse-university",
+      "prompts": [
+        {
+          "prompt_text": "Why is Syracuse University a good match for your academic and personal goals?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "the-new-school",
+      "prompts": [
+        {
+          "prompt_text": "In your study or work at The New School, what social issue or system would you want to focus your efforts on to effect change?",
+          "word_limit": 400,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What specific aspects of The New School's academic programs or community drew you to apply?",
+          "word_limit": 400,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "trinity-college",
+      "prompts": [
+        {
+          "prompt_text": "What aspect of your background are you most excited to explore within the Trinity College community?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "stanford-university",
+      "prompts": [
+        {
+          "prompt_text": "Short question (50 words): What is the most significant challenge that society faces today?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Short question (50 words): How did you spend your last two summers?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Short question (50 words): What historical moment or event do you wish you could have witnessed?",
+          "word_limit": 50,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Short question (50 words): Briefly elaborate on one of your extracurricular activities, a job you hold, or responsibilities you have for your family.",
+          "word_limit": 50,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Short question (50 words): List five things that are important to you.",
+          "word_limit": 50,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "The Stanford community is deeply curious and driven to learn in and out of the classroom. Reflect on an idea or experience that makes you genuinely excited about learning.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Virtually all of Stanford's undergraduates live on campus. Write a note to your future roommate that reveals something about you or that will help your roommate – and us – get to know you better.",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Please describe what aspects of your life experiences, interests and character would help you make a distinctive contribution as an undergraduate to Stanford University. (100–250 words)",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "monmouth-college",
+      "prompts": [
+        {
+          "prompt_text": "Why do you want to attend Monmouth College, and what specific academic programs, campus features, or opportunities draw you to our community?",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "tulane-university-of-louisiana",
+      "prompts": [
+        {
+          "prompt_text": "Why are you interested in attending Tulane University, and how do your academic or personal goals align with what Tulane offers?",
+          "word_limit": 800,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "When did you engage with a community or demographic different from your own, and what did you learn from that interaction?",
+          "word_limit": 400,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-central-florida",
+      "prompts": [
+        {
+          "prompt_text": "What are your specific reasons for choosing your intended major, and how will your academic goals prepare you for your future career path?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How will your individual background, lived experiences, and personal qualities enrich the campus community and diverse student body at UCF?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-florida",
+      "prompts": [
+        {
+          "prompt_text": "Which one of your primary extracurricular activities or work responsibilities would you like to elaborate on, and what is its significance to your personal development?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-illinois-chicago",
+      "prompts": [
+        {
+          "prompt_text": "What specific motivations led you to apply to the University of Illinois Chicago, and how do you envision our academic programs or campus resources supporting your future ambitions?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Honors College applicants) What intellectual interest or academic challenge have you found deeply engaging, and why do you want to pursue it within the UIC Honors community?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-arizona",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general undergraduate supplemental essay for standard first-year admission this cycle (2026-27) beyond the Common App baseline; per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "university-of-minnesota-twin-cities",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general undergraduate supplemental essay for standard first-year admission this cycle (2026-27) beyond the Common App baseline; per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "university-of-mount-saint-vincent",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general undergraduate supplemental essay for standard first-year admission this cycle (2026-27) beyond the Common App baseline; per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "university-of-north-carolina-at-charlotte",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No general undergraduate supplemental essay for standard first-year admission this cycle (2026-27) beyond the Common App baseline; per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "university-of-north-carolina-at-greensboro",
+      "prompts": [
+        {
+          "prompt_text": "(UNC Greensboro — optional; choose one of three, 200–600 words) What meaningful life event or contribution to your community has shaped who you are?",
+          "word_limit": 600,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(UNC Greensboro — optional; choose one of three, 200–600 words) What are your intended major or career goals, and what draws you to them?",
+          "word_limit": 600,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(UNC Greensboro — optional; choose one of three, 200–600 words) What does global citizenship mean to you, and how do you hope to practice it?",
+          "word_limit": 600,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-north-carolina-wilmington",
+      "prompts": [
+        {
+          "prompt_text": "Why are you interested in UNC Wilmington, how does it align with your academic goals, and how will you contribute to our campus community?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-oklahoma-norman-campus",
+      "prompts": [
+        {
+          "prompt_text": "What leadership experiences have been most significant to you, and what did you learn from them?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How have you engaged in cultural awareness or community service, and why does it matter to you?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What career area or field interests you most, and why do you want to pursue it?",
+          "word_limit": 650,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-oregon",
+      "prompts": [
+        {
+          "prompt_text": "(Oregon — required; choose one of two, 250–500 words) What social justice issue matters most to you, and how have you engaged with it?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "(Oregon — required; choose one of two, 250–500 words) How will you contribute to the University of Oregon campus community?",
+          "word_limit": 500,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-southern-california",
+      "prompts": [
+        {
+          "prompt_text": "What are your academic interests, and why do you want to pursue them at USC?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "How do you engage in civil discourse with people whose views or experiences differ from your own?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What three words describe you? (25 characters per word)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What is your favorite snack? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What is the best movie of all time? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What is your dream job? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: If your life had a theme song, what would it be? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What is your dream trip? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What TV show will you binge watch next? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: Which well-known person or fictional character would be your ideal roommate? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: What is your favorite book? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "USC Quick Take: If you could teach a class on any topic, what would it be? (100 characters max)",
+          "word_limit": null,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "the-university-of-texas-at-austin",
+      "prompts": [
+        {
+          "prompt_text": "What draws you to your first-choice major, and why do you want to study it?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Which high school activity are you proudest of, and why?",
+          "word_limit": 300,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Is there anything about your background or circumstances you would like to share to give context to your application?",
+          "word_limit": 300,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-tulsa",
+      "prompts": [
+        {
+          "prompt_text": "Which activity or leadership experience has been most meaningful to you, and what did you take from it?",
+          "word_limit": 250,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "Why are you interested in the University of Tulsa?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        },
+        {
+          "prompt_text": "What personal connections do you have to the University of Tulsa or its community?",
+          "word_limit": 200,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-virginia-main-campus",
+      "prompts": [
+        {
+          "prompt_text": "(School of Nursing applicants) What healthcare-related experience or other significant interaction deepened your interest in studying nursing?",
+          "word_limit": 250,
+          "is_required": false,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true,
+          "school": "School of Nursing"
+        }
+      ]
+    },
+    {
+      "college": "virginia-commonwealth-university",
+      "prompts": [
+        {
+          "prompt_text": "Why are you interested in Virginia Commonwealth University, and how does it fit your academic and personal goals?",
+          "word_limit": 650,
+          "is_required": true,
+          "source_type": "common_app",
+          "source_url": null,
+          "verified": true
+        }
+      ]
+    },
+    {
+      "college": "university-of-wyoming",
+      "status": "none_required",
+      "verified": true,
+      "notes": "No separate undergraduate supplemental essay outside standard Common App materials this cycle (2026-27); per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    },
+    {
+      "college": "worcester-polytechnic-institute",
+      "status": "none_required",
+      "verified": true,
+      "notes": "Removed writing supplements for 2026-27; relies solely on the Common App personal statement. Per applicant-provided current info.",
+      "status_source_url": null,
+      "prompts": []
+    }
+  ]
+}

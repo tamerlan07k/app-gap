@@ -16,6 +16,7 @@ import { evaluateCollege } from "~/lib/colleges/evaluate";
 import { CATEGORY_ORDER, categoryLabel } from "~/lib/colleges/matching";
 import type { CollegeMatch, MatchCategory } from "~/lib/colleges/types";
 import { createClient } from "~/lib/supabase/server";
+import { loadCollegeEssaySignals } from "~/lib/supplemental/db";
 import { type AddableCollege, AddCollege } from "./add-college";
 import { ClearCollegesButton } from "./clear-colleges-button";
 import { CollegeCard } from "./college-card";
@@ -53,7 +54,7 @@ export default async function CollegesPage() {
       loadUserColleges(supabase, user.id),
       loadFinalizedAt(supabase, user.id),
     ]);
-  const [fieldIndex, schoolStats] = await Promise.all([
+  const [fieldIndex, schoolStats, essaySignals] = await Promise.all([
     loadFieldDataIndex(supabase, fieldKey),
     // B2: real school-level baselines for saved colleges with a chosen school.
     loadSchoolLevelStats(
@@ -65,6 +66,8 @@ export default async function CollegesPage() {
           schoolId: s.schoolId as string,
         })),
     ),
+    // Qualitative supplemental-essay progress per college (never chancing).
+    loadCollegeEssaySignals(supabase, user.id),
   ]);
 
   const { all, byId } = colleges;
@@ -232,6 +235,7 @@ export default async function CollegesPage() {
                           key={m.college.id}
                           match={m}
                           finalized={finalized}
+                          essaySignal={essaySignals.get(m.college.id) ?? null}
                         />
                       ))}
                     </div>
