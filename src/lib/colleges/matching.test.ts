@@ -43,6 +43,8 @@ function college(
     actComposite25: null,
     actComposite75: null,
     gpaAvg: null,
+    tuitionInState: null,
+    tuitionOutState: null,
   };
   return {
     id: `c${seq}`,
@@ -52,6 +54,7 @@ function college(
     state: null,
     institutionType: null,
     logoAssetPath: null,
+    logoUrl: null,
     logoVariant: null,
     officialWebsite: null,
     stats,

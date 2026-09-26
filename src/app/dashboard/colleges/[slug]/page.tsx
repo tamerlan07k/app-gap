@@ -174,6 +174,30 @@ export default async function CollegeDetailPage({
 
   const cp = college.profile;
   const admitRate = college.stats?.admitRate ?? null;
+
+  // Info-panel display values. SAT/ACT/Tuition/Location always render a row (an
+  // explicit "N/A" when the source doesn't report it) — never a fabricated value.
+  const st = college.stats;
+  const satRange =
+    st?.satTotal25 != null && st?.satTotal75 != null
+      ? `${st.satTotal25}–${st.satTotal75}`
+      : // No composite range reported → derive it from the section ranges (the
+        // standard CDS composite = sum of the section 25th/75th percentiles).
+        st?.satEbrw25 != null &&
+          st?.satEbrw75 != null &&
+          st?.satMath25 != null &&
+          st?.satMath75 != null
+        ? `${st.satEbrw25 + st.satMath25}–${st.satEbrw75 + st.satMath75}`
+        : "N/A";
+  const actRange =
+    st?.actComposite25 != null && st?.actComposite75 != null
+      ? `${st.actComposite25}–${st.actComposite75}`
+      : "N/A";
+  const tuitionValue = st?.tuitionOutState ?? st?.tuitionInState ?? null;
+  const tuition =
+    tuitionValue != null ? `$${tuitionValue.toLocaleString("en-US")}` : "N/A";
+  const location =
+    [college.city, college.state].filter(Boolean).join(", ") || "N/A";
   const hasSpecificMajor =
     !!fieldKey && fieldKey !== "undecided" && fieldKey !== "other";
   const majorHeading = hasSpecificMajor
@@ -220,6 +244,7 @@ export default async function CollegeDetailPage({
         <CollegeLogo
           name={college.name}
           logoAssetPath={college.logoAssetPath}
+          logoUrl={college.logoUrl}
           className="size-16 rounded-2xl text-xl"
         />
         <div className="min-w-0">
@@ -336,25 +361,23 @@ export default async function CollegeDetailPage({
               {cp?.factsVerified && cp.foundedYear != null && (
                 <InfoRow label="Founded" value={String(cp.foundedYear)} />
               )}
-              {cp?.factsVerified && cp.studentFacultyRatio != null && (
-                <InfoRow
-                  label="Student–faculty ratio"
-                  value={`${cp.studentFacultyRatio}:1`}
-                />
-              )}
               {admitRate != null && (
                 <InfoRow
                   label="Overall admit rate"
                   value={`${Math.round(admitRate * 100)}%`}
                 />
               )}
-            </div>
-            {!(cp?.factsVerified && cp.foundedYear != null) &&
-              admitRate == null && (
-                <p className="text-sm text-muted-foreground">
-                  Institutional details are being added.
-                </p>
+              <InfoRow label="SAT" value={satRange} />
+              <InfoRow label="ACT" value={actRange} />
+              <InfoRow label="Tuition" value={tuition} />
+              <InfoRow label="Location" value={location} />
+              {cp?.factsVerified && cp.studentFacultyRatio != null && (
+                <InfoRow
+                  label="Student–faculty ratio"
+                  value={`${cp.studentFacultyRatio}:1`}
+                />
               )}
+            </div>
           </div>
         </aside>
       </div>

@@ -22,6 +22,8 @@ const ULTRA: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 // Same ultra-selective admit rate, but a NOTABLY lower academic band — a student
@@ -46,6 +48,8 @@ const SELECTIVE: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 const ACCESSIBLE: CollegeStats = {
@@ -59,6 +63,8 @@ const ACCESSIBLE: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 const STRONG = deriveApplicantStrength({
@@ -199,6 +205,7 @@ describe("order independence", () => {
     state: null,
     institutionType: null,
     logoAssetPath: null,
+    logoUrl: null,
     logoVariant: null,
     officialWebsite: null,
     stats,

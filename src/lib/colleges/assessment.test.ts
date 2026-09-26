@@ -17,6 +17,8 @@ const ULTRA: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 // Selective private: ~30% admit.
@@ -31,6 +33,8 @@ const SELECTIVE: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 // Accessible public: ~70% admit.
@@ -45,6 +49,8 @@ const ACCESSIBLE: CollegeStats = {
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 };
 
 // A stronger holistic profile (AppGap ~89) and a weaker one (AppGap ~74),
@@ -279,6 +285,8 @@ const realStats = (
   actComposite25: null,
   actComposite75: null,
   gpaAvg: null,
+  tuitionInState: null,
+  tuitionOutState: null,
 });
 
 // The ultra-selective tier (real p25/p75). The SAME rules must hold for all.

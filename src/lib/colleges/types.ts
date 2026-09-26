@@ -26,6 +26,9 @@ export interface CollegeStats {
   actComposite25: number | null;
   actComposite75: number | null;
   gpaAvg: number | null;
+  /** Annual published undergraduate tuition (USD), not cost of attendance. */
+  tuitionInState: number | null;
+  tuitionOutState: number | null;
 }
 
 /** The subset of a user's profile the matching engine consumes. */
@@ -160,6 +163,8 @@ export interface CollegeRecord {
   state: string | null;
   institutionType: string | null;
   logoAssetPath: string | null;
+  /** Official-logo URL resolved from the institution domain (see backfill-logos). */
+  logoUrl: string | null;
   logoVariant: string | null;
   officialWebsite: string | null;
   stats: CollegeStats | null;
