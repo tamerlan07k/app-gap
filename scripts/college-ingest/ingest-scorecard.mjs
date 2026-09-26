@@ -43,6 +43,9 @@ const FIELDS = [
   "latest.admissions.act_scores.25th_percentile.cumulative",
   "latest.admissions.act_scores.midpoint.cumulative",
   "latest.admissions.act_scores.75th_percentile.cumulative",
+  // Published annual undergraduate tuition (USD) — NOT total cost of attendance.
+  "latest.cost.tuition.in_state",
+  "latest.cost.tuition.out_of_state",
 ].join(",");
 
 // ─── args + env ───────────────────────────────────────────────────────────────
@@ -240,6 +243,15 @@ function mapRecord(rec) {
     act_composite_75: mark(
       "act_composite_75",
       f("latest.admissions.act_scores.75th_percentile.cumulative"),
+    ),
+    // Annual published undergraduate tuition (USD), not cost of attendance.
+    tuition_in_state: mark(
+      "tuition_in_state",
+      f("latest.cost.tuition.in_state"),
+    ),
+    tuition_out_of_state: mark(
+      "tuition_out_of_state",
+      f("latest.cost.tuition.out_of_state"),
     ),
     // Scorecard does not report these; other sources (IPEDS/CDS) fill them later.
     applicants: mark("applicants", null),

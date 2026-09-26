@@ -35,6 +35,8 @@ interface StatsRow {
   act_composite_25: number | null;
   act_composite_75: number | null;
   gpa_avg: number | null;
+  tuition_in_state: number | null;
+  tuition_out_of_state: number | null;
 }
 
 interface CycleRow {
@@ -160,7 +162,7 @@ export async function loadSchoolLevelStats(
   const { data } = await client
     .from("college_admission_stats")
     .select(
-      "college_id, school_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg",
+      "college_id, school_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg, tuition_in_state, tuition_out_of_state",
     )
     .in("school_id", schoolIds);
 
@@ -188,6 +190,8 @@ export async function loadSchoolLevelStats(
       actComposite25: s.act_composite_25,
       actComposite75: s.act_composite_75,
       gpaAvg: s.gpa_avg,
+      tuitionInState: s.tuition_in_state,
+      tuitionOutState: s.tuition_out_of_state,
     });
   }
   return out;
@@ -342,6 +346,42 @@ export async function loadFieldDataIndex(
   return { strengthByKey, resourcesByKey };
 }
 
+interface CollegeSelectRow {
+  id: string;
+  slug: string;
+  canonical_name: string;
+  city: string | null;
+  state: string | null;
+  institution_type: string | null;
+  logo_asset_path: string | null;
+  logo_url: string | null;
+  logo_variant: string | null;
+  official_website: string | null;
+}
+
+/**
+ * Fetch EVERY row of a query, paging past PostgREST's 1000-row default cap. An
+ * un-ranged select silently returns at most 1000 rows, so any table larger than
+ * that (the college dataset is ~1.5k) loses rows — the caller must paginate.
+ */
+async function fetchAllPaged<T>(
+  makeQuery: (
+    from: number,
+    to: number,
+  ) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
+): Promise<T[]> {
+  const PAGE = 1000;
+  const out: T[] = [];
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await makeQuery(from, from + PAGE - 1);
+    if (error) throw new Error(error.message);
+    const rows = data ?? [];
+    out.push(...rows);
+    if (rows.length < PAGE) break;
+  }
+  return out;
+}
+
 /**
  * Load every college with its standardized stats and current-cycle application
  * rounds. Returns a map keyed by college id for easy lookup + the full array.
@@ -350,42 +390,55 @@ export async function loadCollegesWithData(client: SupabaseClient): Promise<{
   all: CollegeWithData[];
   byId: Map<string, CollegeWithData>;
 }> {
-  const [collegesRes, statsRes, cyclesRes] = await Promise.all([
-    client
-      .from("colleges")
-      .select(
-        "id, slug, canonical_name, city, state, institution_type, logo_asset_path, logo_variant, official_website",
-      )
-      .eq("status", "active")
-      .order("canonical_name"),
-    client
-      .from("college_admission_stats")
-      .select(
-        "college_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg",
-      ),
-    client
-      .from("application_cycles")
-      .select("id, college_id, test_policy, verified_at")
-      .eq("cycle_year", CURRENT_CYCLE_YEAR),
+  // Every query is paginated: the college dataset exceeds PostgREST's 1000-row
+  // cap, so an un-ranged select silently drops rows (everything alphabetically
+  // after ~"Sk" — Stanford, Yale — would vanish from the list and search).
+  const [colleges, statsRows, cycleRows] = await Promise.all([
+    fetchAllPaged<CollegeSelectRow>((from, to) =>
+      client
+        .from("colleges")
+        .select(
+          "id, slug, canonical_name, city, state, institution_type, logo_asset_path, logo_url, logo_variant, official_website",
+        )
+        .eq("status", "active")
+        .order("canonical_name")
+        .range(from, to),
+    ),
+    fetchAllPaged<StatsRow>((from, to) =>
+      client
+        .from("college_admission_stats")
+        .select(
+          "college_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg, tuition_in_state, tuition_out_of_state",
+        )
+        .range(from, to),
+    ),
+    fetchAllPaged<CycleRow>((from, to) =>
+      client
+        .from("application_cycles")
+        .select("id, college_id, test_policy, verified_at")
+        .eq("cycle_year", CURRENT_CYCLE_YEAR)
+        .range(from, to),
+    ),
   ]);
 
-  const colleges = collegesRes.data ?? [];
-  const statsRows = (statsRes.data ?? []) as StatsRow[];
-  const cycleRows = (cyclesRes.data ?? []) as CycleRow[];
-
-  // Rounds for the current cycle only.
-  const cycleIds = cycleRows.map((c) => c.id);
-  let roundRows: RoundRow[] = [];
-  if (cycleIds.length) {
-    const { data } = await client
-      .from("application_rounds")
-      .select(
-        "id, cycle_id, round_type, name, deadline_date, decision_release_date, is_binding, is_restrictive, is_rolling, offered, verified_at",
-      )
-      .in("cycle_id", cycleIds)
-      .eq("offered", true);
-    roundRows = (data ?? []) as RoundRow[];
-  }
+  // Rounds for the current cycle only. Fetch all offered rounds (paginated) and
+  // filter to our cycles in memory — a `.in()` over ~1.5k cycle ids would blow
+  // the URL length and is itself capped at 1000 rows.
+  const cycleIdSet = new Set(cycleRows.map((c) => c.id));
+  const roundRows =
+    cycleIdSet.size === 0
+      ? []
+      : (
+          await fetchAllPaged<RoundRow>((from, to) =>
+            client
+              .from("application_rounds")
+              .select(
+                "id, cycle_id, round_type, name, deadline_date, decision_release_date, is_binding, is_restrictive, is_rolling, offered, verified_at",
+              )
+              .eq("offered", true)
+              .range(from, to),
+          )
+        ).filter((r) => cycleIdSet.has(r.cycle_id));
 
   // Pick the most recent stats row per college.
   const statsByCollege = new Map<string, StatsRow>();
@@ -445,6 +498,7 @@ export async function loadCollegesWithData(client: SupabaseClient): Promise<{
       state: c.state,
       institutionType: c.institution_type,
       logoAssetPath: c.logo_asset_path,
+      logoUrl: c.logo_url,
       logoVariant: c.logo_variant,
       officialWebsite: c.official_website,
       stats: s
@@ -459,6 +513,8 @@ export async function loadCollegesWithData(client: SupabaseClient): Promise<{
             actComposite25: s.act_composite_25,
             actComposite75: s.act_composite_75,
             gpaAvg: s.gpa_avg,
+            tuitionInState: s.tuition_in_state,
+            tuitionOutState: s.tuition_out_of_state,
           }
         : null,
       cycle,
@@ -503,7 +559,7 @@ export async function loadCollegeDetailBySlug(
   const { data: c } = await client
     .from("colleges")
     .select(
-      "id, slug, canonical_name, city, state, institution_type, logo_asset_path, logo_variant, official_website",
+      "id, slug, canonical_name, city, state, institution_type, logo_asset_path, logo_url, logo_variant, official_website",
     )
     .eq("slug", slug)
     .eq("status", "active")
@@ -514,7 +570,7 @@ export async function loadCollegeDetailBySlug(
     client
       .from("college_admission_stats")
       .select(
-        "college_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg",
+        "college_id, source_date, admit_rate, sat_ebrw_25, sat_ebrw_75, sat_math_25, sat_math_75, sat_total_25, sat_total_75, act_composite_25, act_composite_75, gpa_avg, tuition_in_state, tuition_out_of_state",
       )
       .eq("college_id", c.id),
     client
@@ -615,6 +671,7 @@ export async function loadCollegeDetailBySlug(
     state: c.state,
     institutionType: c.institution_type,
     logoAssetPath: c.logo_asset_path,
+    logoUrl: c.logo_url,
     logoVariant: c.logo_variant,
     officialWebsite: c.official_website,
     stats: s
@@ -629,6 +686,8 @@ export async function loadCollegeDetailBySlug(
           actComposite25: s.act_composite_25,
           actComposite75: s.act_composite_75,
           gpaAvg: s.gpa_avg,
+          tuitionInState: s.tuition_in_state,
+          tuitionOutState: s.tuition_out_of_state,
         }
       : null,
     cycle,

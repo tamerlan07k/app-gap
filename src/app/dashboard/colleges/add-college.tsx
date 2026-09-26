@@ -22,7 +22,26 @@ export function AddCollege({ colleges }: { colleges: AddableCollege[] }) {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return [];
-    return colleges.filter((c) => c.name.toLowerCase().includes(q)).slice(0, 8);
+    // Rank by relevance so the best match is never buried by the 8-item cap:
+    // exact name → name starts with query → a word starts with query → any
+    // substring (earlier = better). Without this, "University of Pennsylvania"
+    // loses all 8 slots to the many "<City> University of Pennsylvania" schools
+    // that sort before it alphabetically.
+    return colleges
+      .map((c) => {
+        const name = c.name.toLowerCase();
+        const idx = name.indexOf(q);
+        if (idx === -1) return null;
+        let score = idx;
+        if (name === q) score = -1000;
+        else if (name.startsWith(q)) score = -500;
+        else if (idx > 0 && name[idx - 1] === " ") score = -100 + idx;
+        return { c, score };
+      })
+      .filter((x): x is { c: AddableCollege; score: number } => x !== null)
+      .sort((a, b) => a.score - b.score || a.c.name.length - b.c.name.length)
+      .slice(0, 8)
+      .map((x) => x.c);
   }, [query, colleges]);
 
   return (

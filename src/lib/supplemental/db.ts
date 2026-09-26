@@ -101,7 +101,7 @@ export async function loadEssayGroups(
 
   const { data: colleges } = await client
     .from("colleges")
-    .select("id, canonical_name, slug, logo_asset_path")
+    .select("id, canonical_name, slug, logo_asset_path, logo_url")
     .in("id", orderedIds);
   const nameById = new Map(
     (colleges ?? []).map((c) => [
@@ -110,6 +110,7 @@ export async function loadEssayGroups(
         name: c.canonical_name as string,
         slug: c.slug as string | null,
         logoAssetPath: (c.logo_asset_path as string | null) ?? null,
+        logoUrl: (c.logo_url as string | null) ?? null,
       },
     ]),
   );
@@ -121,6 +122,7 @@ export async function loadEssayGroups(
       collegeName: meta?.name ?? "Unknown college",
       slug: meta?.slug ?? null,
       logoAssetPath: meta?.logoAssetPath ?? null,
+      logoUrl: meta?.logoUrl ?? null,
       essays: essaysByCollege.get(id) ?? [],
     };
   });
@@ -135,7 +137,7 @@ export async function loadCollegeGroup(
   const [collegeRes, essaysRes] = await Promise.all([
     client
       .from("colleges")
-      .select("id, canonical_name, slug, logo_asset_path")
+      .select("id, canonical_name, slug, logo_asset_path, logo_url")
       .eq("id", collegeId)
       .maybeSingle(),
     client
@@ -151,6 +153,7 @@ export async function loadCollegeGroup(
     collegeName: collegeRes.data.canonical_name as string,
     slug: (collegeRes.data.slug as string | null) ?? null,
     logoAssetPath: (collegeRes.data.logo_asset_path as string | null) ?? null,
+    logoUrl: (collegeRes.data.logo_url as string | null) ?? null,
     essays: (essaysRes.data ?? []).map(essayFromRow),
   };
 }
@@ -340,7 +343,7 @@ export async function loadEssayWorkspace(
   const [collegeRes, analysesRes, chatRes] = await Promise.all([
     client
       .from("colleges")
-      .select("canonical_name, slug, logo_asset_path")
+      .select("canonical_name, slug, logo_asset_path, logo_url")
       .eq("id", essay.collegeId)
       .maybeSingle(),
     client
@@ -371,6 +374,7 @@ export async function loadEssayWorkspace(
     collegeName: (collegeRes.data?.canonical_name as string) ?? "",
     collegeSlug: (collegeRes.data?.slug as string | null) ?? null,
     logoAssetPath: (collegeRes.data?.logo_asset_path as string | null) ?? null,
+    logoUrl: (collegeRes.data?.logo_url as string | null) ?? null,
     parse: parse.success ? parse.data : null,
     evaluation: evaluation.success ? evaluation.data : null,
     lineByLine: lineByLine.success ? lineByLine.data : null,

@@ -67,6 +67,8 @@ export type CollegeEssayGroupDTO = {
   slug: string | null;
   /** Self-hosted logo asset path, or null (CollegeLogo renders a monogram). */
   logoAssetPath: string | null;
+  /** Official-logo URL resolved from the institution domain, or null. */
+  logoUrl: string | null;
   essays: SupplementalEssayDTO[];
 };
 
@@ -77,6 +79,7 @@ export type EssayWorkspaceData = {
   collegeName: string;
   collegeSlug: string | null;
   logoAssetPath: string | null;
+  logoUrl: string | null;
   parse: PromptParse | null;
   evaluation: RawEvaluation | null;
   lineByLine: LineByLineAnalysis | null;

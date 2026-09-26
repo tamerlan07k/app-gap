@@ -1,9 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import { cn } from "~/lib/utils";
 
-// Deterministic monogram fallback. The DB never stores hotlinked logos; when an
-// official self-hosted asset exists we render it, otherwise a generated
-// monogram (see docs/college-data-architecture.md §8). Colors are picked
-// deterministically from the name so a college always looks the same.
+// College logo with a deterministic monogram fallback.
+//
+// Priority: a self-hosted asset (`logoAssetPath`) → an official logo URL resolved
+// from the institution's domain (`logoUrl`, see scripts/college-ingest/
+// backfill-logos.mjs) → a generated monogram. The monogram colors are picked
+// deterministically from the name so a college always looks the same, and it is
+// also what renders if the remote logo fails to load (`onError`), so a broken or
+// missing logo never leaves an empty box. See docs/college-data-architecture.md §8.
 
 const PALETTE = [
   "bg-brand-teal/10 text-brand-teal",
@@ -35,22 +42,33 @@ function hash(s: string): number {
 export function CollegeLogo({
   name,
   logoAssetPath,
+  logoUrl,
   className,
 }: {
   name: string;
   logoAssetPath?: string | null;
+  logoUrl?: string | null;
   className?: string;
 }) {
-  if (logoAssetPath) {
+  const src = logoAssetPath ?? logoUrl ?? null;
+  const [failed, setFailed] = useState(false);
+
+  if (src && !failed) {
     return (
-      // biome-ignore lint/performance/noImgElement: self-hosted asset path, not a Next-optimized remote image
+      // biome-ignore lint/performance/noImgElement: cross-origin logo (self-hosted asset or resolved logo CDN), not a Next-optimized image
       <img
-        src={logoAssetPath}
+        src={src}
         alt={`${name} logo`}
-        className={cn("size-11 shrink-0 rounded-xl object-contain", className)}
+        loading="lazy"
+        onError={() => setFailed(true)}
+        className={cn(
+          "size-11 shrink-0 rounded-xl bg-white object-contain p-1 ring-1 ring-border/60",
+          className,
+        )}
       />
     );
   }
+
   const color = PALETTE[hash(name) % PALETTE.length];
   return (
     <div

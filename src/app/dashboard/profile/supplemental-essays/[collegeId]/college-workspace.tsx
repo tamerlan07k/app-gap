@@ -78,6 +78,7 @@ export function CollegeWorkspace({
         <CollegeLogo
           name={group.collegeName}
           logoAssetPath={group.logoAssetPath}
+          logoUrl={group.logoUrl}
         />
         <div className="min-w-0">
           <h2 className="text-lg font-bold tracking-tight">

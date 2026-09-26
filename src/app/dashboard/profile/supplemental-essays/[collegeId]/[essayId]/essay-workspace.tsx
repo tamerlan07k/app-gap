@@ -343,6 +343,7 @@ export function EssayWorkspace({
           <CollegeLogo
             name={data.collegeName}
             logoAssetPath={data.logoAssetPath}
+            logoUrl={data.logoUrl}
           />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
