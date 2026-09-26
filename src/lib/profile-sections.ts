@@ -51,9 +51,9 @@ export const PROFILE_SECTIONS: ProfileSection[] = [
   {
     slug: "awards",
     label: "Awards",
-    locked: true,
+    locked: false,
     description:
-      "Maintain your awards and honors — level, recognition, date, and external validation.",
+      "See what your recognition demonstrates and where the gaps are, discover real opportunities that could add something new, and test whether a specific competition or program is worth pursuing.",
   },
 ];
 

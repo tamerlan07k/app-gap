@@ -18,6 +18,8 @@ export type FeatureKey =
   | "supplementalCoach" // Supplemental Essays: prompt parse + redundancy/value-add + revision guidance (Gemini)
   | "supplementalDeepCoach" // Supplemental Essays: graded evaluation + line-by-line (Opus, higher cost)
   | "supplementalChat" // Supplemental Essays: GapCoach live chat (Gemini, metered per message)
+  | "awardsRecognition" // Awards: Recognition Map — collective + per-award interpretation (Gemini, cached one-row-per-user)
+  | "opportunityExperiment" // Awards: "Test an Opportunity" — concise application-value assessment (Gemini, metered per use)
   | "opportunityFinder"; // internships / research / competitions finder (future, data-backed)
 
 export type FeatureConfig = {
@@ -128,6 +130,27 @@ export const AI_FEATURES = {
     temperature: 0.6,
     description:
       "Supplemental Essays GapCoach live chat — answers a student's questions while they write (coaches, never authors)",
+  },
+  // Awards → Recognition Map. Reads the student's awards + activities + a
+  // deterministic recognition profile (themes, coverage, gaps, connected
+  // evidence — all computed in code) and INTERPRETS it: what the recognition
+  // collectively demonstrates, where the recognition gaps are, and a compact
+  // per-award "why this matters". Analytic, not generative → low temperature.
+  // Cheap Flash tier; cached one row per user (opening the page never calls AI).
+  awardsRecognition: {
+    model: "google/gemini-2.5-flash",
+    temperature: 0.3,
+    description:
+      "Awards Recognition Map — interprets what a student's collection of awards collectively demonstrates, the recognition/evidence gaps, and a compact per-award analysis (coaches, never invents awards or results)",
+  },
+  // Awards → "Test an Opportunity". A short, practical assessment of whether a
+  // pasted competition/program/fellowship is worth pursuing given the student's
+  // current recognition profile and timing. Deliberately concise; Flash tier.
+  opportunityExperiment: {
+    model: "google/gemini-2.5-flash",
+    temperature: 0.3,
+    description:
+      "Awards 'Test an Opportunity' — a concise, practical read on whether pursuing a specific opportunity adds application value given the student's profile, gaps, and timing (never an admissions prediction)",
   },
 } satisfies Partial<Record<FeatureKey, FeatureConfig>>;
 
@@ -339,6 +362,45 @@ export const FEATURE_ACCESS: Record<
     pro: {
       enabled: true,
       limit: 120,
+      window: "month",
+      model: "google/gemini-2.5-flash",
+    },
+  },
+  // Awards → Recognition Map. A My Profile core analysis feature (cheap Flash).
+  // Free = 5/month; Pro = 25/month. The two Awards AI features (this +
+  // opportunityExperiment) are sized so a Pro user maxing BOTH costs ≈ $0.25/mo
+  // combined at observed Flash usage (recognition ≈ $0.0051/call → 25 ≈ $0.13;
+  // experiment ≈ $0.0047/call → 25 ≈ $0.12; total ≈ $0.245). That keeps Awards
+  // within a $0.25 Pro allocation → ~$7.25/user/mo across ALL AppGap features.
+  // Adding/editing awards is always free (profile data); only AI is metered.
+  awardsRecognition: {
+    free: {
+      enabled: true,
+      limit: 5,
+      window: "month",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 25,
+      window: "month",
+      model: "google/gemini-2.5-flash",
+    },
+  },
+  // Awards → "Test an Opportunity". Per-use metered (each test = one use). Small,
+  // concise Flash calls. Free = 5/month; Pro = 25/month. Sized with
+  // awardsRecognition so both Awards features together stay within the ≈ $0.25/mo
+  // Pro allocation (see the note above) → ~$7.25/user/mo for all features.
+  opportunityExperiment: {
+    free: {
+      enabled: true,
+      limit: 5,
+      window: "month",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 25,
       window: "month",
       model: "google/gemini-2.5-flash",
     },
