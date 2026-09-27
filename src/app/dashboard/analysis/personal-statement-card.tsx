@@ -57,7 +57,7 @@ export function PersonalStatementCard({
           A quick read to give your score a signal — not full feedback. For
           brainstorming, line-by-line coaching, and revision,{" "}
           <Link
-            href="/dashboard/profile/personal-statement"
+            href="/dashboard/application-writing/personal-statement"
             className="inline-flex items-center gap-0.5 font-medium text-brand-teal underline-offset-4 hover:underline"
           >
             open the Personal Statement coach

@@ -47,6 +47,15 @@ export const activityWritingFeedbackSchema = z.object({
   // improve without inventing facts (e.g. "Volunteered"). Guides the student to
   // supply their own real specifics. Null when a real rewrite was provided.
   template: z.string().nullable(),
+
+  // A ≤150-character tightened version of the CURRENT description, provided ONLY
+  // when the current description exceeds the 150-char Common App limit. It
+  // preserves the highest-value information (never a blind truncation at char
+  // 150) and never invents facts. Null when the description already fits.
+  // Defaults to null so feedback cached before this field existed still
+  // validates. The UI re-verifies the length before showing it (see
+  // isValidTightenedActivity).
+  tightenedDescription: z.string().nullable().default(null),
 });
 
 /** One piece of content that does not belong in Additional Information. */

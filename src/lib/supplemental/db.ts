@@ -6,7 +6,10 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { CURRENT_CYCLE_YEAR } from "~/lib/colleges/types";
+import { resolveWeights } from "./archetypes";
+import { collegeEssayChanceDelta, type EssayChanceInput } from "./chance-delta";
 import { chatThreadSchema } from "./chat";
+import { scoreEvaluation } from "./evaluate";
 import {
   evaluationSchema,
   lineByLineSchema,
@@ -409,4 +412,118 @@ export async function loadCollegeEssaySignals(
     out.set(id, deriveCollegeSignal(statuses));
   }
   return out;
+}
+
+/**
+ * The per-college chance nudge (percentage points) from the student's finalized,
+ * scored supplemental essays. Recomputed live from the cached AI evaluations —
+ * nothing is stored. Returns a map collegeId → delta (only colleges with a
+ * non-zero delta). Degrades to an empty map on any error so My Colleges never
+ * breaks over a missing table/migration. See chance-delta.ts for the rules.
+ */
+export async function loadCollegeEssayChanceDeltas(
+  client: SupabaseClient,
+  userId: string,
+): Promise<Map<string, number>> {
+  try {
+    const { data: essayRows } = await client
+      .from("supplemental_essays")
+      .select("id, college_id, word_limit, catalog_prompt_id, status")
+      .eq("user_id", userId);
+
+    const essays = essayRows ?? [];
+    if (essays.length === 0) return new Map();
+
+    const essayIds = essays.map((e) => e.id as string);
+    const catalogIds = Array.from(
+      new Set(
+        essays
+          .map((e) => e.catalog_prompt_id as string | null)
+          .filter((id): id is string => !!id),
+      ),
+    );
+
+    const [analysesRes, catalogRes] = await Promise.all([
+      client
+        .from("supplemental_essay_analyses")
+        .select("essay_id, kind, analysis")
+        .eq("user_id", userId)
+        .in("essay_id", essayIds)
+        .in("kind", ["parse", "evaluation"]),
+      catalogIds.length > 0
+        ? client
+            .from("college_supplemental_prompts")
+            .select("id, is_required")
+            .in("id", catalogIds)
+        : Promise.resolve({
+            data: [] as { id: string; is_required: boolean }[],
+          }),
+    ]);
+
+    // essayId → { parse, evaluation } raw jsonb.
+    const analysisByEssay = new Map<
+      string,
+      { parse?: unknown; evaluation?: unknown }
+    >();
+    for (const row of analysesRes.data ?? []) {
+      const id = row.essay_id as string;
+      const entry = analysisByEssay.get(id) ?? {};
+      entry[row.kind as "parse" | "evaluation"] = row.analysis;
+      analysisByEssay.set(id, entry);
+    }
+
+    const requiredByCatalogId = new Map<string, boolean>();
+    for (const row of catalogRes.data ?? []) {
+      requiredByCatalogId.set(
+        row.id as string,
+        (row.is_required as boolean) ?? true,
+      );
+    }
+
+    // Recompute each essay's AppGap overall (0–100) from its cached parse +
+    // evaluation, exactly as the essay workspace does — server-side here.
+    const byCollege = new Map<string, EssayChanceInput[]>();
+    for (const e of essays) {
+      const collegeId = e.college_id as string;
+      const cached = analysisByEssay.get(e.id as string);
+      const parse = parseSchema.safeParse(cached?.parse);
+      const evaluation = evaluationSchema.safeParse(cached?.evaluation);
+
+      let overall: number | null = null;
+      if (parse.success && evaluation.success) {
+        const { weights, rationale } = resolveWeights(
+          parse.data.primaryArchetype,
+          parse.data.secondaryArchetypes,
+          (e.word_limit as number | null) ?? parse.data.wordLimit,
+        );
+        overall = scoreEvaluation(evaluation.data, weights, rationale).overall;
+      }
+
+      const catalogId = e.catalog_prompt_id as string | null;
+      const required = catalogId
+        ? (requiredByCatalogId.get(catalogId) ?? true)
+        : true; // manual/self-added essays are treated as required
+
+      const input: EssayChanceInput = {
+        finalized: (e.status as string) === "finalized",
+        required,
+        overall,
+      };
+      if (!byCollege.has(collegeId)) byCollege.set(collegeId, []);
+      byCollege.get(collegeId)?.push(input);
+    }
+
+    const out = new Map<string, number>();
+    for (const [collegeId, inputs] of byCollege) {
+      const delta = collegeEssayChanceDelta(inputs);
+      if (delta !== 0) out.set(collegeId, delta);
+    }
+    return out;
+  } catch (err) {
+    console.error(
+      "[supplemental] loadCollegeEssayChanceDeltas failed:",
+      err instanceof Error ? err.message : String(err),
+    );
+    return new Map();
+  }
 }

@@ -86,7 +86,7 @@ function CollegeRow({
 
   return (
     <Link
-      href={`/dashboard/profile/supplemental-essays/${group.collegeId}`}
+      href={`/dashboard/application-writing/supplemental-essays/${group.collegeId}`}
       className="group flex items-center gap-4 rounded-xl border border-border bg-card px-4 py-3.5 transition-colors hover:border-brand-teal/40 hover:bg-brand-teal/[0.03]"
     >
       <CollegeLogo

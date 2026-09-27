@@ -16,6 +16,7 @@ import { fieldLabel } from "~/lib/colleges/field-fit";
 import { buildFitNarrative } from "~/lib/colleges/fit-narrative";
 import type { AdmissionFit, MatchCategory } from "~/lib/colleges/types";
 import { createClient } from "~/lib/supabase/server";
+import { loadCollegeEssayChanceDeltas } from "~/lib/supplemental/db";
 import { cn } from "~/lib/utils";
 import { CollegeLogo } from "../college-logo";
 
@@ -155,7 +156,10 @@ export default async function CollegeDetailPage({
   ]);
   if (!college) notFound();
 
-  const fieldIndex = await loadFieldDataIndex(supabase, fieldKey);
+  const [fieldIndex, essayDeltas] = await Promise.all([
+    loadFieldDataIndex(supabase, fieldKey),
+    loadCollegeEssayChanceDeltas(supabase, user.id),
+  ]);
   const fieldData = fieldDataFor(fieldIndex, college.id, fieldKey);
 
   // The assessment is only personalized once the profile exists; without it we
@@ -169,6 +173,7 @@ export default async function CollegeDetailPage({
         fieldData,
         source: "detail",
         selectedRoundId: null,
+        essayChanceDeltaPp: essayDeltas.get(college.id) ?? 0,
       })
     : null;
 

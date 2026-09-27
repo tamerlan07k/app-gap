@@ -13,7 +13,7 @@ import type { SupplementalEssayDTO } from "~/lib/supplemental/types";
 // the authoritative text. Structural changes (add / delete / finalize / status)
 // do revalidate so a fresh load and the college progress are correct.
 
-const PATH = "/dashboard/profile/supplemental-essays";
+const PATH = "/dashboard/application-writing/supplemental-essays";
 
 type Err = { ok: false; error: string };
 type Result = { ok: true } | Err;

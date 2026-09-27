@@ -28,7 +28,7 @@ import type {
 import { cn } from "~/lib/utils";
 import { addEssay, addEssayFromPrompt, deleteEssay } from "../actions";
 
-const BASE = "/dashboard/profile/supplemental-essays";
+const BASE = "/dashboard/application-writing/supplemental-essays";
 
 export function CollegeWorkspace({
   group,

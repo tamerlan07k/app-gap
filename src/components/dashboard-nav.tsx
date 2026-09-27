@@ -27,6 +27,11 @@ const navItems: NavItem[] = [
     activePrefix: "/dashboard/profile",
   },
   {
+    label: "Application Writing",
+    href: "/dashboard/application-writing",
+    activePrefix: "/dashboard/application-writing",
+  },
+  {
     label: "My Roadmap",
     href: "/dashboard/workspace",
     activePrefix: "/dashboard/workspace",

@@ -4,10 +4,11 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { DashboardNav } from "~/components/dashboard-nav";
 
-// Renders the authenticated app shell. Everywhere except My Profile shows the
-// main sidebar next to the content. Inside My Profile (/dashboard/profile*) the
-// main sidebar is hidden so the profile workspace can present its own internal
-// navigation and a back button (see dashboard/profile/layout.tsx).
+// Renders the authenticated app shell. Most sections show the main sidebar next
+// to the content. The self-navigating workspaces — My Profile
+// (/dashboard/profile*) and Application Writing (/dashboard/application-writing*)
+// — hide the main sidebar and present their own internal nav + back button (see
+// their respective layout.tsx).
 export function DashboardShell({
   isAdmin,
   children,
@@ -16,9 +17,11 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
-  const inProfileWorkspace = pathname.startsWith("/dashboard/profile");
+  const inOwnWorkspace =
+    pathname.startsWith("/dashboard/profile") ||
+    pathname.startsWith("/dashboard/application-writing");
 
-  if (inProfileWorkspace) {
+  if (inOwnWorkspace) {
     return <>{children}</>;
   }
 

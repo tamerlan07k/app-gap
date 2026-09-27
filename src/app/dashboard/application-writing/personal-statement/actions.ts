@@ -15,7 +15,7 @@ import { createClient } from "~/lib/supabase/server";
 //
 // No AI is wired here — this is Phase 1 (the writing surface) only.
 
-const PATH = "/dashboard/profile/personal-statement";
+const PATH = "/dashboard/application-writing/personal-statement";
 
 export type DraftDTO = {
   id: string;
