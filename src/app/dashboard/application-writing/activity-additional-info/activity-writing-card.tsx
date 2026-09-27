@@ -1,6 +1,12 @@
 "use client";
 
-import { Lightbulb, Pencil, Sparkles, TriangleAlert } from "lucide-react";
+import {
+  Lightbulb,
+  Pencil,
+  Scissors,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
 import type { ActivityWritingFeedback } from "~/lib/ai/writing-schema";
 import { cn } from "~/lib/utils";
@@ -10,6 +16,7 @@ import {
   activityWritingMode,
   computeActivityScore,
   countChars,
+  enforceActivityCharLimit,
 } from "~/lib/writing/checks";
 
 // Category slug → human label. Kept local so the client bundle doesn't pull in
@@ -91,6 +98,17 @@ export function ActivityWritingCard({
     feedback && overall != null
       ? activityWritingMode(overall, feedback.groundable)
       : null;
+
+  // Every suggested rewrite the UI shows is forced within the 150-char limit
+  // before display — the model is asked for ≤150 but we never render a suggestion
+  // that crosses it. enforceActivityCharLimit is a no-op when it already fits.
+  const tightened =
+    over && feedback?.tightenedDescription?.trim()
+      ? enforceActivityCharLimit(feedback.tightenedDescription)
+      : null;
+  const improved = feedback?.improvedDescription?.trim()
+    ? enforceActivityCharLimit(feedback.improvedDescription)
+    : null;
 
   return (
     <div className="space-y-4 px-6 py-5">
@@ -178,6 +196,40 @@ export function ActivityWritingCard({
             />
           </div>
 
+          {/* Over the 150-char limit: always offer a verified ≤150 tightened
+              version, regardless of the polish/rewrite/template mode. */}
+          {over && (
+            <div className="space-y-1.5 rounded-lg border border-amber-300/50 bg-amber-50 p-3 dark:border-amber-900/50 dark:bg-amber-950/20">
+              <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-400">
+                <Scissors className="size-3.5" />
+                Over the {ACTIVITY_CHAR_LIMIT}-character limit
+              </p>
+              {tightened ? (
+                <>
+                  <p className="text-sm leading-relaxed text-muted-foreground">
+                    Your description is {chars} characters —{" "}
+                    {chars - ACTIVITY_CHAR_LIMIT} over the Common App limit.
+                    Here&apos;s a tightened version that keeps the most
+                    important information and fits:
+                  </p>
+                  <p className="rounded-md border border-border bg-background/60 px-3 py-2 text-sm leading-relaxed">
+                    {tightened}
+                  </p>
+                  <p className="text-right text-xs tabular-nums text-muted-foreground">
+                    {countChars(tightened)} / {ACTIVITY_CHAR_LIMIT} characters
+                  </p>
+                </>
+              ) : (
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  Your description is {chars} characters —{" "}
+                  {chars - ACTIVITY_CHAR_LIMIT} over the Common App limit. Trim
+                  it to {ACTIVITY_CHAR_LIMIT} characters, keeping the concrete
+                  action, specifics, and impact.
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Guidance depends on the mode. */}
           {mode === "polish" && (
             <div className="space-y-1.5 rounded-lg border border-brand-teal/20 bg-brand-teal/[0.04] p-3">
@@ -189,7 +241,7 @@ export function ActivityWritingCard({
             </div>
           )}
 
-          {mode === "rewrite" && feedback.improvedDescription && (
+          {mode === "rewrite" && improved && (
             <div className="space-y-2">
               {feedback.polishNote && (
                 <p className="text-sm leading-relaxed text-muted-foreground">
@@ -201,12 +253,9 @@ export function ActivityWritingCard({
                   <Sparkles className="size-3.5" />
                   Suggested 10/10 rewrite
                 </p>
-                <p className="text-sm leading-relaxed">
-                  {feedback.improvedDescription}
-                </p>
+                <p className="text-sm leading-relaxed">{improved}</p>
                 <p className="text-right text-xs tabular-nums text-muted-foreground">
-                  {countChars(feedback.improvedDescription)} /{" "}
-                  {ACTIVITY_CHAR_LIMIT} characters
+                  {countChars(improved)} / {ACTIVITY_CHAR_LIMIT} characters
                 </p>
               </div>
             </div>

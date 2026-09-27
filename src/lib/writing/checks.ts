@@ -42,6 +42,56 @@ export function countWords(text: string): number {
   return trimmed.split(/\s+/).length;
 }
 
+/** True when an activity description exceeds the 150-character Common App limit. */
+export function isActivityOverLimit(description: string): boolean {
+  return countChars(description) > ACTIVITY_CHAR_LIMIT;
+}
+
+/**
+ * Whether an AI-generated tightened activity description is safe to show: it must
+ * be non-empty AND actually fit within the 150-character limit. The model is
+ * asked for a ≤150-char rewrite, but we never trust that blindly — a tightened
+ * version that is itself over the limit is worse than useless, so we verify the
+ * count here before the UI displays it.
+ */
+export function isValidTightenedActivity(
+  text: string | null | undefined,
+): boolean {
+  if (!text) return false;
+  const trimmed = text.trim();
+  return trimmed.length > 0 && countChars(trimmed) <= ACTIVITY_CHAR_LIMIT;
+}
+
+/**
+ * Guarantee a suggested rewrite fits the 150-character limit before it is shown.
+ * The model is asked for a ≤150-char rewrite and usually delivers, but the UI
+ * must NEVER render a suggestion that exceeds the limit — so this is the last
+ * line of defense: when the model overshoots, back off to the last WHOLE word
+ * that fits (never a mid-word chop) and drop any separator/punctuation left
+ * dangling by the cut. A single token longer than the limit (no spaces) is
+ * hard-capped by code point as a final fallback. The returned string is always
+ * ≤ ACTIVITY_CHAR_LIMIT code points; empty in, empty out.
+ */
+export function enforceActivityCharLimit(
+  text: string | null | undefined,
+): string {
+  const trimmed = (text ?? "").trim();
+  if (countChars(trimmed) <= ACTIVITY_CHAR_LIMIT) return trimmed;
+
+  const codePoints = Array.from(trimmed);
+  // Start from the first LIMIT code points, then back off to a word boundary.
+  let slice = codePoints.slice(0, ACTIVITY_CHAR_LIMIT).join("");
+  const lastSpace = slice.lastIndexOf(" ");
+  if (lastSpace > 0) slice = slice.slice(0, lastSpace);
+  // Clean a trailing separator/punctuation the cut may have left behind.
+  slice = slice.replace(/[\s,;:.·|/\\–—-]+$/u, "").trim();
+  // Degenerate case (e.g. one token longer than the limit): hard-cap by code
+  // point so we still return something within the limit.
+  if (slice.length === 0)
+    slice = codePoints.slice(0, ACTIVITY_CHAR_LIMIT).join("");
+  return slice;
+}
+
 // ─── Activity writing score (code-computed overall) ───────────────────────────
 // The model rates three dimensions (0–10 each); the overall /10 is computed here
 // so the top-line number is deterministic and never left to the model. The mode

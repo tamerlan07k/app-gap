@@ -40,14 +40,40 @@ export function ApplicationWritingWorkspace({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Match AI feedback back to live activities by name.
-  const feedbackByName = useMemo(() => {
-    const map = new Map<string, ActivityWritingFeedback>();
-    for (const f of analysis?.activities ?? []) {
-      if (!map.has(f.activityName)) map.set(f.activityName, f);
+  // Match each AI feedback entry back to exactly one live activity, keeping every
+  // activity's analysis under its own card. Primary match is by normalized name
+  // (case/whitespace-insensitive) so a minor echo difference still lands; any
+  // feedback that doesn't match a name is assigned, in order, to the next
+  // still-unmatched activity as a positional fallback. This guarantees one
+  // activity's recommendations never appear under another and none silently
+  // vanish.
+  const feedbackForActivity = useMemo(() => {
+    const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, " ");
+    const result = new Map<string, ActivityWritingFeedback>();
+    const entries = [...(analysis?.activities ?? [])];
+    const used = new Set<number>();
+
+    // Pass 1 — exact (normalized) name match.
+    for (const a of activities) {
+      const idx = entries.findIndex(
+        (f, i) => !used.has(i) && norm(f.activityName) === norm(a.name),
+      );
+      if (idx !== -1) {
+        used.add(idx);
+        result.set(a.name, entries[idx]);
+      }
     }
-    return map;
-  }, [analysis]);
+    // Pass 2 — positional fallback for activities still without feedback.
+    for (const a of activities) {
+      if (result.has(a.name)) continue;
+      const idx = entries.findIndex((_, i) => !used.has(i));
+      if (idx !== -1) {
+        used.add(idx);
+        result.set(a.name, entries[idx]);
+      }
+    }
+    return result;
+  }, [analysis, activities]);
 
   async function runAnalysis() {
     setLoading(true);
@@ -83,7 +109,7 @@ export function ApplicationWritingWorkspace({
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Application Writing
+            Activity &amp; Additional Info
           </p>
         </div>
         <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -158,7 +184,7 @@ export function ApplicationWritingWorkspace({
                 name={a.name}
                 category={a.category}
                 description={a.description}
-                feedback={feedbackByName.get(a.name) ?? null}
+                feedback={feedbackForActivity.get(a.name) ?? null}
               />
             ))}
           </div>

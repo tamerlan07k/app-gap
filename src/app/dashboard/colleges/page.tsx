@@ -16,7 +16,10 @@ import { evaluateCollege } from "~/lib/colleges/evaluate";
 import { CATEGORY_ORDER, categoryLabel } from "~/lib/colleges/matching";
 import type { CollegeMatch, MatchCategory } from "~/lib/colleges/types";
 import { createClient } from "~/lib/supabase/server";
-import { loadCollegeEssaySignals } from "~/lib/supplemental/db";
+import {
+  loadCollegeEssayChanceDeltas,
+  loadCollegeEssaySignals,
+} from "~/lib/supplemental/db";
 import { type AddableCollege, AddCollege } from "./add-college";
 import { ClearCollegesButton } from "./clear-colleges-button";
 import { CollegeCard } from "./college-card";
@@ -54,21 +57,24 @@ export default async function CollegesPage() {
       loadUserColleges(supabase, user.id),
       loadFinalizedAt(supabase, user.id),
     ]);
-  const [fieldIndex, schoolStats, essaySignals] = await Promise.all([
-    loadFieldDataIndex(supabase, fieldKey),
-    // B2: real school-level baselines for saved colleges with a chosen school.
-    loadSchoolLevelStats(
-      supabase,
-      saved
-        .filter((s) => s.schoolId)
-        .map((s) => ({
-          collegeId: s.collegeId,
-          schoolId: s.schoolId as string,
-        })),
-    ),
-    // Qualitative supplemental-essay progress per college (never chancing).
-    loadCollegeEssaySignals(supabase, user.id),
-  ]);
+  const [fieldIndex, schoolStats, essaySignals, essayDeltas] =
+    await Promise.all([
+      loadFieldDataIndex(supabase, fieldKey),
+      // B2: real school-level baselines for saved colleges with a chosen school.
+      loadSchoolLevelStats(
+        supabase,
+        saved
+          .filter((s) => s.schoolId)
+          .map((s) => ({
+            collegeId: s.collegeId,
+            schoolId: s.schoolId as string,
+          })),
+      ),
+      // Qualitative supplemental-essay progress per college (never chancing).
+      loadCollegeEssaySignals(supabase, user.id),
+      // Per-college chance nudge from finalized, scored supplemental essays.
+      loadCollegeEssayChanceDeltas(supabase, user.id),
+    ]);
 
   const { all, byId } = colleges;
   const savedSet = new Set(saved.map((s) => s.collegeId));
@@ -105,6 +111,7 @@ export default async function CollegesPage() {
               degreeType: s.degreeType,
               intendedMajor: s.intendedMajor,
             },
+            essayChanceDeltaPp: essayDeltas.get(s.collegeId) ?? 0,
           });
         })
         .filter((m): m is CollegeMatch => m !== null)

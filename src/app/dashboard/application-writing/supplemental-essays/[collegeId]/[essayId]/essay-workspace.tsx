@@ -47,7 +47,7 @@ import { LineByLineReview } from "./line-by-line-review";
 import { PromptParsePanel } from "./prompt-parse-panel";
 import { RedundancyPanel } from "./redundancy-panel";
 
-const BASE = "/dashboard/profile/supplemental-essays";
+const BASE = "/dashboard/application-writing/supplemental-essays";
 const AUTOSAVE_MS = 800;
 
 type SaveStatus = "idle" | "unsaved" | "saving" | "saved" | "error";

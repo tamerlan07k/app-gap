@@ -8,9 +8,14 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import { ACTIVITY_CATEGORY_LABELS } from "~/lib/profile-labels";
 import { cn } from "~/lib/utils";
+import { ACTIVITY_CHAR_LIMIT, countChars } from "~/lib/writing/checks";
 import { type ActivityInput, addActivity, updateActivity } from "./actions";
 
-const DESCRIPTION_LIMIT = 300;
+// The Common App Activities description limit is 150 characters (the counter
+// tracks this). We let the field accept a bit more so an over-limit draft is
+// reachable — the Application Writing analysis then flags it and offers a
+// tightened ≤150 version — but bound raw input at a generous cap.
+const DESCRIPTION_INPUT_CAP = 300;
 const GRADES = ["9", "10", "11", "12"] as const;
 const MEANINGFULNESS = [
   { value: 1, label: "Minor" },
@@ -104,7 +109,8 @@ export function ActivityForm({
     });
   }
 
-  const descOver = description.length > DESCRIPTION_LIMIT;
+  const descChars = countChars(description);
+  const descOver = descChars > ACTIVITY_CHAR_LIMIT;
 
   return (
     <form
@@ -185,7 +191,7 @@ export function ActivityForm({
               descOver ? "text-destructive" : "text-muted-foreground",
             )}
           >
-            {description.length} / {DESCRIPTION_LIMIT}
+            {descChars} / {ACTIVITY_CHAR_LIMIT} characters
           </span>
         </div>
         <Textarea
@@ -194,7 +200,7 @@ export function ActivityForm({
           onChange={(e) => setDescription(e.target.value)}
           placeholder="1–2 sentences: what you did and any impact."
           rows={2}
-          maxLength={DESCRIPTION_LIMIT}
+          maxLength={DESCRIPTION_INPUT_CAP}
         />
       </div>
 

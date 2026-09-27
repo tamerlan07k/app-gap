@@ -11,35 +11,18 @@ export type ProfileSection = {
   description: string;
 };
 
+// Personal Statement, Supplemental Essays, and the activity-description /
+// Additional Information workspace now live under the top-level Application
+// Writing section (/dashboard/application-writing), not here — see
+// application-writing-sections.ts.
 export const PROFILE_SECTIONS: ProfileSection[] = [
   { slug: "", label: "Overview", locked: false, description: "" },
-  {
-    slug: "personal-statement",
-    label: "Personal Statement",
-    locked: false,
-    description:
-      "Draft and refine your Common App personal statement with an AppGap coach — brainstorming, structure, feedback, and revision.",
-  },
-  {
-    slug: "supplemental-essays",
-    label: "Supplemental Essays",
-    locked: false,
-    description:
-      "Manage, write, and evaluate your college-specific supplemental essays — a prompt-first coach that checks whether you answered the prompt, stayed specific, and added something new.",
-  },
   {
     slug: "activities",
     label: "Activities",
     locked: false,
     description:
       "Manage your activities list — descriptions, hours, roles, and impact — as a living part of your application.",
-  },
-  {
-    slug: "application-writing",
-    label: "Application Writing",
-    locked: false,
-    description:
-      "Get help writing your activity descriptions and the Additional Information section of the Common App.",
   },
   {
     slug: "coursework",

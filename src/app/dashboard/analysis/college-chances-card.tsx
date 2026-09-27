@@ -14,6 +14,7 @@ import {
 import { evaluateCollege } from "~/lib/colleges/evaluate";
 import type { CollegeMatch, MatchCategory } from "~/lib/colleges/types";
 import { createClient } from "~/lib/supabase/server";
+import { loadCollegeEssayChanceDeltas } from "~/lib/supplemental/db";
 import { cn } from "~/lib/utils";
 
 const CATEGORY_STYLES: Record<MatchCategory, string> = {
@@ -44,7 +45,7 @@ export async function CollegeChancesCard({ userId }: { userId: string }) {
     loadCollegesWithData(supabase),
     loadUserColleges(supabase, userId),
   ]);
-  const [fieldIndex, schoolStats] = await Promise.all([
+  const [fieldIndex, schoolStats, essayDeltas] = await Promise.all([
     loadFieldDataIndex(supabase, fieldKey),
     loadSchoolLevelStats(
       supabase,
@@ -55,6 +56,7 @@ export async function CollegeChancesCard({ userId }: { userId: string }) {
           schoolId: s.schoolId as string,
         })),
     ),
+    loadCollegeEssayChanceDeltas(supabase, userId),
   ]);
 
   const { byId } = colleges;
@@ -86,6 +88,7 @@ export async function CollegeChancesCard({ userId }: { userId: string }) {
               degreeType: s.degreeType,
               intendedMajor: s.intendedMajor,
             },
+            essayChanceDeltaPp: essayDeltas.get(s.collegeId) ?? 0,
           });
         })
         .filter((m): m is CollegeMatch => m !== null)

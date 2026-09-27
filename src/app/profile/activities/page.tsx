@@ -25,6 +25,7 @@ import {
   type Step3Data,
   saveStep3,
 } from "~/lib/profile-storage";
+import { ACTIVITY_CHAR_LIMIT, countChars } from "~/lib/writing/checks";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -248,9 +249,22 @@ function ActivityForm({
 
       {/* Description */}
       <div className="space-y-2">
-        <div className="flex items-baseline gap-2">
-          <Label htmlFor={`desc-${activity.id}`}>Description</Label>
-          <span className="text-xs text-muted-foreground">1–2 sentences</span>
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="flex items-baseline gap-2">
+            <Label htmlFor={`desc-${activity.id}`}>Description</Label>
+            <span className="text-xs text-muted-foreground">1–2 sentences</span>
+          </div>
+          <span
+            className={[
+              "text-xs tabular-nums",
+              countChars(activity.description) > ACTIVITY_CHAR_LIMIT
+                ? "text-destructive"
+                : "text-muted-foreground",
+            ].join(" ")}
+          >
+            {countChars(activity.description)} / {ACTIVITY_CHAR_LIMIT}{" "}
+            characters
+          </span>
         </div>
         <textarea
           id={`desc-${activity.id}`}

@@ -48,6 +48,8 @@ NEVER invent numbers, impact, leadership, responsibilities, awards, organization
 
 Every activity description is limited to 150 CHARACTERS (not words). All rewrites and templates MUST be ≤150 characters.
 
+CRITICAL LENGTH RULE: any value you place in "improvedDescription" or "tightenedDescription" MUST be 150 characters or fewer. Count the characters of your draft (spaces and punctuation included). If it is over 150, cut words until it fits BEFORE you return it — a value over 150 characters is invalid output. Never return a rewrite you have not length-checked.
+
 Score each activity description on THREE dimensions, each 0–10. Score honestly and independently:
 
 1. "actionVerb" — Does it open with / center a strong, accurate action verb (Organized, Built, Coordinated, Researched, Tutored, Led, Designed, Managed, Analyzed, Mentored…) rather than a weak, passive, or vague opener ("Was part of", "Helped with", "Volunteered")? Reward accurate verbs, not thesaurus inflation.
@@ -65,17 +67,52 @@ Then always provide:
 - "improvedDescription" — a truthful, ≤150-character rewrite that would earn a 10/10, using ONLY known facts. Provide this ONLY when "groundable" is true; otherwise set it to null. NEVER invent details to fill it.
 - "template" — a fill-in-the-blank scaffold the student completes with their OWN real specifics. Provide this ONLY when "groundable" is false; otherwise null. Example for "Volunteered": "Did __ hours of __ (what you did); helped __ (who/what); achieved __ (result)." Templates use blanks and short parenthetical hints — they must NOT contain invented facts.
 
+### Descriptions that EXCEED 150 characters
+
+ALWAYS analyze and score a description even if it is over 150 characters — never skip it, never refuse, never return null scores because it is too long. A description over the limit still gets its three scores and notes like any other.
+
+When (and ONLY when) the current description is over 150 characters, ALSO provide "tightenedDescription": a version of the STUDENT'S OWN description rewritten to fit within 150 characters. Requirements:
+- Preserve the highest-value information: the concrete action, the specifics/metrics, and the real impact. Cut filler, redundancy, and low-value words first — do NOT simply chop the text off at character 150.
+- Use ONLY facts already present in the current description or profile — never invent to fill space.
+- It MUST be ≤150 characters. Count characters and confirm before returning it.
+- Keep the student's own meaning and voice; tighten wording, don't rewrite into consultant-speak.
+When the description already fits within 150 characters, set "tightenedDescription" to null.
+
 Do NOT compute an overall score yourself — AppGap derives the overall /10 from your three sub-scores.
 
 ## Additional Information — Common App 2026–2027 criteria (300-word limit)
 
-Judge the Additional Information response by what this section is actually FOR on the current Common App. Its purpose is to share meaningful context or circumstances that the rest of the application does not already capture — for example: explaining an interruption or anomaly (a dip in grades, a school change, a family or health circumstance, limited access to opportunities), clarifying something confusing, or briefly noting a genuinely significant item there was no room for elsewhere. It is OPTIONAL — a strong application often leaves it blank.
+Judge the Additional Information response by what this section is actually FOR on the current Common App. The core question for EVERY piece of content is:
 
-It is NOT the place for: a second personal essay or narrative; restating or padding activities, awards, or coursework already listed elsewhere; bragging or listing accomplishments for emphasis; generic statements of passion or "why this major"; filler written just to use the space.
+"Does this information materially help an admissions reader understand something important about the student's application that cannot be adequately understood elsewhere?"
 
-Assess: does the content BELONG here per that purpose? Set "belongs" accordingly. Identify anything the student should REMOVE because it doesn't fit — put each such item in "toRemove" with the offending "text" (quote or paraphrase) and a short "reason" (e.g. "Already covered in your activities list — repeating it here wastes the space."). If everything belongs, "toRemove" is an empty array.
+If yes, it may belong. If it is merely impressive, interesting, emotional, a minor accomplishment, an explanation the student simply wants to give, or something that didn't fit elsewhere, it generally should be left out. Prioritize material context over completeness. This section is OPTIONAL — a strong application often leaves it blank, and empty is better than padded.
 
-Do NOT encourage using all 300 words simply because they exist — concise is often better. If the profile flags the response is over 300 words, call that out in "improvements". Provide "improvedVersion" (a tightened version using ONLY the student's real content) only when it genuinely helps; otherwise null.
+### What legitimately BELONGS here (recognize these as valid)
+- Mitigating circumstances that materially affected the student's academic or extracurricular experience.
+- Unusual schooling situations: school restrictions, unusual curriculum structures, scheduling limitations, or school policies that materially affected the courses or opportunities available (e.g. a cap on AP classes).
+- Significant family responsibilities that materially affected the student's time, academics, or extracurricular participation (e.g. regular caregiving).
+- In-depth activity expansion — ONLY when a genuinely significant activity cannot be adequately explained within the 150-character Activity Description and a few added sentences materially improve understanding. Use this selectively. Do NOT automatically tell students to expand activities here — ask whether the extra explanation is genuinely necessary; if the activity description already conveys enough, it does not belong here.
+
+### What should be FLAGGED or discouraged (put in "toRemove")
+- Excuses for poor grades. Distinguish a genuine mitigating circumstance that materially affected performance (may belong) from simply explaining or defending a bad grade (does not). Do NOT blindly recommend explanations for weak grades.
+- A second personal statement: storytelling for its own sake, emotional narratives, philosophical reflections, long personal essays, or dramatic writing. This is not another essay.
+- Minor details or fluff: minor certificates, hobbies, small accomplishments, ninth-grade awards that didn't fit elsewhere, miscellaneous facts, insignificant extracurricular details. "Interesting" does not mean it belongs.
+- Creative writing or poetry, literary experimentation, or another personal narrative.
+- External links: personal websites, portfolios (unless genuinely necessary and appropriate), Google Drive documents, social media, external achievement pages, or any other external site. Additional Information should communicate directly, not send the reader elsewhere.
+- Restating or padding activities, awards, or coursework already listed elsewhere just for emphasis; generic statements of passion or "why this major"; filler written to use the space.
+
+### Formatting: bullets and prose are BOTH valid
+Do NOT penalize, criticize, or recommend against bullet points, and do NOT recommend converting bullets into a paragraph on formatting grounds. Concise bullet points and concise paragraphs are equally acceptable. In many cases bullet points are PREFERABLE — when the student is presenting multiple distinct circumstances or pieces of information, bullets improve readability and communicate efficiently. Judge the content (does it belong? is it useful, relevant, specific, concise?), never the choice of bullets vs. prose. A direct, scannable, labeled structure (e.g. "School Constraint: ...", "Family Responsibility: ...") is a strong format — feel free to recommend it. Do not force everything into paragraph form.
+
+### Assess
+Does the content BELONG here per the core question? Set "belongs" accordingly. Put each item that doesn't fit in "toRemove" with the offending "text" (quote or paraphrase) and a short "reason". If everything belongs, "toRemove" is an empty array. Do NOT encourage using all 300 words simply because they exist — concise is better. If the profile flags the response is over 300 words, call that out in "improvements".
+
+### "improvedVersion" — get straight to the point, no filler
+Provide "improvedVersion" (a tightened rewrite using ONLY the student's real content) only when it genuinely helps; otherwise null. When you do:
+- NEVER open with generic meta-introductions. Do NOT write "I want to provide some context…", "I would like to explain…", "I want to provide context…", "I would like to provide some background…", "I feel it is important to mention…", "I want admissions officers to understand…", or any similar announcement. Admissions officers already know what this section is for; such phrases waste extremely limited space.
+- Get directly to the circumstance or information. Prefer a direct, labeled structure. For example, instead of "I want to provide some context about my academic circumstances. My high school…", write: "School Constraint: My high school limits students to a maximum of two AP classes per year. I took the maximum allowed." Preserve bullet/labeled formatting when the original uses it — do not flatten it into prose.
+- Preserve the student's own meaning and voice; tighten and clarify, do not polish it into admissions-consultant language, and never invent circumstances, achievements, responsibilities, or facts the student did not provide.
 
 ## Output
 
@@ -90,7 +127,8 @@ Respond with ONLY valid JSON — no markdown fences, no prose outside the JSON o
       "groundable": <true|false>,
       "polishNote": "<one or two sentences of concrete guidance>",
       "improvedDescription": "<truthful ≤150-char 10/10 rewrite, or null>",
-      "template": "<fill-in-the-blank scaffold with blanks, or null>"
+      "template": "<fill-in-the-blank scaffold with blanks, or null>",
+      "tightenedDescription": "<≤150-char tightening of the student's OWN current description, provided ONLY when the current description is over 150 characters; otherwise null>"
     }
   ],
   "additionalInfo": {
@@ -103,7 +141,7 @@ Respond with ONLY valid JSON — no markdown fences, no prose outside the JSON o
   }
 }
 
-If the student has no Additional Information response, set "additionalInfo" to null. Only include activities that have a description. Provide exactly one of "improvedDescription" / "template" per activity (the other is null), chosen by "groundable".`;
+If the student has no Additional Information response, set "additionalInfo" to null. Only include activities that have a description. Provide exactly one of "improvedDescription" / "template" per activity (the other is null), chosen by "groundable". Set "tightenedDescription" only when the current description exceeds 150 characters (null otherwise) — it is independent of the "improvedDescription"/"template" choice.`;
 
 // ─── Prompt builder ───────────────────────────────────────────────────────────
 
@@ -153,8 +191,9 @@ export function buildWritingPrompt(profile: FullProfile): string {
       }
       if (a.meaningfulness != null)
         lines.push(`  Personal significance: ${a.meaningfulness}/5`);
+      const over = chars > ACTIVITY_CHAR_LIMIT;
       lines.push(
-        `  Current description (${chars}/${ACTIVITY_CHAR_LIMIT} chars): "${a.description}"`,
+        `  Current description (${chars}/${ACTIVITY_CHAR_LIMIT} chars${over ? " — OVER THE 150-CHAR LIMIT; still score it AND provide a ≤150-char tightenedDescription" : ""}): "${a.description}"`,
       );
     }
   }

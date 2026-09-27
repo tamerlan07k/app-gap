@@ -169,7 +169,11 @@ export function CollegeCard({
                   official probability. */}
               {admission.chance != null && (
                 <div className="mt-1 flex items-center gap-2">
-                  <ChanceReveal chance={admission.chance} size="md" />
+                  <ChanceReveal
+                    chance={admission.chance}
+                    size="md"
+                    trackKey={college.id}
+                  />
                   <span className="text-xs leading-tight text-muted-foreground">
                     AppGap
                     <br />
@@ -250,7 +254,7 @@ export function CollegeCard({
           {/* Supplemental-essay progress — a QUALITATIVE signal only (never a
               chancing input). Links into the essay workspace for this college. */}
           <Link
-            href={`/dashboard/profile/supplemental-essays/${college.id}`}
+            href={`/dashboard/application-writing/supplemental-essays/${college.id}`}
             className="relative z-10 mt-2 inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
           >
             <span className="font-medium text-foreground/70">Supplements:</span>
