@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  AlertTriangle,
   BadgeCheck,
   Check,
   ChevronDown,
@@ -40,6 +41,7 @@ import {
   isCustomPrompt,
   WORD_LIMIT,
 } from "~/lib/personal-statement/prompts";
+import { isEvaluationStale } from "~/lib/personal-statement/scoring";
 import { cn } from "~/lib/utils";
 import {
   createDraft,
@@ -180,6 +182,19 @@ export function StatementEditor({
   const [evalLoading, setEvalLoading] = useState(false);
   const [evalError, setEvalError] = useState<string | null>(null);
   const [showScore, setShowScore] = useState(true);
+  // The draft text each displayed score was computed from, keyed by draft id, so
+  // an edited draft never shows a score that belongs to its previous text. A
+  // server-loaded score is seeded against the draft's loaded content (unchanged
+  // since it was scored); re-scoring updates the snapshot to the scored text.
+  const [scoredContentByDraft, setScoredContentByDraft] = useState<
+    Record<string, string>
+  >(() => {
+    const seed: Record<string, string> = {};
+    for (const d of statement.drafts) {
+      if (initialEvaluations[d.id] !== undefined) seed[d.id] = d.content;
+    }
+    return seed;
+  });
   // Revision guidance (Gemini coach) — cached per draft id.
   const [revisions, setRevisions] =
     useState<Record<string, Revision>>(initialRevisions);
@@ -636,7 +651,8 @@ export function StatementEditor({
     }
     pendingContent.current = null;
     const draftId = activeDraft.id;
-    await persistContent(draftId, activeDraft.content);
+    const scoredText = activeDraft.content;
+    await persistContent(draftId, scoredText);
     try {
       const res = await fetch("/api/personal-statement/evaluation", {
         method: "POST",
@@ -652,6 +668,9 @@ export function StatementEditor({
         ...prev,
         [draftId]: data.evaluation as Evaluation,
       }));
+      // Pin this score to the exact text it was computed from, so edits after
+      // this point are detected as stale.
+      setScoredContentByDraft((prev) => ({ ...prev, [draftId]: scoredText }));
       setShowScore(true);
     } catch {
       setEvalError("Something went wrong. Please try again.");
@@ -663,6 +682,15 @@ export function StatementEditor({
   const activeEvaluation = activeDraft
     ? (evaluations[activeDraft.id] ?? null)
     : null;
+  // A displayed score is stale once the draft text no longer matches the text it
+  // was scored from, so the old score is never presented as the current essay's.
+  const evaluationStale = activeDraft
+    ? isEvaluationStale({
+        hasEvaluation: Boolean(activeEvaluation),
+        scoredContent: scoredContentByDraft[activeDraft.id],
+        currentContent: activeDraft.content,
+      })
+    : false;
 
   // ─── Revision guidance (Gemini coach) ──────────────────────────────────────
   async function runRevision() {
@@ -1139,7 +1167,11 @@ export function StatementEditor({
                         </Button>
                       )}
                       <Button
-                        variant={activeEvaluation ? "outline" : "default"}
+                        variant={
+                          activeEvaluation && !evaluationStale
+                            ? "outline"
+                            : "default"
+                        }
                         size="sm"
                         onClick={runEvaluation}
                         disabled={evalLoading}
@@ -1163,7 +1195,23 @@ export function StatementEditor({
                     )}
                     {activeEvaluation ? (
                       showScore ? (
-                        <EvaluationPanel evaluation={activeEvaluation} />
+                        <>
+                          {evaluationStale && (
+                            <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
+                              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                              <span>
+                                You've edited this draft since it was scored.
+                                This score reflects the{" "}
+                                <span className="font-medium">previous</span>{" "}
+                                text — tap “Re-score” to grade your current
+                                essay.
+                              </span>
+                            </div>
+                          )}
+                          <div className={cn(evaluationStale && "opacity-60")}>
+                            <EvaluationPanel evaluation={activeEvaluation} />
+                          </div>
+                        </>
                       ) : (
                         <p className="text-sm text-muted-foreground">
                           Score hidden. Tap “Show” to view it again.
