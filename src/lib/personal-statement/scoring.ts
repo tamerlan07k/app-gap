@@ -58,6 +58,27 @@ export function overallScore(categories: { score: number }[]): number {
   return Math.round(sum / categories.length);
 }
 
+/**
+ * Whether a displayed evaluation is STALE — i.e. it was computed from text that
+ * no longer matches the draft's current content, so its score must not be shown
+ * as the current essay's score. Leading/trailing whitespace is ignored because
+ * the scorer trims the draft before grading (see buildEssayBlock in the
+ * evaluation engine), so it cannot change the score. When the scored text is
+ * unknown (`scoredContent` null/undefined) — e.g. a score loaded from the server
+ * that hasn't been edited this session — the score is treated as current until
+ * the draft is actually edited.
+ */
+export function isEvaluationStale(params: {
+  hasEvaluation: boolean;
+  scoredContent: string | null | undefined;
+  currentContent: string;
+}): boolean {
+  const { hasEvaluation, scoredContent, currentContent } = params;
+  if (!hasEvaluation) return false;
+  if (scoredContent == null) return false;
+  return scoredContent.trim() !== currentContent.trim();
+}
+
 /** A qualitative band for a 0–100 score (display only). */
 export function scoreBand(score: number): string {
   if (score >= 90) return "Exceptional";
