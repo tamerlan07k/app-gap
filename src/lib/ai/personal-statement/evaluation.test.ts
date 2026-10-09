@@ -22,6 +22,7 @@ import {
   buildContextBlock,
   buildEssayBlock,
   buildPrompt,
+  evaluationSchema,
   generateEvaluation,
   SYSTEM_PROMPT,
 } from "./evaluation";
@@ -249,5 +250,105 @@ describe("generateEvaluation still returns a parsed evaluation", () => {
     const call = generateTextMock.mock.calls[0][0];
     expect(call.temperature).toBe(0);
     expect(call.model).toEqual({ id: "anthropic/claude-opus-5" });
+  });
+});
+
+// ─── strengths/improvements cap no longer fails the whole evaluation ──────────
+// Root cause of the observed scoring crash: `strengths`/`improvements` were
+// `z.array(z.string()).max(3)`, so a model response with 4+ valid items threw a
+// Zod error and failed the entire scoring call. The fix trims extras to the
+// first three instead of rejecting. These tests lock that in at 3, 4, and a
+// large response, and confirm the numeric scores are untouched.
+
+/** Build one category with `n` strengths and `n` improvements. */
+function categoryWith(key: string, score: number, n: number) {
+  return {
+    key,
+    score,
+    summary: "s",
+    strengths: Array.from({ length: n }, (_, i) => `strength ${i + 1}`),
+    improvements: Array.from({ length: n }, (_, i) => `improvement ${i + 1}`),
+  };
+}
+
+describe("strengths/improvements are capped, not rejected", () => {
+  it("keeps all three when exactly three are returned", () => {
+    const parsed = evaluationSchema.parse({
+      overview: "o",
+      categories: [categoryWith("voice", 70, 3)],
+    });
+    expect(parsed.categories[0].strengths).toHaveLength(3);
+    expect(parsed.categories[0].improvements).toHaveLength(3);
+    // Order is preserved (the first three).
+    expect(parsed.categories[0].improvements).toEqual([
+      "improvement 1",
+      "improvement 2",
+      "improvement 3",
+    ]);
+  });
+
+  it("does not throw on four items — it keeps the first three", () => {
+    expect(() =>
+      evaluationSchema.parse({
+        overview: "o",
+        categories: [categoryWith("voice", 70, 4)],
+      }),
+    ).not.toThrow();
+
+    const parsed = evaluationSchema.parse({
+      overview: "o",
+      categories: [categoryWith("voice", 70, 4)],
+    });
+    expect(parsed.categories[0].strengths).toEqual([
+      "strength 1",
+      "strength 2",
+      "strength 3",
+    ]);
+    expect(parsed.categories[0].improvements).toHaveLength(3);
+  });
+
+  it("caps a maximum-size response (4 categories × many items) without failing", () => {
+    const parsed = evaluationSchema.parse({
+      overview: "o",
+      categories: [
+        categoryWith("voice", 70, 10),
+        categoryWith("depth", 60, 10),
+        categoryWith("storytelling", 80, 10),
+        categoryWith("creativity", 65, 10),
+      ],
+    });
+    expect(parsed.categories).toHaveLength(4);
+    for (const c of parsed.categories) {
+      expect(c.strengths).toHaveLength(3);
+      expect(c.improvements).toHaveLength(3);
+    }
+    // The scoring math is unaffected by the display-list trimming.
+    expect(overallScore(parsed.categories)).toBe(69); // (70+60+80+65)/4 → 69
+  });
+
+  it("generateEvaluation no longer crashes when the model returns four improvements", async () => {
+    generateTextMock.mockResolvedValueOnce({
+      text: JSON.stringify({
+        overview: "o",
+        categories: [
+          categoryWith("voice", 70, 4),
+          categoryWith("depth", 60, 4),
+          categoryWith("storytelling", 80, 4),
+          categoryWith("creativity", 65, 4),
+        ],
+      }),
+      usage: { inputTokens: 100, outputTokens: 50 },
+    });
+
+    const { evaluation } = await generateEvaluation(
+      ESSAY,
+      PROMPT_TEXT,
+      profileNoSoccer,
+    );
+    expect(evaluation.categories).toHaveLength(4);
+    for (const c of evaluation.categories) {
+      expect(c.strengths).toHaveLength(3);
+      expect(c.improvements).toHaveLength(3);
+    }
   });
 });

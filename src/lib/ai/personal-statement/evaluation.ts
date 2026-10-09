@@ -16,13 +16,21 @@ import { ESSAY_SCORING_LENSES } from "./lenses";
 
 // ─── Output contract ─────────────────────────────────────────────────────────
 
+// Display lists are shown at most three at a time. The model occasionally
+// returns a fourth (or more) valid item; a hard `.max(3)` rejected the whole
+// response and failed the entire scoring call (observed: one eval threw on 4
+// improvements). Keep the first three and drop the extras instead of failing —
+// the cap is a display limit, not a correctness constraint, and the four
+// numeric scores (the only scoring input) are untouched.
+const cappedList = z.array(z.string()).transform((items) => items.slice(0, 3));
+
 const categorySchema = z.object({
   key: z.enum(["voice", "depth", "storytelling", "creativity"]),
   score: z.number().int().min(0).max(100),
   // One line explaining why this score.
   summary: z.string(),
-  strengths: z.array(z.string()).max(3),
-  improvements: z.array(z.string()).max(3),
+  strengths: cappedList,
+  improvements: cappedList,
 });
 
 export type EvaluationCategory = z.infer<typeof categorySchema>;
