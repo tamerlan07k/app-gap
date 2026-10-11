@@ -292,6 +292,12 @@ function Footer() {
               Terms of Service
             </Link>
             <Link
+              href="/partners"
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Partners
+            </Link>
+            <Link
               href="/contact"
               className="text-xs text-muted-foreground transition-colors hover:text-foreground"
             >

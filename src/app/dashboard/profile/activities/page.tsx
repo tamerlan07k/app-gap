@@ -1,6 +1,10 @@
 import { loadVerifiedOpportunities } from "~/lib/activities/db";
 import { computeTimeline, timeRemainingLabel } from "~/lib/activities/timeline";
 import { activitiesAnalysisSchema } from "~/lib/ai/activities-schema";
+import {
+  atlasGradeFromLevel,
+  atlasInterestsForDirection,
+} from "~/lib/atlas/interests";
 import { createClient } from "~/lib/supabase/server";
 import { ActivitiesWorkspace } from "./activities-workspace";
 import type { EditableActivity } from "./activity-form";
@@ -28,7 +32,7 @@ export default async function ActivitiesPage() {
       .order("sort_order"),
     supabase
       .from("profiles")
-      .select("grade_level, major_category")
+      .select("grade_level, major_category, academic_major")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -67,9 +71,21 @@ export default async function ActivitiesPage() {
   const profile = profileRes.data as {
     grade_level: string | null;
     major_category: string | null;
+    academic_major: string | null;
   } | null;
   const gradeLevel = profile?.grade_level ?? "";
   const fieldKey = profile?.major_category ?? null;
+
+  // Atlas of Opportunity deep-link inputs. We send ONLY grade + interests (AppGap
+  // doesn't collect the student's state, so it's omitted — never an invalid value).
+  const atlas = {
+    grade: atlasGradeFromLevel(gradeLevel),
+    state: null,
+    interests: atlasInterestsForDirection({
+      academicMajor: profile?.academic_major ?? null,
+      fieldKey,
+    }),
+  };
 
   // Deterministic timeline (grade + calendar) — the AI is told this, not asked.
   const timeline = computeTimeline(gradeLevel, new Date());
@@ -110,6 +126,7 @@ export default async function ActivitiesPage() {
       initialAnalysis={initialAnalysis}
       initialAnalyzedAt={initialAnalyzedAt}
       verifiedOpportunities={verifiedOpportunities}
+      atlas={atlas}
     />
   );
 }

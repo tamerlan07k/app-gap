@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ExploreOpportunitiesButton } from "~/components/explore-opportunities-button";
 import { Button } from "~/components/ui/button";
 import type { VerifiedOpportunity } from "~/lib/activities/db";
 import type {
@@ -53,12 +54,19 @@ export function ActivitiesWorkspace({
   initialAnalysis,
   initialAnalyzedAt,
   verifiedOpportunities,
+  atlas,
 }: {
   activities: EditableActivity[];
   timeline: WorkspaceTimeline;
   initialAnalysis: ActivitiesAnalysis | null;
   initialAnalyzedAt: string | null;
   verifiedOpportunities: VerifiedOpportunity[];
+  /** Pre-resolved Atlas of Opportunity deep-link inputs (grade/state/interests). */
+  atlas: {
+    grade: number | null;
+    state: string | null;
+    interests: string[];
+  };
 }) {
   const [analysis, setAnalysis] = useState<ActivitiesAnalysis | null>(
     initialAnalysis,
@@ -265,6 +273,25 @@ export function ActivitiesWorkspace({
           )}
         </div>
       )}
+
+      {/* Explore more — Atlas of Opportunity (external, public, no sign-in) */}
+      <div className="flex flex-col gap-3 rounded-2xl border border-brand-teal/30 bg-brand-teal/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-0.5">
+          <p className="text-sm font-medium">
+            Looking for something new to get involved in?
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Browse Atlas of Opportunity's public finder — programs,
+            competitions, and research pre-filtered to your grade and intended
+            field. No sign-in or account needed.
+          </p>
+        </div>
+        <ExploreOpportunitiesButton
+          grade={atlas.grade}
+          state={atlas.state}
+          interests={atlas.interests}
+        />
+      </div>
 
       {/* What Should I Do Next */}
       {analysis &&

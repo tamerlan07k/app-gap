@@ -1,4 +1,8 @@
 import { recognitionAnalysisSchema } from "~/lib/ai/awards-schema";
+import {
+  atlasGradeFromLevel,
+  atlasInterestsForDirection,
+} from "~/lib/atlas/interests";
 import { loadAwards, loadOpportunities } from "~/lib/awards/db";
 import { rankOpportunities } from "~/lib/awards/opportunities";
 import { buildRecognitionProfile } from "~/lib/awards/recognition";
@@ -26,7 +30,7 @@ export default async function AwardsPage() {
     loadOpportunities(supabase),
     supabase
       .from("profiles")
-      .select("grade_level, major_category")
+      .select("grade_level, major_category, academic_major")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -41,9 +45,21 @@ export default async function AwardsPage() {
   const profile = profileRes.data as {
     grade_level: string | null;
     major_category: string | null;
+    academic_major: string | null;
   } | null;
   const gradeLevel = profile?.grade_level ?? null;
   const fieldKey = profile?.major_category || null;
+
+  // Atlas of Opportunity deep-link inputs. We send ONLY grade + interests (AppGap
+  // doesn't collect the student's state, so it's omitted — never an invalid value).
+  const atlas = {
+    grade: atlasGradeFromLevel(gradeLevel),
+    state: null,
+    interests: atlasInterestsForDirection({
+      academicMajor: profile?.academic_major ?? null,
+      fieldKey,
+    }),
+  };
 
   const recognition = buildRecognitionProfile({ awards, fieldKey });
 
@@ -80,6 +96,7 @@ export default async function AwardsPage() {
       fits={fits}
       initialAnalysis={initialAnalysis}
       initialAnalyzedAt={initialAnalyzedAt}
+      atlas={atlas}
     />
   );
 }
