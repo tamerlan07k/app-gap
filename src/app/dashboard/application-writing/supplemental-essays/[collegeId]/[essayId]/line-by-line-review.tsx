@@ -13,7 +13,7 @@ import { cn } from "~/lib/utils";
 // whose quote can't be located, and "directive_missing" comments (no quote by
 // design), are still listed. Adapts the Personal Statement reviewer's approach.
 
-type Tone = "good" | "warn" | "bad";
+type Tone = "good" | "warn" | "bad" | "add";
 
 const CATEGORY_META: Record<LineByLineCategory, { label: string; tone: Tone }> =
   {
@@ -27,6 +27,7 @@ const CATEGORY_META: Record<LineByLineCategory, { label: string; tone: Tone }> =
     missing_explanation: { label: "Missing explanation", tone: "warn" },
     unsupported_claim: { label: "Unsupported claim", tone: "warn" },
     repetitive: { label: "Repetitive", tone: "warn" },
+    add: { label: "Add", tone: "add" },
     superficial_namedrop: { label: "Superficial name-drop", tone: "bad" },
     directive_missing: { label: "Prompt directive missing", tone: "bad" },
   };
@@ -35,12 +36,14 @@ const TONE_DOT: Record<Tone, string> = {
   good: "bg-brand-teal",
   warn: "bg-amber-500",
   bad: "bg-red-500 dark:bg-red-400",
+  add: "bg-blue-500 dark:bg-blue-400",
 };
 
 const TONE_HL: Record<Tone, string> = {
   good: "bg-brand-teal/15",
   warn: "bg-amber-500/15",
   bad: "bg-red-500/15",
+  add: "bg-blue-500/15",
 };
 
 type Segment = { text: string; tone: Tone | null };
@@ -161,7 +164,7 @@ export function LineByLineReview({
               {c.suggestion && (
                 <p className="mt-1 text-sm text-muted-foreground">
                   <span className="font-medium text-foreground">
-                    Consider:{" "}
+                    {c.category === "add" ? "Add: " : "Consider: "}
                   </span>
                   {c.suggestion}
                 </p>
