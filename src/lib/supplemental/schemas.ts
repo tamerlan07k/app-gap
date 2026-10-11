@@ -92,6 +92,7 @@ export const LBL_CATEGORIES = [
   "missing_explanation",
   "repetitive",
   "unsupported_claim",
+  "add",
   "strong_college_connection",
   "superficial_namedrop",
   "directive_missing",

@@ -4,6 +4,7 @@ import {
   lineByLineSchema,
   type PromptParse,
 } from "~/lib/supplemental/schemas";
+import { countWords } from "~/lib/supplemental/text";
 import { gateway } from "../client";
 import { AI_FEATURES } from "../config";
 import { SUPPLEMENT_COACH_BOUNDARIES } from "./boundaries";
@@ -12,7 +13,9 @@ import { SUPPLEMENT_COACH_BOUNDARIES } from "./boundaries";
 // tuned for supplements. Each comment carries a VERBATIM quote so the Review view
 // can highlight the exact span (Google-Docs style). It never rewrites the prose.
 // Runs on Opus. The one exception to the verbatim-quote rule is "directive_missing"
-// — something ABSENT has no text to quote, so its quote may be empty.
+// — something ABSENT has no text to quote, so its quote may be empty. "add" marks
+// a specific beat worth adding and anchors its quote to the sentence it attaches
+// to; additions are budgeted against the prompt's word limit.
 
 const CATEGORY_BLOCK = `- **strong_evidence** (🟢): a concrete experience, precise detail, specific decision, or real observation that backs a claim. Explain why it works.
 - **strong_reflection** (🟢): genuine thinking — why something mattered, what changed, what they noticed, earned uncertainty. Explain why it works.
@@ -21,6 +24,7 @@ const CATEGORY_BLOCK = `- **strong_evidence** (🟢): a concrete experience, pre
 - **missing_explanation** (🟠): a claim, event, or feeling stated but not explained — the "why", the "so what", or the thinking is absent.
 - **unsupported_claim** (🟠): a trait or accomplishment asserted without evidence ("I'm a natural leader"). Ask what they actually did.
 - **repetitive** (🟠): repeats something earlier in the essay, or (if flagged) the rest of the application, adding nothing new here.
+- **add** (🔵): something SPECIFIC to THIS essay is missing and adding it would strengthen the answer — a concrete example the prompt is begging for, the thinking behind a decision, the "so what", or (Why-Us) a real detail about the student that would turn a name-drop into a genuine connection. This is NOT a prompt directive left unanswered (that is "directive_missing"); it is a beat the essay would be stronger for including. Anchor the quote to the sentence the addition attaches to. Give what is missing, why it would help, the KIND of thing to add, and a question whose honest answer gives the student the material. NEVER a generic "add more detail" note that fits any essay, and NEVER invent the content yourself.
 - **superficial_namedrop** (🔴, Why-Us): a college resource, professor, or program named only to impress, with no real connection to the student. Distinguish from a genuine connection.
 - **directive_missing** (🔴): an explicit directive of the prompt the essay never answers. Quote may be empty; say which directive is unaddressed.`;
 
@@ -34,6 +38,7 @@ ${CATEGORY_BLOCK}
 ## Rules
 - Point to real, specific passages. Comment on what matters — a focused set (roughly 8–20 marks), not every sentence.
 - Always include some 🟢 STRONG marks when anything works — students learn from what to keep, not only what to fix.
+- Additions are not free: supplements have tight word limits. The essay's current length and limit are given below. When the essay is at or over its limit, don't pile on 🔵 add marks — lead with cuts (repetitive/generic telling) and only suggest an addition your own cuts make room for, so following all your marks keeps the essay within its limit. Fewer, higher-value additions beat many.
 - Distinguish claiming a trait from demonstrating it; when claimed, ask for the evidence.
 - Do not force sensory detail everywhere, do not impose a structure, and do not push toward a generic prestigious-admissions style. Don't flag humor, lists, dialogue, or unconventional formats as problems unless they're an empty gimmick.
 - Never rewrite, and never invent content the student didn't write or college facts you weren't given.
@@ -72,6 +77,23 @@ function buildPrompt(
   lines.push('"""');
   lines.push(content.trim() || "(the essay is empty)");
   lines.push('"""');
+  lines.push("");
+
+  const words = countWords(content);
+  if (parse.wordLimit && parse.wordLimit > 0) {
+    const headroom = parse.wordLimit - words;
+    lines.push(
+      `# Current length: ${words} words (limit ${parse.wordLimit}) — ${
+        headroom > 0
+          ? `about ${headroom} words of headroom for additions`
+          : `${-headroom} words OVER the limit: additions must be paid for with cuts`
+      }`,
+    );
+  } else {
+    lines.push(
+      `# Current length: ${words} words (no stated limit on this prompt)`,
+    );
+  }
   lines.push("");
 
   lines.push(

@@ -43,6 +43,14 @@ const CATEGORY: Record<
     text: "text-amber-700 dark:text-amber-400",
     chip: "bg-amber-500/10",
   },
+  add: {
+    label: "Add",
+    dot: "🔵",
+    mark: "bg-blue-500/15 hover:bg-blue-500/30",
+    border: "border-blue-500/40",
+    text: "text-blue-600 dark:text-blue-400",
+    chip: "bg-blue-500/10",
+  },
   strong: {
     label: "Strong",
     dot: "🟢",
@@ -141,7 +149,7 @@ export function LineByLineReview({
     });
   }
 
-  const counts = { remove: 0, rewrite: 0, strong: 0 };
+  const counts = { remove: 0, rewrite: 0, add: 0, strong: 0 };
   for (const c of analysis?.comments ?? []) counts[c.category]++;
 
   const header = (
@@ -152,7 +160,8 @@ export function LineByLineReview({
         </p>
         {analysis && (
           <span className="text-xs text-muted-foreground">
-            🔴 {counts.remove} · 🟠 {counts.rewrite} · 🟢 {counts.strong}
+            🔴 {counts.remove} · 🟠 {counts.rewrite} · 🔵 {counts.add} · 🟢{" "}
+            {counts.strong}
           </span>
         )}
       </div>
@@ -284,7 +293,9 @@ export function LineByLineReview({
             )}
             {c.suggestion && (
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                <span className="font-medium text-foreground">Try:</span>{" "}
+                <span className="font-medium text-foreground">
+                  {c.category === "add" ? "Add:" : "Try:"}
+                </span>{" "}
                 {c.suggestion}
               </p>
             )}
@@ -302,8 +313,8 @@ export function LineByLineReview({
   const body = !analysis ? (
     <p className="text-sm leading-relaxed text-muted-foreground">
       Get margin notes on your draft — the coach highlights specific passages as
-      🔴 remove, 🟠 rewrite, or 🟢 strong, and explains each one. It won't
-      rewrite your essay; click a highlight to read its note.
+      🔴 remove, 🟠 rewrite, 🔵 add, or 🟢 strong, and explains each one. It
+      won't rewrite your essay; click a highlight to read its note.
       {content.trim() ? "" : " Write some of your draft first."}
     </p>
   ) : (
