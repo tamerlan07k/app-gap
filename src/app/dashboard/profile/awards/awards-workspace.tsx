@@ -1,14 +1,8 @@
 "use client";
 
-import {
-  Award,
-  Compass,
-  Loader2,
-  Lock,
-  RefreshCw,
-  Sparkles,
-} from "lucide-react";
+import { Award, Compass, Loader2, RefreshCw, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { ExploreOpportunitiesButton } from "~/components/explore-opportunities-button";
 import { Button } from "~/components/ui/button";
 import type { RecognitionAnalysis } from "~/lib/ai/awards-schema";
 import type {
@@ -18,29 +12,30 @@ import type {
 } from "~/lib/awards/types";
 import { cn } from "~/lib/utils";
 import { OpportunityExperiment } from "./opportunity-experiment";
+import { OpportunityFinder } from "./opportunity-finder";
 import { RecognitionMap } from "./recognition-map";
-
-// The Opportunity Finder is built (deterministic ranking + verified catalog) but
-// intentionally LOCKED behind a "Coming soon" state for now. The `fits` prop is
-// still computed and passed by the page so re-enabling is a one-line swap: restore
-// the OpportunityFinder import and render `<OpportunityFinder fits={fits} />` in the
-// finder branch below, and drop `FINDER_LOCKED`.
-const FINDER_LOCKED = true;
 
 type Tab = "recognition" | "finder";
 
 export function AwardsWorkspace({
   awards,
   recognition,
+  fits,
   initialAnalysis,
   initialAnalyzedAt,
+  atlas,
 }: {
   awards: AwardRecord[];
   recognition: RecognitionProfile;
-  /** Still computed + passed for when the Finder is unlocked (see FINDER_LOCKED). */
   fits: OpportunityFit[];
   initialAnalysis: RecognitionAnalysis | null;
   initialAnalyzedAt: string | null;
+  /** Pre-resolved Atlas of Opportunity deep-link inputs (grade/state/interests). */
+  atlas: {
+    grade: number | null;
+    state: string | null;
+    interests: string[];
+  };
 }) {
   const [tab, setTab] = useState<Tab>("recognition");
   const [analysis, setAnalysis] = useState<RecognitionAnalysis | null>(
@@ -83,7 +78,6 @@ export function AwardsWorkspace({
     key: Tab;
     label: string;
     icon: React.ReactNode;
-    locked?: boolean;
   }[] = [
     {
       key: "recognition",
@@ -94,7 +88,6 @@ export function AwardsWorkspace({
       key: "finder",
       label: "Opportunity Finder",
       icon: <Compass className="size-4" />,
-      locked: FINDER_LOCKED,
     },
   ];
 
@@ -141,9 +134,6 @@ export function AwardsWorkspace({
             >
               {t.icon}
               {t.label}
-              {t.locked && (
-                <Lock className="size-3 opacity-60" aria-hidden={true} />
-              )}
             </button>
           );
         })}
@@ -188,32 +178,27 @@ export function AwardsWorkspace({
           />
         </>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-              Opportunity Finder
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-4 px-6 py-16 text-center">
-            <div className="flex size-12 items-center justify-center rounded-2xl bg-muted">
-              <Lock
-                className="size-6 text-muted-foreground"
-                aria-hidden={true}
-              />
-            </div>
-            <div className="max-w-md space-y-1.5">
-              <p className="text-base font-semibold">Coming soon</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                A curated, date-aware list of competitions, research,
-                fellowships, and other opportunities — ranked for your
-                recognition gaps and your intended field. In the meantime, use{" "}
-                <span className="font-medium text-foreground">
-                  Test an Opportunity
-                </span>{" "}
-                above to check whether a specific one is worth pursuing.
+        <div className="space-y-4">
+          {/* Atlas of Opportunity — explore a much larger external catalog,
+              pre-filtered to the student's grade + interests. No sign-in needed. */}
+          <div className="flex flex-col gap-3 rounded-2xl border border-brand-teal/30 bg-brand-teal/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium">
+                Explore more on Atlas of Opportunity
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Open Atlas's public opportunity finder, pre-filtered to your
+                grade and intended field. No sign-in or account needed.
               </p>
             </div>
+            <ExploreOpportunitiesButton
+              grade={atlas.grade}
+              state={atlas.state}
+              interests={atlas.interests}
+            />
           </div>
+
+          <OpportunityFinder fits={fits} />
         </div>
       )}
     </div>
