@@ -62,6 +62,8 @@ export default async function RoadmapsPage() {
   // (hide the generate action) if usage can't be verified.
   const entitlement = resolveEntitlement(
     profileRes.data as EntitlementProfile | null,
+    new Date(),
+    user.email,
   );
   const tier = entitlement.tier;
   const allowance = await checkFeatureAllowance(
@@ -69,6 +71,8 @@ export default async function RoadmapsPage() {
     user.id,
     "profileAnalysis",
     tier,
+    undefined,
+    entitlement.unlimited,
   ).catch(() => null);
   const canGenerate = allowance?.allowed ?? false;
 

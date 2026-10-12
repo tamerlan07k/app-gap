@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import type { EntitlementSource } from "~/lib/entitlement";
 import { cn } from "~/lib/utils";
 import {
   assignSubscription,
@@ -24,7 +25,7 @@ export interface BillingUser {
   email: string;
   joinedAt: string;
   effectiveTier: "free" | "pro";
-  source: "admin_override" | "stripe";
+  source: EntitlementSource;
   status: string | null;
   expiresAt: string | null;
   stripeCustomerId: string | null;

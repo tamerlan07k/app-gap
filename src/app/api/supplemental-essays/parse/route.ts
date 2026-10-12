@@ -11,7 +11,7 @@ import { extractWordLimit } from "~/lib/supplemental/text";
 export async function POST(req: Request) {
   const auth = await authorizeEssayRequest(req, "supplementalCoach");
   if ("response" in auth) return auth.response;
-  const { userId, admin, essay, tier, model } = auth.context;
+  const { userId, admin, essay, tier, unlimited, model } = auth.context;
 
   const detected = essay.word_limit ?? extractWordLimit(essay.prompt_text);
 
@@ -22,7 +22,9 @@ export async function POST(req: Request) {
       model,
     );
 
-    await recordFeatureUsage(admin, userId, "supplementalCoach", tier);
+    if (!unlimited) {
+      await recordFeatureUsage(admin, userId, "supplementalCoach", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("supplemental_essay_analyses")

@@ -54,6 +54,8 @@ export default async function PersonalStatementPage() {
 
   const entitlement = resolveEntitlement(
     profileRow as EntitlementProfile | null,
+    new Date(),
+    user.email,
   );
   const access = resolveFeatureAccess(
     "personalStatementCoach",

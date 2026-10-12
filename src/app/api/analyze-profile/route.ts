@@ -47,7 +47,11 @@ export async function POST() {
   // lapsed admin override first, then resolve with priority: active admin override
   // > Stripe > free (an expired override is treated as inactive by the resolver).
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   // Feature-based access check BEFORE any AI request. The diagnostic is a lifetime
@@ -61,6 +65,8 @@ export async function POST() {
       user.id,
       "profileAnalysis",
       tier,
+      undefined,
+      entitlement.unlimited,
     );
   } catch (err) {
     // Fail closed: if we can't verify usage we must NOT allow a free generation.
@@ -96,7 +102,9 @@ export async function POST() {
     // This is the authoritative allowance record, decoupled from the ai_analyses
     // row: even if the analysis insert below fails, or the user later deletes the
     // saved analysis, this use still counts against their allowance.
-    await recordFeatureUsage(admin, user.id, "profileAnalysis", tier);
+    if (!entitlement.unlimited) {
+      await recordFeatureUsage(admin, user.id, "profileAnalysis", tier);
+    }
 
     // Persist the analysis; errors here are non-fatal — we return the result either way
     const { data: insertData, error: insertError } = await admin

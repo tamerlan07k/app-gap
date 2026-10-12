@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     requireContent: true,
   });
   if ("response" in auth) return auth.response;
-  const { userId, admin, essay, profile, tier, model } = auth.context;
+  const { userId, admin, essay, profile, tier, unlimited, model } =
+    auth.context;
 
   // Personal Statement — prefer a finalized version, else the current draft.
   let personalStatement: string | null = null;
@@ -73,7 +74,9 @@ export async function POST(req: Request) {
     const { analysis, promptTokens, completionTokens } =
       await generateRedundancy(essay.content, essay.prompt_text, ctx, model);
 
-    await recordFeatureUsage(admin, userId, "supplementalCoach", tier);
+    if (!unlimited) {
+      await recordFeatureUsage(admin, userId, "supplementalCoach", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("supplemental_essay_analyses")

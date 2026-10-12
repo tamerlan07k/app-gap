@@ -16,8 +16,16 @@ export async function POST(req: Request) {
     requireContent: true,
   });
   if ("response" in auth) return auth.response;
-  const { userId, admin, essay, collegeName, fieldKey, tier, model } =
-    auth.context;
+  const {
+    userId,
+    admin,
+    essay,
+    collegeName,
+    fieldKey,
+    tier,
+    unlimited,
+    model,
+  } = auth.context;
 
   // The evaluation needs the parsed directives + archetype.
   const { data: parseRow } = await admin
@@ -47,7 +55,9 @@ export async function POST(req: Request) {
         model,
       );
 
-    await recordFeatureUsage(admin, userId, "supplementalDeepCoach", tier);
+    if (!unlimited) {
+      await recordFeatureUsage(admin, userId, "supplementalDeepCoach", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("supplemental_essay_analyses")

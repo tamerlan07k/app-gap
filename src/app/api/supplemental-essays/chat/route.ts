@@ -36,8 +36,16 @@ export async function POST(req: Request) {
 
   const auth = await authorizeEssayRequest(req, "supplementalChat");
   if ("response" in auth) return auth.response;
-  const { userId, admin, essay, collegeName, fieldKey, tier, model } =
-    auth.context;
+  const {
+    userId,
+    admin,
+    essay,
+    collegeName,
+    fieldKey,
+    tier,
+    unlimited,
+    model,
+  } = auth.context;
 
   const verified = await loadVerifiedCollege(admin, essay.college_id, fieldKey);
 
@@ -73,7 +81,9 @@ export async function POST(req: Request) {
       -MAX_STORED_MESSAGES,
     );
 
-    await recordFeatureUsage(admin, userId, "supplementalChat", tier);
+    if (!unlimited) {
+      await recordFeatureUsage(admin, userId, "supplementalChat", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("supplemental_essay_chats")

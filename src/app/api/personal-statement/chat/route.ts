@@ -94,7 +94,11 @@ export async function POST(req: Request) {
   const { profileRow, profile } = loaded;
 
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
@@ -104,6 +108,8 @@ export async function POST(req: Request) {
       user.id,
       "personalStatementChat",
       tier,
+      undefined,
+      entitlement.unlimited,
     );
   } catch (err) {
     console.error(
@@ -161,7 +167,9 @@ export async function POST(req: Request) {
       -MAX_STORED,
     );
 
-    await recordFeatureUsage(admin, user.id, "personalStatementChat", tier);
+    if (!entitlement.unlimited) {
+      await recordFeatureUsage(admin, user.id, "personalStatementChat", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("personal_statement_chats")

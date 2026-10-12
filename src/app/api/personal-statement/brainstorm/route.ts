@@ -44,7 +44,11 @@ export async function POST() {
   const { profileRow, profile } = loaded;
 
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
@@ -54,6 +58,8 @@ export async function POST() {
       user.id,
       "personalStatementCoach",
       tier,
+      undefined,
+      entitlement.unlimited,
     );
   } catch (err) {
     console.error(
@@ -110,7 +116,9 @@ export async function POST() {
       await generateBrainstorm(inputs, profile, model);
 
     // Ledger first — authoritative, decoupled from the cache write below.
-    await recordFeatureUsage(admin, user.id, "personalStatementCoach", tier);
+    if (!entitlement.unlimited) {
+      await recordFeatureUsage(admin, user.id, "personalStatementCoach", tier);
+    }
 
     const { error: upsertError } = await admin
       .from("personal_statement_brainstorms")
