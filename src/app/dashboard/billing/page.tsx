@@ -39,7 +39,11 @@ export default async function BillingPage() {
     await reconcileExpiredOverride(admin, profile as EntitlementProfile);
   }
 
-  const entitlement = resolveEntitlement(profile as EntitlementProfile | null);
+  const entitlement = resolveEntitlement(
+    profile as EntitlementProfile | null,
+    new Date(),
+    user.email,
+  );
   const isPro = isProEntitled(entitlement);
 
   const { data: notifications } = await admin

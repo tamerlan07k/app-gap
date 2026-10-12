@@ -29,6 +29,8 @@ export async function resolveSupplementalGate(): Promise<SupplementalGate | null
 
   const entitlement = resolveEntitlement(
     profileRow as EntitlementProfile | null,
+    new Date(),
+    user.email,
   );
   const access = resolveFeatureAccess("supplementalCoach", entitlement.tier);
   return { userId: user.id, enabled: access.enabled };

@@ -61,12 +61,16 @@ export default async function RoadmapResultPage({
   // so deleting an analysis never re-enables regeneration. Fail closed on error.
   const entitlement = resolveEntitlement(
     profileRes.data as EntitlementProfile | null,
+    new Date(),
+    user.email,
   );
   const allowance = await checkFeatureAllowance(
     supabase,
     user.id,
     "profileAnalysis",
     entitlement.tier,
+    undefined,
+    entitlement.unlimited,
   ).catch(() => null);
   const canGenerate = allowance?.allowed ?? false;
 

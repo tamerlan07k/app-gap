@@ -6,10 +6,11 @@
 // Server-only: reconcileExpiredOverride talks to Stripe and the service-role DB.
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isAdmin } from "~/lib/is-admin";
 import { stripe } from "~/lib/stripe";
 
 export type Tier = "free" | "pro";
-export type EntitlementSource = "admin_override" | "stripe";
+export type EntitlementSource = "admin_override" | "stripe" | "admin";
 
 /** The subset of `profiles` columns entitlement logic reads. */
 export interface EntitlementProfile {
@@ -42,6 +43,12 @@ export interface Entitlement {
    * instead of renewing. Always false for admin overrides.
    */
   cancelAtPeriodEnd: boolean;
+  /**
+   * True for the hardcoded admin account (see `~/lib/is-admin`): every feature is
+   * unlocked with no usage cap. Only ever true for that one email — all other
+   * free and pro accounts resolve this to false and keep their normal limits.
+   */
+  unlimited: boolean;
 }
 
 function toTier(value: string | null | undefined): Tier {
@@ -64,11 +71,29 @@ export function isOverrideActive(
 /**
  * Pure resolver — no side effects. An expired-but-not-yet-reconciled override is
  * treated as inactive, so display is correct even before reconciliation writes.
+ *
+ * When `email` belongs to the admin account, the resolver short-circuits to an
+ * unlimited Pro entitlement regardless of Stripe or override state. This is the
+ * single place that grants the admin account its no-limit access; pass `email`
+ * at any gate (enforcement or UI) that should honor it.
  */
 export function resolveEntitlement(
   profile: EntitlementProfile | null | undefined,
   now: Date = new Date(),
+  email?: string | null,
 ): Entitlement {
+  if (isAdmin(email)) {
+    return {
+      tier: "pro",
+      status: "active",
+      expiresAt: null,
+      source: "admin",
+      isAdminOverride: false,
+      cancelAtPeriodEnd: false,
+      unlimited: true,
+    };
+  }
+
   if (profile && isOverrideActive(profile, now)) {
     return {
       tier: toTier(profile.admin_override_tier),
@@ -77,6 +102,7 @@ export function resolveEntitlement(
       source: "admin_override",
       isAdminOverride: true,
       cancelAtPeriodEnd: false,
+      unlimited: false,
     };
   }
 
@@ -87,6 +113,7 @@ export function resolveEntitlement(
     source: "stripe",
     isAdminOverride: false,
     cancelAtPeriodEnd: profile?.cancel_at_period_end ?? false,
+    unlimited: false,
   };
 }
 

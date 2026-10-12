@@ -46,7 +46,11 @@ export async function POST() {
   const { profileRow, profile } = loaded;
 
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
@@ -56,6 +60,8 @@ export async function POST() {
       user.id,
       "awardsRecognition",
       tier,
+      undefined,
+      entitlement.unlimited,
     );
   } catch (err) {
     console.error(
@@ -92,7 +98,9 @@ export async function POST() {
     });
 
     // Record the consumed use in the append-only ledger FIRST.
-    await recordFeatureUsage(admin, user.id, "awardsRecognition", tier);
+    if (!entitlement.unlimited) {
+      await recordFeatureUsage(admin, user.id, "awardsRecognition", tier);
+    }
 
     // Cache the interpretation as the user's single latest analysis. Non-fatal.
     const { error: insertError } = await admin

@@ -97,6 +97,10 @@ export type Allowance = {
  * The central entitlement check. Resolves the feature's access rule for the tier,
  * then compares recorded usage against the limit. Call this BEFORE any AI request.
  * Throws only if the usage count fails (caller should fail closed).
+ *
+ * `unlimited` (true only for the admin account — see `resolveEntitlement`) forces
+ * the feature enabled with no cap and never touches the usage ledger. Every other
+ * free and pro account leaves this false and is metered exactly as before.
  */
 export async function checkFeatureAllowance(
   client: SupabaseClient,
@@ -104,8 +108,21 @@ export async function checkFeatureAllowance(
   feature: FeatureKey,
   tier: TierKey,
   now: Date = new Date(),
+  unlimited = false,
 ): Promise<Allowance> {
   const access = resolveFeatureAccess(feature, tier);
+
+  // Admin account: every feature unlocked, no limit, no ledger read.
+  if (unlimited) {
+    return {
+      allowed: true,
+      enabled: true,
+      limit: null,
+      used: 0,
+      window: access.window,
+      model: access.model,
+    };
+  }
 
   if (!access.enabled) {
     return {

@@ -45,7 +45,11 @@ export async function POST() {
   // Effective tier: reconcile a lapsed admin override, then resolve with
   // priority active-override > Stripe > free.
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   // Feature-based access check BEFORE any AI request.
@@ -56,6 +60,8 @@ export async function POST() {
       user.id,
       "activitiesAnalysis",
       tier,
+      undefined,
+      entitlement.unlimited,
     );
   } catch (err) {
     // Fail closed: if we can't verify usage we must NOT allow a free generation.
@@ -84,7 +90,9 @@ export async function POST() {
 
     // Record the consumed use in the append-only ledger FIRST — authoritative,
     // decoupled from the cached row below.
-    await recordFeatureUsage(admin, user.id, "activitiesAnalysis", tier);
+    if (!entitlement.unlimited) {
+      await recordFeatureUsage(admin, user.id, "activitiesAnalysis", tier);
+    }
 
     // Cache the result as the user's single latest analysis (upsert on user_id;
     // one row per user — see migration 20260817120000). Non-fatal on failure.

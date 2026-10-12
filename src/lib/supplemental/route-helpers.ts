@@ -41,6 +41,8 @@ export type AuthorizedContext = {
   profile: FullProfile;
   profileRow: EntitlementProfile;
   tier: TierKey;
+  /** True for the admin account — unlimited, unmetered (see resolveEntitlement). */
+  unlimited: boolean;
   /** The model to use for this feature/tier. */
   model: string;
 };
@@ -136,12 +138,23 @@ export async function authorizeEssayRequest(
   const fieldKey = profile.majorCategory || null;
 
   await reconcileExpiredOverride(admin, profileRow as EntitlementProfile);
-  const entitlement = resolveEntitlement(profileRow as EntitlementProfile);
+  const entitlement = resolveEntitlement(
+    profileRow as EntitlementProfile,
+    new Date(),
+    user.email,
+  );
   const tier: TierKey = entitlement.tier;
 
   let allowance: Awaited<ReturnType<typeof checkFeatureAllowance>>;
   try {
-    allowance = await checkFeatureAllowance(admin, user.id, featureKey, tier);
+    allowance = await checkFeatureAllowance(
+      admin,
+      user.id,
+      featureKey,
+      tier,
+      undefined,
+      entitlement.unlimited,
+    );
   } catch (err) {
     console.error(
       `[API] supplemental ${featureKey}: failed to verify usage:`,
@@ -181,6 +194,7 @@ export async function authorizeEssayRequest(
       profile,
       profileRow: profileRow as EntitlementProfile,
       tier,
+      unlimited: entitlement.unlimited,
       model,
     },
   };
