@@ -37,6 +37,11 @@ const navItems: NavItem[] = [
     activePrefix: "/dashboard/workspace",
   },
   {
+    label: "Calendar",
+    href: "/dashboard/calendar",
+    activePrefix: "/dashboard/calendar",
+  },
+  {
     label: "My Colleges",
     href: "/dashboard/colleges",
     activePrefix: "/dashboard/colleges",

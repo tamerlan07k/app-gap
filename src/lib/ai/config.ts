@@ -20,6 +20,8 @@ export type FeatureKey =
   | "supplementalChat" // Supplemental Essays: GapCoach live chat (Gemini, metered per message)
   | "awardsRecognition" // Awards: Recognition Map — collective + per-award interpretation (Gemini, cached one-row-per-user)
   | "opportunityExperiment" // Awards: "Test an Opportunity" — concise application-value assessment (Gemini, metered per use)
+  | "roadmapGeneration" // My Roadmap: one bounded, personalized four-branch plan per account (free + Pro, lifetime-once)
+  | "calendarGeneration" // My Roadmap: one deterministic application calendar per account (free + Pro, lifetime-once, no AI)
   | "opportunityFinder"; // internships / research / competitions finder (future, data-backed)
 
 export type FeatureConfig = {
@@ -151,6 +153,19 @@ export const AI_FEATURES = {
     temperature: 0.3,
     description:
       "Awards 'Test an Opportunity' — a concise, practical read on whether pursuing a specific opportunity adds application value given the student's profile, gaps, and timing (never an admissions prediction)",
+  },
+  // My Roadmap — ONE bounded personalization call per account, ever. The model
+  // only SELECTS, ORDERS, and briefly explains milestones from the approved code
+  // library (never invents milestones or routes); a deterministic fallback runs
+  // if the call fails or returns nothing usable. Because it is lifetime-once, the
+  // per-account cost is negligible, so Pro uses the stronger Gemini tier for a
+  // better-reasoned ordering. Slightly warm for natural "why this is next" notes,
+  // but the prompt keeps it grounded in the student's real data.
+  roadmapGeneration: {
+    model: "google/gemini-2.5-pro",
+    temperature: 0.4,
+    description:
+      "My Roadmap — selects, prioritizes, and personalizes milestones from the approved roadmap library into a grade- and deadline-aware four-branch plan (never invents milestones, routes, or admissions claims)",
   },
 } satisfies Partial<Record<FeatureKey, FeatureConfig>>;
 
@@ -404,6 +419,38 @@ export const FEATURE_ACCESS: Record<
       window: "month",
       model: "google/gemini-2.5-flash",
     },
+  },
+  // My Roadmap — exactly ONE generation for the lifetime of the account, for
+  // BOTH tiers (a roadmap isn't something you re-generate). limit 1 over the
+  // LIFETIME window means the append-only feature_usage ledger permanently records
+  // the single consumed generation (no window reset → a second generation is
+  // blocked forever), and because usage is recorded only on a SUCCESSFUL persist,
+  // a failed attempt never consumes it. The unique roadmaps.user_id constraint is
+  // the concurrency primitive; this ledger entry is the durable, delete-proof
+  // record the allowance check reads. Free uses Flash to keep the single call's
+  // cost minimal; Pro uses the stronger model (one call ever, so negligible cost).
+  roadmapGeneration: {
+    free: {
+      enabled: true,
+      limit: 1,
+      window: "lifetime",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 1,
+      window: "lifetime",
+      model: "google/gemini-2.5-pro",
+    },
+  },
+  // My Roadmap — the Personalized Application Calendar. One generation per account
+  // for both tiers, same lifetime-once enforcement as the roadmap. Scheduling is
+  // fully DETERMINISTIC (no AI / no model), so there is no per-tier model and no
+  // AI cost at all — the ledger here only enforces the single-generation rule;
+  // routine edits (marking tasks done, adjusting dates) never consume it.
+  calendarGeneration: {
+    free: { enabled: true, limit: 1, window: "lifetime" },
+    pro: { enabled: true, limit: 1, window: "lifetime" },
   },
   opportunityFinder: {
     free: { enabled: false, limit: 0, window: null },

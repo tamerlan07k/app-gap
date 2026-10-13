@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Button } from "~/components/ui/button";
 import { type Analysis, analysisSchema } from "~/lib/ai/schema";
+import { todayISO } from "~/lib/date";
 import { getNextDeadline } from "~/lib/deadlines";
 import { getLatestEvent } from "~/lib/events";
 import { createClient } from "~/lib/supabase/server";
 import { getFirstName } from "~/lib/user";
 import { GapScoreCard } from "./analysis/gap-score-card";
+import { CalendarCard, type TodayTask } from "./home/calendar-card";
 import {
   EssaysCard,
   JumpInCard,
@@ -93,34 +95,59 @@ export default async function DashboardPage() {
   let essaysCount = 0;
   let collegesCount = 0;
   let latestEvent = null;
+  let hasCalendar = false;
+  let todayTasks: TodayTask[] = [];
 
   if (user) {
-    const [analysisRes, profileRes, essays, event, collegesRes] =
-      await Promise.all([
-        supabase
-          .from("ai_analyses")
-          .select("id, analysis, created_at")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-        supabase
-          .from("profiles")
-          .select("grade_level")
-          .eq("id", user.id)
-          .maybeSingle(),
-        getEssaysCompletedCount(supabase, user.id),
-        getLatestEvent(supabase, user.id),
-        supabase
-          .from("user_colleges")
-          .select("id", { count: "exact", head: true })
-          .eq("user_id", user.id),
-      ]);
+    const today = todayISO();
+
+    const [
+      analysisRes,
+      profileRes,
+      essays,
+      event,
+      collegesRes,
+      calendarRes,
+      todayTasksRes,
+    ] = await Promise.all([
+      supabase
+        .from("ai_analyses")
+        .select("id, analysis, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("grade_level")
+        .eq("id", user.id)
+        .maybeSingle(),
+      getEssaysCompletedCount(supabase, user.id),
+      getLatestEvent(supabase, user.id),
+      supabase
+        .from("user_colleges")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id),
+      supabase
+        .from("calendars")
+        .select("status")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("calendar_tasks")
+        .select("id, title, status")
+        .eq("user_id", user.id)
+        .eq("due_date", today)
+        .order("sort_order", { ascending: true }),
+    ]);
 
     gradeLevel = profileRes.data?.grade_level ?? null;
     essaysCount = essays;
     collegesCount = collegesRes.count ?? 0;
     latestEvent = event;
+    hasCalendar =
+      (calendarRes.data as { status: string } | null)?.status === "ready";
+    todayTasks = (todayTasksRes.data ?? []) as TodayTask[];
 
     if (analysisRes.data) {
       const parsed = analysisSchema.safeParse(analysisRes.data.analysis);
@@ -179,6 +206,7 @@ export default async function DashboardPage() {
             </div>
 
             <div className="space-y-6">
+              <CalendarCard tasks={todayTasks} hasCalendar={hasCalendar} />
               <NextDeadlineCard deadline={deadline} />
               <MyAnalysisCard
                 analysisId={analysisId}
@@ -189,7 +217,12 @@ export default async function DashboardPage() {
           </div>
         </>
       ) : (
-        <GenerateCta />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <GenerateCta />
+          </div>
+          <CalendarCard tasks={todayTasks} hasCalendar={hasCalendar} />
+        </div>
       )}
     </div>
   );
