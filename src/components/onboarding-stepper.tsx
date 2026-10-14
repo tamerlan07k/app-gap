@@ -16,6 +16,7 @@ interface Step {
 }
 
 const STEPS: Step[] = [
+  { href: "/profile/welcome", label: "About you" },
   { href: "/profile", label: "Academic profile" },
   { href: "/profile/school-type", label: "High school" },
   { href: "/profile/career-direction", label: "Career direction" },

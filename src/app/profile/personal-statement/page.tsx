@@ -105,9 +105,9 @@ export default function OnboardingPersonalStatementPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <OnboardingStepper current={5} />
+          <OnboardingStepper current={6} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 5 of 6 · Optional
+            Step 6 of 7 · Optional
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your personal statement

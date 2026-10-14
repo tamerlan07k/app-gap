@@ -48,7 +48,7 @@ export default async function DashboardLayout({
       .maybeSingle();
 
     if (!isOnboardingComplete(profile)) {
-      redirect("/profile");
+      redirect("/profile/welcome");
     }
   }
 

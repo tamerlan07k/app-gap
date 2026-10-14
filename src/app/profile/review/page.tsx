@@ -8,6 +8,7 @@ import { OnboardingStepper } from "~/components/onboarding-stepper";
 import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { majorLabel, specializationLabel } from "~/lib/academic-interests";
+import { classRankLabel } from "~/lib/academics";
 import {
   loadAdditionalContextFromDb,
   loadSchoolTypeFromDb,
@@ -177,7 +178,7 @@ export default function ReviewPage() {
       if (dbContext) setAdditionalContext(dbContext);
       // Gate strictly on the DB — data must be persisted to THIS account.
       setDbStep1Complete(
-        !!dbStep1?.info.gradeLevel && !!dbStep1?.info.unweightedGpa,
+        !!dbStep1?.info.gradeLevel && !!dbStep1?.info.gpaValue,
       );
       setDbStep2Complete(!!(dbStep2?.academicMajor || dbStep2?.majorCategory));
       setIsLoaded(true);
@@ -243,9 +244,9 @@ export default function ReviewPage() {
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
-          <OnboardingStepper current={6} />
+          <OnboardingStepper current={7} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 6 of 6
+            Step 7 of 7
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Review &amp; generate
@@ -325,13 +326,43 @@ export default function ReviewPage() {
               value={GRADE_LABELS[step1?.info.gradeLevel ?? ""] ?? ""}
             />
             <Row
-              label="Unweighted GPA"
+              label="GPA"
               value={
-                step1?.info.unweightedGpa
-                  ? `${step1.info.unweightedGpa} / 4.0`
+                step1?.info.gpaValue
+                  ? `${step1.info.gpaValue}${
+                      step1.info.gpaScale && step1.info.gpaScale !== "none"
+                        ? ` (${step1.info.gpaScale === "100" ? "100-pt" : `${step1.info.gpaScale}.0`}, ${step1.info.gpaWeighted ? "weighted" : "unweighted"})`
+                        : ""
+                    }`
                   : ""
               }
             />
+            {classRankLabel({
+              type: (step1?.info.classRankType as never) ?? "none",
+              rankValue: step1?.info.classRankValue
+                ? parseInt(step1.info.classRankValue, 10)
+                : null,
+              classSize: step1?.info.classSize
+                ? parseInt(step1.info.classSize, 10)
+                : null,
+              band: step1?.info.classRankBand ?? null,
+            }) && (
+              <Row
+                label="Class rank"
+                value={
+                  classRankLabel({
+                    type: (step1?.info.classRankType as never) ?? "none",
+                    rankValue: step1?.info.classRankValue
+                      ? parseInt(step1.info.classRankValue, 10)
+                      : null,
+                    classSize: step1?.info.classSize
+                      ? parseInt(step1.info.classSize, 10)
+                      : null,
+                    band: step1?.info.classRankBand ?? null,
+                  }) ?? ""
+                }
+              />
+            )}
             <Row label="SAT score" value={step1?.info.satScore ?? ""} />
             <Row label="ACT score" value={step1?.info.actScore ?? ""} />
           </div>

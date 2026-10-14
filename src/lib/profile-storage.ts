@@ -3,9 +3,31 @@
 
 export interface AcademicInfo {
   gradeLevel: string;
-  unweightedGpa: string;
+  /** GPA as entered on the student's native scale (string for the form input). */
+  gpaValue: string;
+  /** Native GPA scale: "4".."20" (point scales), "100", or "none". */
+  gpaScale: string;
+  /** Whether the GPA is weighted. Recorded for context; downstream math uses the
+   * 4.0-normalized value derived from gpaValue + gpaScale. */
+  gpaWeighted: boolean;
   satScore: string;
   actScore: string;
+  /** Class rank type: "exact" | "decile" | "quintile" | "quartile" | "none". */
+  classRankType: string;
+  /** Exact rank position (1 = valedictorian), when classRankType === "exact". */
+  classRankValue: string;
+  /** Approximate graduating class size, when classRankType === "exact". */
+  classSize: string;
+  /** Selected band ("1" = top band) for decile/quintile/quartile. */
+  classRankBand: string;
+  /** Whether the rank is based on weighted GPA (recorded only; no score effect). */
+  classRankWeighted: boolean;
+}
+
+/** Onboarding Step 1 "About you" — name + free-text location. */
+export interface WelcomeInfo {
+  name: string;
+  location: string;
 }
 
 export interface Course {
@@ -75,6 +97,7 @@ export interface Step3Data {
   awards: Award[];
 }
 
+const KEY_WELCOME = "appgap:welcome";
 const KEY_STEP1 = "appgap:step1";
 const KEY_STEP2 = "appgap:step2";
 const KEY_STEP3 = "appgap:step3";
@@ -85,7 +108,14 @@ const KEY_PS = "appgap:personal-statement";
 // previous account's pre-filled forms. See OnboardingStorageGuard.
 const KEY_OWNER = "appgap:owner";
 
-const ONBOARDING_KEYS = [KEY_STEP1, KEY_STEP2, KEY_STEP3, KEY_SCHOOL, KEY_PS];
+const ONBOARDING_KEYS = [
+  KEY_WELCOME,
+  KEY_STEP1,
+  KEY_STEP2,
+  KEY_STEP3,
+  KEY_SCHOOL,
+  KEY_PS,
+];
 
 /** Wipe all cached onboarding step data from this device. */
 export function clearOnboardingStorage(): void {
@@ -119,6 +149,14 @@ function safeParse<T>(key: string): T | null {
   } catch {
     return null;
   }
+}
+
+export function saveWelcome(data: WelcomeInfo): void {
+  localStorage.setItem(KEY_WELCOME, JSON.stringify(data));
+}
+
+export function loadWelcome(): WelcomeInfo | null {
+  return safeParse<WelcomeInfo>(KEY_WELCOME);
 }
 
 export function saveStep1(info: AcademicInfo, courses: Course[]): void {
