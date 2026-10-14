@@ -317,10 +317,25 @@ export function JourneyTree({
   for (const m of milestones) byBranch[m.branch].push(m);
 
   const maxNodes = Math.max(1, ...BRANCHES.map((b) => byBranch[b].length));
-  const viewW = Math.max(1040, BRANCH_START_X + maxNodes * B_GAP + 40);
 
   const branchPointX = F_START_X + 3 * F_GAP;
   const labelX = (branchPointX + BRANCH_START_X) / 2;
+
+  // Before the journey is generated there are no branches to show — the tree is
+  // just the foundation trunk. Rendering the four branches pre-generation made
+  // the roadmap look already-built, defeating the point of the "Begin journey"
+  // generation step. So pre-journey we draw ONLY the foundation trunk in a
+  // compact, vertically-centered canvas; the branches are the product of
+  // generation and appear only once the roadmap is ready.
+  const viewW = journeyStarted
+    ? Math.max(1040, BRANCH_START_X + maxNodes * B_GAP + 40)
+    : branchPointX + RF + 40;
+  // A window cropped tightly around the trunk (±85 of TRUNK_Y) so the single row
+  // of foundation nodes sits centered instead of floating in the 4-branch height.
+  const viewBox = journeyStarted
+    ? `0 0 ${viewW} ${VIEW_H}`
+    : `0 ${TRUNK_Y - 85} ${viewW} 170`;
+  const minWidth = journeyStarted ? 760 : 480;
 
   // The single glowing "current" foundation step = the first actionable one.
   const currentFoundationId = FOUNDATION_STEPS.find(
@@ -343,9 +358,9 @@ export function JourneyTree({
       `}</style>
       {/* biome-ignore lint/a11y/useSemanticElements: an <svg> is the diagram container; role="group" labels the set of interactive nodes within it. */}
       <svg
-        viewBox={`0 0 ${viewW} ${VIEW_H}`}
+        viewBox={viewBox}
         width="100%"
-        style={{ minWidth: 760, height: "auto", display: "block" }}
+        style={{ minWidth, height: "auto", display: "block" }}
         role="group"
         aria-label="Your application roadmap"
       >
@@ -370,49 +385,50 @@ export function JourneyTree({
           );
         })}
 
-        {/* ── Branch curves fanning from the "Begin" node ── */}
-        {BRANCHES.map((branch, j) => {
-          const by = BRANCH_Y[j];
-          const { cssVar } = BRANCH_META[branch];
-          const active = journeyStarted;
-          return (
-            <path
-              key={`curve-${branch}`}
-              d={`M ${branchPointX + RF - 4} ${TRUNK_Y} C ${labelX} ${TRUNK_Y}, ${labelX} ${by}, ${BRANCH_START_X - RB - 2} ${by}`}
-              fill="none"
-              stroke={active ? cssVar : "var(--color-border)"}
-              strokeWidth="3"
-              strokeLinecap="round"
-              opacity={active ? 0.9 : 0.5}
-            />
-          );
-        })}
-
-        {/* ── Branch node connectors ── */}
-        {BRANCHES.map((branch, j) => {
-          const by = BRANCH_Y[j];
-          const { cssVar } = BRANCH_META[branch];
-          const nodes = byBranch[branch];
-          return nodes.slice(0, -1).map((m, k) => {
-            const x1 = BRANCH_START_X + k * B_GAP + RB;
-            const x2 = BRANCH_START_X + (k + 1) * B_GAP - RB;
-            const nextLocked = nodes[k + 1]?.state === "locked";
+        {/* ── Branch curves fanning from the "Begin" node (only once started) ── */}
+        {journeyStarted &&
+          BRANCHES.map((branch, j) => {
+            const by = BRANCH_Y[j];
+            const { cssVar } = BRANCH_META[branch];
             return (
-              <line
-                key={`bc-${branch}-${m.id}`}
-                x1={x1}
-                y1={by}
-                x2={x2}
-                y2={by}
+              <path
+                key={`curve-${branch}`}
+                d={`M ${branchPointX + RF - 4} ${TRUNK_Y} C ${labelX} ${TRUNK_Y}, ${labelX} ${by}, ${BRANCH_START_X - RB - 2} ${by}`}
+                fill="none"
                 stroke={cssVar}
-                strokeWidth="2.5"
+                strokeWidth="3"
                 strokeLinecap="round"
-                strokeDasharray={nextLocked ? "4 4" : undefined}
-                opacity="0.7"
+                opacity={0.9}
               />
             );
-          });
-        })}
+          })}
+
+        {/* ── Branch node connectors ── */}
+        {journeyStarted &&
+          BRANCHES.map((branch, j) => {
+            const by = BRANCH_Y[j];
+            const { cssVar } = BRANCH_META[branch];
+            const nodes = byBranch[branch];
+            return nodes.slice(0, -1).map((m, k) => {
+              const x1 = BRANCH_START_X + k * B_GAP + RB;
+              const x2 = BRANCH_START_X + (k + 1) * B_GAP - RB;
+              const nextLocked = nodes[k + 1]?.state === "locked";
+              return (
+                <line
+                  key={`bc-${branch}-${m.id}`}
+                  x1={x1}
+                  y1={by}
+                  x2={x2}
+                  y2={by}
+                  stroke={cssVar}
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeDasharray={nextLocked ? "4 4" : undefined}
+                  opacity="0.7"
+                />
+              );
+            });
+          })}
 
         {/* ── START pill ── */}
         <g>
@@ -462,79 +478,79 @@ export function JourneyTree({
           );
         })}
 
-        {/* ── Branch labels + nodes ── */}
-        {BRANCHES.map((branch, j) => {
-          const by = BRANCH_Y[j];
-          const { cssVar, label } = BRANCH_META[branch];
-          const nodes = byBranch[branch];
-          const active = journeyStarted;
-          return (
-            <g key={`branch-${branch}`}>
-              {/* Label pill on the curve */}
-              <rect
-                x={labelX - 56}
-                y={by - 15}
-                width="112"
-                height="30"
-                rx="15"
-                fill="var(--color-card)"
-                stroke={active ? cssVar : "var(--color-border)"}
-                strokeWidth="1.5"
-              />
-              <text
-                x={labelX}
-                y={by}
-                textAnchor="middle"
-                dominantBaseline="central"
-                fontSize="13.5"
-                fontWeight="600"
-                fill={active ? cssVar : "var(--color-muted-foreground)"}
-              >
-                {label}
-              </text>
+        {/* ── Branch labels + nodes (only once started) ── */}
+        {journeyStarted &&
+          BRANCHES.map((branch, j) => {
+            const by = BRANCH_Y[j];
+            const { cssVar, label } = BRANCH_META[branch];
+            const nodes = byBranch[branch];
+            return (
+              <g key={`branch-${branch}`}>
+                {/* Label pill on the curve */}
+                <rect
+                  x={labelX - 56}
+                  y={by - 15}
+                  width="112"
+                  height="30"
+                  rx="15"
+                  fill="var(--color-card)"
+                  stroke={cssVar}
+                  strokeWidth="1.5"
+                />
+                <text
+                  x={labelX}
+                  y={by}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fontSize="13.5"
+                  fontWeight="600"
+                  fill={cssVar}
+                >
+                  {label}
+                </text>
 
-              {active && nodes.length > 0 ? (
-                nodes.map((m, k) => {
-                  const visual = milestoneVisual(m);
-                  return (
-                    <TreeNode
-                      key={m.id}
-                      cx={BRANCH_START_X + k * B_GAP}
+                {nodes.length > 0 ? (
+                  nodes.map((m, k) => {
+                    const visual = milestoneVisual(m);
+                    return (
+                      <TreeNode
+                        key={m.id}
+                        cx={BRANCH_START_X + k * B_GAP}
+                        cy={by}
+                        r={RB}
+                        visual={visual}
+                        color={cssVar}
+                        glyphLabel={String(k + 1)}
+                        title={m.title}
+                        ariaLabel={`${label}: ${m.title} — ${visual}`}
+                        onActivate={() => onMilestoneSelect(m)}
+                      />
+                    );
+                  })
+                ) : (
+                  // Empty branch (defensive): a single muted stub node.
+                  <g>
+                    <circle
+                      cx={BRANCH_START_X}
                       cy={by}
                       r={RB}
-                      visual={visual}
-                      color={cssVar}
-                      glyphLabel={String(k + 1)}
-                      title={m.title}
-                      ariaLabel={`${label}: ${m.title} — ${visual}`}
-                      onActivate={() => onMilestoneSelect(m)}
+                      fill="var(--color-card)"
+                      stroke="var(--color-border)"
+                      strokeWidth="2"
+                      strokeDasharray="4 4"
                     />
-                  );
-                })
-              ) : (
-                // Pre-journey (or empty branch): a single muted stub node.
-                <g>
-                  <circle
-                    cx={BRANCH_START_X}
-                    cy={by}
-                    r={RB}
-                    fill="var(--color-card)"
-                    stroke="var(--color-border)"
-                    strokeWidth="2"
-                    strokeDasharray="4 4"
-                  />
-                  <Glyph
-                    visual="locked"
-                    cx={BRANCH_START_X}
-                    cy={by}
-                    color="var(--color-muted-foreground)"
-                    label=""
-                  />
-                </g>
-              )}
-            </g>
-          );
-        })}
+                    <Glyph
+                      visual="locked"
+                      cx={BRANCH_START_X}
+                      cy={by}
+                      color="var(--color-muted-foreground)"
+                      label=""
+                    />
+                  </g>
+                )}
+              </g>
+            );
+          })}
       </svg>
     </div>
   );
