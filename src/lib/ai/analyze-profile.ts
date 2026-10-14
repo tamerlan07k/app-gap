@@ -1,4 +1,5 @@
 import { generateText } from "ai";
+import { classRankBoost } from "~/lib/academics";
 import { gateway } from "./client";
 import { AI_FEATURES } from "./config";
 import { generateOnboardingPsDiagnostic } from "./personal-statement/onboarding-diagnostic";
@@ -100,6 +101,19 @@ export async function analyzeProfile(
         "[AI] No component or category scores in analysis — using model gapScore as fallback",
       );
     }
+  }
+
+  // Deterministic class-rank boost on the overall score. A strong rank is hard
+  // evidence of academic standing the component model can't see directly, so we
+  // add a small fixed bump (val/sal +5, top 10% +3, top 20% +1), clamped to 100.
+  const rankBoost = classRankBoost({
+    type: (profile.classRankType as never) ?? "none",
+    rankValue: profile.classRankValue ?? null,
+    classSize: profile.classSize ?? null,
+    band: profile.classRankBand ?? null,
+  });
+  if (rankBoost > 0) {
+    analysis.gapScore = Math.min(100, analysis.gapScore + rankBoost);
   }
 
   // AI SDK v7 renamed tokens: inputTokens/outputTokens (previously promptTokens/completionTokens)

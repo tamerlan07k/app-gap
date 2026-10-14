@@ -197,6 +197,24 @@ export async function loadSchoolLevelStats(
   return out;
 }
 
+/** The user's auto-detected 2-letter US state (profiles.location_state), or null.
+ * Powers the My Colleges location filters. Fail-soft before the column migrates. */
+export async function loadLocationState(
+  client: SupabaseClient,
+  userId: string,
+): Promise<string | null> {
+  try {
+    const { data } = await client
+      .from("profiles")
+      .select("location_state")
+      .eq("id", userId)
+      .maybeSingle();
+    return (data?.location_state as string | null) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** The user's intended-field key (profiles.major_category), or null. */
 export async function loadFieldKey(
   client: SupabaseClient,

@@ -9,6 +9,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useHistory } from "~/hooks/use-history";
+import { GPA_SCALES, gpaScaleLabel, RANK_BANDS } from "~/lib/academics";
 import { loadStep1FromDb, saveStep1ToDb } from "~/lib/profile-db";
 import {
   type AcademicInfo,
@@ -22,7 +23,7 @@ import {
 
 interface FormErrors {
   gradeLevel?: string;
-  unweightedGpa?: string;
+  gpaValue?: string;
 }
 
 interface CourseFormErrors {
@@ -344,9 +345,16 @@ export default function ProfilePage() {
   } = useHistory<Step1Data>({
     info: {
       gradeLevel: "",
-      unweightedGpa: "",
+      gpaValue: "",
+      gpaScale: "4",
+      gpaWeighted: false,
       satScore: "",
       actScore: "",
+      classRankType: "none",
+      classRankValue: "",
+      classSize: "",
+      classRankBand: "",
+      classRankWeighted: false,
     },
     courses: [],
   });
@@ -385,12 +393,12 @@ export default function ProfilePage() {
     saveStep1(committed.info, committed.courses);
   }, [committed, isLoaded]);
 
-  function setAcademic(field: keyof AcademicInfo, value: string) {
+  function setAcademic(field: keyof AcademicInfo, value: string | boolean) {
     setCommitted(
       (prev) => ({ ...prev, info: { ...prev.info, [field]: value } }),
       { coalesceKey: `info.${field}` },
     );
-    if (field === "gradeLevel" || field === "unweightedGpa") {
+    if (field === "gradeLevel" || field === "gpaValue") {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   }
@@ -398,8 +406,8 @@ export default function ProfilePage() {
   async function handleContinue() {
     const next: FormErrors = {};
     if (!info.gradeLevel) next.gradeLevel = "Please select your grade level.";
-    if (!info.unweightedGpa.trim())
-      next.unweightedGpa = "Please enter your GPA.";
+    if (info.gpaScale !== "none" && !info.gpaValue.trim())
+      next.gpaValue = "Please enter your GPA (or choose scale “None”).";
 
     if (Object.keys(next).length > 0) {
       setErrors(next);
@@ -551,9 +559,9 @@ export default function ProfilePage() {
 
         {/* Page header */}
         <div className="space-y-3">
-          <OnboardingStepper current={1} />
+          <OnboardingStepper current={2} />
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-            Step 1 of 6
+            Step 2 of 7
           </p>
           <h1 className="text-3xl font-bold tracking-tight">
             Your academic profile
@@ -597,29 +605,71 @@ export default function ProfilePage() {
               </select>
             </Field>
 
-            <Field
-              id="unweighted-gpa"
-              label="Unweighted GPA"
-              hint="out of 4.0"
-              error={errors.unweightedGpa}
-            >
-              <Input
-                id="unweighted-gpa"
-                type="number"
-                inputMode="decimal"
-                min={0}
-                max={4}
-                step={0.1}
-                placeholder="e.g. 3.7"
-                value={info.unweightedGpa}
-                onChange={(e) => setAcademic("unweightedGpa", e.target.value)}
-                onBlur={(e) => {
-                  if (e.target.value)
-                    setAcademic("unweightedGpa", clamp(e.target.value, 0, 4));
-                }}
-                className={errors.unweightedGpa ? "border-destructive" : ""}
-              />
-            </Field>
+            {/* GPA — native scale + weighted basis; normalized to 4.0 internally. */}
+            <div className="space-y-3">
+              <div className="grid gap-4 sm:grid-cols-[1fr_1fr]">
+                <Field id="gpa-value" label="GPA" error={errors.gpaValue}>
+                  <Input
+                    id="gpa-value"
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step={0.01}
+                    placeholder={
+                      info.gpaScale === "100" ? "e.g. 94" : "e.g. 3.7"
+                    }
+                    disabled={info.gpaScale === "none"}
+                    value={info.gpaValue}
+                    onChange={(e) => setAcademic("gpaValue", e.target.value)}
+                    onBlur={(e) => {
+                      const max =
+                        info.gpaScale === "100"
+                          ? 100
+                          : parseInt(info.gpaScale, 10) || 4;
+                      if (e.target.value)
+                        setAcademic("gpaValue", clamp(e.target.value, 0, max));
+                    }}
+                    className={errors.gpaValue ? "border-destructive" : ""}
+                  />
+                </Field>
+                <Field id="gpa-scale" label="Scale">
+                  <select
+                    id="gpa-scale"
+                    value={info.gpaScale}
+                    onChange={(e) => setAcademic("gpaScale", e.target.value)}
+                    className={SELECT_CLASS}
+                  >
+                    {GPA_SCALES.map((s) => (
+                      <option key={s} value={s}>
+                        {gpaScaleLabel(s)}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+              {info.gpaScale !== "none" && (
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="gpa-weighted"
+                      checked={!info.gpaWeighted}
+                      onChange={() => setAcademic("gpaWeighted", false)}
+                    />
+                    Unweighted
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="gpa-weighted"
+                      checked={info.gpaWeighted}
+                      onChange={() => setAcademic("gpaWeighted", true)}
+                    />
+                    Weighted
+                  </label>
+                </div>
+              )}
+            </div>
 
             <Field id="sat-score" label="SAT score" hint="optional · 400–1600">
               <Input
@@ -659,6 +709,103 @@ export default function ProfilePage() {
                 }}
               />
             </Field>
+
+            {/* Class rank — optional. A strong rank (top 10%/20%, or
+                val/salutatorian) adds a small boost to the AppGap score. */}
+            <Field id="class-rank-type" label="Class rank" hint="optional">
+              <select
+                id="class-rank-type"
+                value={info.classRankType}
+                onChange={(e) => setAcademic("classRankType", e.target.value)}
+                className={SELECT_CLASS}
+              >
+                <option value="none">Not reporting / no rank</option>
+                <option value="exact">Exact rank</option>
+                <option value="decile">Decile (top 10%, 20%…)</option>
+                <option value="quintile">Quintile (top 20%, 40%…)</option>
+                <option value="quartile">Quartile (top 25%, 50%…)</option>
+              </select>
+            </Field>
+
+            {info.classRankType === "exact" && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field id="class-rank-value" label="Your rank" hint="1 = top">
+                  <Input
+                    id="class-rank-value"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    step={1}
+                    placeholder="e.g. 12"
+                    value={info.classRankValue}
+                    onChange={(e) =>
+                      setAcademic("classRankValue", e.target.value)
+                    }
+                  />
+                </Field>
+                <Field
+                  id="class-size"
+                  label="Graduating class size"
+                  hint="approx."
+                >
+                  <Input
+                    id="class-size"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    step={1}
+                    placeholder="e.g. 320"
+                    value={info.classSize}
+                    onChange={(e) => setAcademic("classSize", e.target.value)}
+                  />
+                </Field>
+              </div>
+            )}
+
+            {["decile", "quintile", "quartile"].includes(
+              info.classRankType,
+            ) && (
+              <Field id="class-rank-band" label="Which band?">
+                <select
+                  id="class-rank-band"
+                  value={info.classRankBand}
+                  onChange={(e) => setAcademic("classRankBand", e.target.value)}
+                  className={SELECT_CLASS}
+                >
+                  <option value="">Select band</option>
+                  {RANK_BANDS[
+                    info.classRankType as "decile" | "quintile" | "quartile"
+                  ].map((b) => (
+                    <option key={b.value} value={b.value}>
+                      {b.label}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
+
+            {info.classRankType !== "none" && (
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="rank-weighted"
+                    checked={!info.classRankWeighted}
+                    onChange={() => setAcademic("classRankWeighted", false)}
+                  />
+                  Unweighted rank
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="radio"
+                    name="rank-weighted"
+                    checked={info.classRankWeighted}
+                    onChange={() => setAcademic("classRankWeighted", true)}
+                  />
+                  Weighted rank
+                </label>
+              </div>
+            )}
           </div>
         </div>
 

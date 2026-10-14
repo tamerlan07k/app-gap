@@ -36,6 +36,14 @@ export async function loadFullProfile(
   const p = profileRes.data as {
     grade_level: string | null;
     unweighted_gpa: number | null;
+    gpa_value: number | null;
+    gpa_scale: string | null;
+    gpa_weighted: boolean | null;
+    class_rank_type: string | null;
+    class_rank_value: number | null;
+    class_size: number | null;
+    class_rank_band: string | null;
+    class_rank_weighted: boolean | null;
     sat_score: number | null;
     act_score: number | null;
     school_type: string | null;
@@ -51,6 +59,14 @@ export async function loadFullProfile(
   const profile: FullProfile = {
     gradeLevel: p.grade_level ?? "",
     unweightedGpa: p.unweighted_gpa ?? null,
+    gpaValue: p.gpa_value ?? null,
+    gpaScale: p.gpa_scale ?? null,
+    gpaWeighted: p.gpa_weighted ?? null,
+    classRankType: p.class_rank_type ?? null,
+    classRankValue: p.class_rank_value ?? null,
+    classSize: p.class_size ?? null,
+    classRankBand: p.class_rank_band ?? null,
+    classRankWeighted: p.class_rank_weighted ?? null,
     satScore: p.sat_score ?? null,
     actScore: p.act_score ?? null,
     schoolType: p.school_type ?? null,

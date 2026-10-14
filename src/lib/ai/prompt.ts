@@ -1,10 +1,23 @@
 import { majorLabel, specializationLabel } from "~/lib/academic-interests";
+import { classRankLabel } from "~/lib/academics";
 
 export interface FullProfile {
   gradeLevel: string;
+  /** Canonical 4.0-normalized GPA — what the scoring + chancing math consume. */
   unweightedGpa: number | null;
+  /** The student's GPA as entered on their native scale (display/context only). */
+  gpaValue?: number | null;
+  /** Native GPA scale: "4".."20", "100", or "none". */
+  gpaScale?: string | null;
+  gpaWeighted?: boolean | null;
   satScore: number | null;
   actScore: number | null;
+  /** Class rank (optional). Feeds the prompt context + a deterministic score boost. */
+  classRankType?: string | null;
+  classRankValue?: number | null;
+  classSize?: number | null;
+  classRankBand?: string | null;
+  classRankWeighted?: boolean | null;
   schoolType?: string | null;
   courses: Array<{
     name: string;
@@ -206,6 +219,20 @@ function getTimelineStage(gradeLevel: string, month: number): string {
 }
 
 // ─── Pre-computed intelligence signals ───────────────────────────────────────
+
+/** Human-readable class-rank line for the prompt, or null when no rank given. */
+function classRankContext(profile: FullProfile): string | null {
+  if (!profile.classRankType || profile.classRankType === "none") return null;
+  const label = classRankLabel({
+    type: profile.classRankType as never,
+    rankValue: profile.classRankValue ?? null,
+    classSize: profile.classSize ?? null,
+    band: profile.classRankBand ?? null,
+  });
+  if (!label) return null;
+  const basis = profile.classRankWeighted ? "weighted" : "unweighted";
+  return `${label}, ${basis}`;
+}
 
 export function computeScoreSignal(profile: FullProfile): string {
   // Absolute, list-independent: contextualize the student's own score against
@@ -656,8 +683,28 @@ export function buildProfilePrompt(profile: FullProfile): string {
     );
   }
   lines.push(
-    `Unweighted GPA: ${profile.unweightedGpa != null ? `${profile.unweightedGpa} / 4.0` : "Not provided"}`,
+    `GPA (normalized): ${profile.unweightedGpa != null ? `${profile.unweightedGpa} / 4.0` : "Not provided"}`,
   );
+  // Native-scale entry, when it isn't a plain unweighted 4.0 — gives the model the
+  // student's real figure so it doesn't misread a normalized value.
+  if (
+    profile.gpaValue != null &&
+    profile.gpaScale &&
+    profile.gpaScale !== "none" &&
+    (profile.gpaScale !== "4" || profile.gpaWeighted)
+  ) {
+    const scaleText =
+      profile.gpaScale === "100" ? "100-point" : `${profile.gpaScale}.0`;
+    const basis = profile.gpaWeighted ? "weighted" : "unweighted";
+    lines.push(
+      `GPA (as reported): ${profile.gpaValue} on a ${scaleText} ${basis} scale`,
+    );
+  }
+  // Class rank — a strong rank is a meaningful academic signal; weight it into the
+  // academics assessment (top 10% / top 20% is strong; valedictorian/salutatorian
+  // exceptional). The overall score also receives a fixed deterministic rank boost.
+  const rankContext = classRankContext(profile);
+  if (rankContext) lines.push(`Class Rank: ${rankContext}`);
   lines.push(
     `SAT Score: ${profile.satScore != null ? String(profile.satScore) : "Not provided"}`,
   );

@@ -1,4 +1,6 @@
 import { areaForMajor, fieldKeyForMajor } from "~/lib/academic-interests";
+import { normalizeGpaTo4 } from "~/lib/academics";
+import { detectState } from "~/lib/colleges/geography";
 import type {
   AcademicInfo,
   Activity,
@@ -8,12 +10,42 @@ import type {
   HighSchoolInfo,
   Step1Data,
   Step3Data,
+  WelcomeInfo,
 } from "~/lib/profile-storage";
 import { createClient } from "~/lib/supabase/client";
 
 // ── Loaders ───────────────────────────────────────────────────────────────────
 // Each loader returns null on any error or missing data, letting the caller
 // fall back to localStorage. This keeps load failures transparent to the user.
+
+export async function loadWelcomeFromDb(): Promise<WelcomeInfo | null> {
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
+
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("location")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const meta = user.user_metadata ?? {};
+    const name =
+      (meta.first_name as string | undefined) ??
+      (meta.given_name as string | undefined) ??
+      (meta.full_name as string | undefined) ??
+      "";
+    const location = (p?.location as string | null) ?? "";
+
+    if (!name && !location) return null;
+    return { name, location };
+  } catch {
+    return null;
+  }
+}
 
 export async function loadStep1FromDb(): Promise<Step1Data | null> {
   try {
@@ -24,11 +56,9 @@ export async function loadStep1FromDb(): Promise<Step1Data | null> {
     if (!user) return null;
 
     const [profileRes, coursesRes] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, grade_level, unweighted_gpa, sat_score, act_score")
-        .eq("id", user.id)
-        .maybeSingle(),
+      // select("*") tolerates envs where the native-GPA / rank columns aren't
+      // migrated yet — they come back undefined rather than erroring.
+      supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
       supabase
         .from("courses")
         .select("*")
@@ -41,11 +71,26 @@ export async function loadStep1FromDb(): Promise<Step1Data | null> {
     // No academic data saved yet — defer to localStorage
     if (!p.grade_level && p.unweighted_gpa == null) return null;
 
+    // Prefer the student's native-scale entry; fall back to the legacy 4.0
+    // `unweighted_gpa` column (scale "4", unweighted) for pre-migration profiles.
+    const hasNativeGpa = p.gpa_scale != null && p.gpa_value != null;
     const info: AcademicInfo = {
       gradeLevel: p.grade_level ?? "",
-      unweightedGpa: p.unweighted_gpa != null ? String(p.unweighted_gpa) : "",
+      gpaValue: hasNativeGpa
+        ? String(p.gpa_value)
+        : p.unweighted_gpa != null
+          ? String(p.unweighted_gpa)
+          : "",
+      gpaScale: hasNativeGpa ? String(p.gpa_scale) : "4",
+      gpaWeighted: hasNativeGpa ? Boolean(p.gpa_weighted) : false,
       satScore: p.sat_score != null ? String(p.sat_score) : "",
       actScore: p.act_score != null ? String(p.act_score) : "",
+      classRankType: (p.class_rank_type as string | null) ?? "none",
+      classRankValue:
+        p.class_rank_value != null ? String(p.class_rank_value) : "",
+      classSize: p.class_size != null ? String(p.class_size) : "",
+      classRankBand: (p.class_rank_band as string | null) ?? "",
+      classRankWeighted: Boolean(p.class_rank_weighted),
     };
 
     const courses: Course[] = (coursesRes.data ?? []).map(
@@ -302,20 +347,70 @@ export async function saveStep1ToDb(
   } = await supabase.auth.getUser();
   if (!user) return;
 
-  const { error: profileError } = await supabase.from("profiles").upsert(
-    {
-      id: user.id,
-      grade_level: info.gradeLevel || null,
-      unweighted_gpa: info.unweightedGpa
-        ? parseFloat(info.unweightedGpa)
-        : null,
-      sat_score: info.satScore ? parseInt(info.satScore, 10) : null,
-      act_score: info.actScore ? parseInt(info.actScore, 10) : null,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: "id" },
+  // Canonical 4.0-normalized GPA every internal consumer reads (chancing math,
+  // AI prompt), derived from the native-scale entry. Null when "none" / blank.
+  const gpaValueNum = info.gpaValue ? parseFloat(info.gpaValue) : null;
+  const normalizedGpa = normalizeGpaTo4(gpaValueNum, info.gpaScale);
+
+  const isExactRank = info.classRankType === "exact";
+  const isCoarseRank = ["decile", "quintile", "quartile"].includes(
+    info.classRankType,
   );
-  if (profileError) throw new Error(profileError.message);
+
+  const fullRow = {
+    id: user.id,
+    grade_level: info.gradeLevel || null,
+    unweighted_gpa: normalizedGpa,
+    sat_score: info.satScore ? parseInt(info.satScore, 10) : null,
+    act_score: info.actScore ? parseInt(info.actScore, 10) : null,
+    // Native-scale GPA entry (display + prompt context).
+    gpa_value: gpaValueNum,
+    gpa_scale: info.gpaScale || null,
+    gpa_weighted: info.gpaValue ? info.gpaWeighted : null,
+    // Class rank.
+    class_rank_type: info.classRankType || null,
+    class_rank_value:
+      isExactRank && info.classRankValue
+        ? parseInt(info.classRankValue, 10)
+        : null,
+    class_size:
+      isExactRank && info.classSize ? parseInt(info.classSize, 10) : null,
+    class_rank_band:
+      isCoarseRank && info.classRankBand ? info.classRankBand : null,
+    class_rank_weighted:
+      info.classRankType && info.classRankType !== "none"
+        ? info.classRankWeighted
+        : null,
+    updated_at: new Date().toISOString(),
+  };
+
+  // Legacy-safe subset for envs where the native-GPA / rank columns aren't
+  // migrated yet — the core academics still save and onboarding completes.
+  const legacyRow = {
+    id: fullRow.id,
+    grade_level: fullRow.grade_level,
+    unweighted_gpa: fullRow.unweighted_gpa,
+    sat_score: fullRow.sat_score,
+    act_score: fullRow.act_score,
+    updated_at: fullRow.updated_at,
+  };
+
+  const { error: profileError } = await supabase
+    .from("profiles")
+    .upsert(fullRow, { onConflict: "id" });
+  if (profileError) {
+    const missingColumn =
+      profileError.code === "PGRST204" ||
+      /gpa_(value|scale|weighted)|class_(rank|size)/.test(profileError.message);
+    if (missingColumn) {
+      const { error: fallbackError } = await supabase
+        .from("profiles")
+        .upsert(legacyRow, { onConflict: "id" });
+      if (fallbackError) throw new Error(fallbackError.message);
+    } else {
+      throw new Error(profileError.message);
+    }
+  }
 
   const { error: deleteError } = await supabase
     .from("courses")
@@ -337,6 +432,41 @@ export async function saveStep1ToDb(
     );
     if (insertError) throw new Error(insertError.message);
   }
+}
+
+/**
+ * Persist the "About you" step: the name goes to the auth user_metadata (so the
+ * dashboard greeting picks it up with no extra lookup), and the free-text
+ * location + its auto-detected US state go to the profiles row (the state powers
+ * the My Colleges location filters).
+ */
+export async function saveWelcomeToDb(data: WelcomeInfo): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const name = data.name.trim();
+  const location = data.location.trim();
+
+  if (name) {
+    const { error: metaError } = await supabase.auth.updateUser({
+      data: { first_name: name },
+    });
+    if (metaError) throw new Error(metaError.message);
+  }
+
+  const { error } = await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      location: location || null,
+      location_state: detectState(location),
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "id" },
+  );
+  if (error) throw new Error(error.message);
 }
 
 export async function saveSchoolTypeToDb(data: HighSchoolInfo): Promise<void> {

@@ -4,8 +4,13 @@ import { revalidatePath } from "next/cache";
 import {
   loadApplicantStrength,
   loadCollegesWithData,
+  loadLocationState,
   loadMatchProfile,
 } from "~/lib/colleges/db";
+import {
+  allowedStatesFor,
+  type CollegeLocationFilter,
+} from "~/lib/colleges/geography";
 import { buildBalancedList } from "~/lib/colleges/matching";
 import { CURRENT_CYCLE_YEAR } from "~/lib/colleges/types";
 import { createClient } from "~/lib/supabase/server";
@@ -57,20 +62,34 @@ export async function removeCollege(collegeId: string): Promise<ActionResult> {
  * Seed the user's list with a balanced 3 safeties / 6 targets / 4 reaches set
  * computed from their profile and the available college data. Skips colleges
  * already saved; classified purely by fit, never prestige.
+ *
+ * An optional location `filter` restricts the candidate pool by geography (the
+ * student's state, bordering states, or a named region) before balancing. A
+ * standard (no-filter) call, or a state-based filter with no known state,
+ * considers the whole pool.
  */
-export async function generateBalancedList(): Promise<ActionResult> {
+export async function generateBalancedList(
+  filter: CollegeLocationFilter = { kind: "none" },
+): Promise<ActionResult> {
   const { supabase, userId } = await currentUserId();
   if (!userId) return { ok: false, error: "Not signed in." };
 
   // Load the SAME applicant strength the college page uses to display/re-bucket
   // the list. Generation and display must feed classifyAdmission identical inputs
   // or a strong profile's reaches would flip to targets on load (the 3/10/0 bug).
-  const [profile, strength, { all }] = await Promise.all([
+  const [profile, strength, { all }, studentState] = await Promise.all([
     loadMatchProfile(supabase, userId),
     loadApplicantStrength(supabase, userId),
     loadCollegesWithData(supabase),
+    loadLocationState(supabase, userId),
   ]);
   if (!profile) return { ok: false, error: "Complete your profile first." };
+
+  // Geographic restriction. null → no restriction (whole pool).
+  const allowedStates = allowedStatesFor(filter, studentState);
+  const pool = allowedStates
+    ? all.filter((c) => c.state && allowedStates.has(c.state.toUpperCase()))
+    : all;
 
   const { data: existing } = await supabase
     .from("user_colleges")
@@ -80,13 +99,18 @@ export async function generateBalancedList(): Promise<ActionResult> {
 
   const { safetyIds, targetIds, reachIds } = buildBalancedList(
     profile,
-    all,
+    pool,
     strength,
     have,
   );
   const ids = [...safetyIds, ...targetIds, ...reachIds];
   if (ids.length === 0) {
-    return { ok: false, error: "No colleges available to recommend." };
+    return {
+      ok: false,
+      error: allowedStates
+        ? "No colleges match that location filter yet. Try a wider area."
+        : "No colleges available to recommend.",
+    };
   }
 
   const rows = ids.map((college_id) => ({
