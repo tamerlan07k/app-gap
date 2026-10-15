@@ -157,12 +157,14 @@ export const AI_FEATURES = {
   // My Roadmap — ONE bounded personalization call per account, ever. The model
   // only SELECTS, ORDERS, and briefly explains milestones from the approved code
   // library (never invents milestones or routes); a deterministic fallback runs
-  // if the call fails or returns nothing usable. Because it is lifetime-once, the
-  // per-account cost is negligible, so Pro uses the stronger Gemini tier for a
-  // better-reasoned ordering. Slightly warm for natural "why this is next" notes,
-  // but the prompt keeps it grounded in the student's real data.
+  // if the call fails or returns nothing usable. The job is lightweight — pick and
+  // order milestone IDs from a fixed, approved catalog and write short notes — so
+  // the fast Gemini tier handles it well at a fraction of the latency (~20s on Pro
+  // → a few seconds on Flash), which keeps the generation loader short and stays
+  // safely under serverless timeouts. Slightly warm for natural "why this is next"
+  // notes, but the prompt keeps it grounded in the student's real data.
   roadmapGeneration: {
-    model: "google/gemini-2.5-pro",
+    model: "google/gemini-2.5-flash",
     temperature: 0.4,
     description:
       "My Roadmap — selects, prioritizes, and personalizes milestones from the approved roadmap library into a grade- and deadline-aware four-branch plan (never invents milestones, routes, or admissions claims)",
@@ -440,7 +442,7 @@ export const FEATURE_ACCESS: Record<
       enabled: true,
       limit: 1,
       window: "lifetime",
-      model: "google/gemini-2.5-pro",
+      model: "google/gemini-2.5-flash",
     },
   },
   // My Roadmap — the Personalized Application Calendar. One generation per account

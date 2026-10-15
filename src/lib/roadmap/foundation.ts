@@ -55,11 +55,11 @@ export const FOUNDATION_STEPS: FoundationStep[] = [
   },
   {
     id: "begin",
-    title: "Begin Your Application Journey",
+    title: "Generate Your Roadmap",
     description:
-      "Unlock your four application branches and start working through your personalized plan.",
-    why: "With your diagnostic, direction, and calendar in place, you're set up to work the plan — not guess at it.",
-    actionLabel: "Begin journey",
+      "Generate your personalized roadmap to unlock your four application branches and start working the plan.",
+    why: "Your diagnostic is enough to build a real plan. Career direction and a calendar sharpen it, but you can generate now and refine later.",
+    actionLabel: "Generate roadmap",
   },
 ];
 
@@ -88,7 +88,8 @@ export type FoundationState = {
   diagnosticMissing: string[];
   /** True when the student can confirm an existing major instead of assessing. */
   careerCanConfirmExisting: boolean;
-  /** Diagnostic + career + calendar are all complete → "Begin" is actionable. */
+  /** The diagnostic is complete (career + calendar optional) → "Generate" is
+   *  actionable. Generation is still manual — this only enables the button. */
   readyToBegin: boolean;
   /** Everything (incl. journey) is done. */
   journeyStarted: boolean;
@@ -113,22 +114,24 @@ export function computeFoundationState(
     ? "complete"
     : "ready";
 
-  const priorComplete =
-    diagnostic === "complete" &&
-    career === "complete" &&
-    calendar === "complete";
+  // 4. Begin (Generate). The roadmap can be generated as soon as the DIAGNOSTIC
+  // is complete. Career direction and calendar are valuable but OPTIONAL
+  // refinements — they no longer gate generation, so a student who has only run
+  // their diagnostic gets the "Generate roadmap" button right away. Generation
+  // stays strictly MANUAL: "ready" means the button is actionable, never that the
+  // roadmap is auto-built.
+  const diagnosticComplete = diagnostic === "complete";
 
-  // 4. Begin — locked until the first three are complete.
   let begin: FoundationStepStatus;
   if (input.journeyStarted) begin = "complete";
-  else if (priorComplete) begin = "ready";
+  else if (diagnosticComplete) begin = "ready";
   else begin = "locked";
 
   return {
     steps: { diagnostic, career, calendar, begin },
     diagnosticMissing: input.hasAnalysis ? [] : input.diagnosticMissing,
     careerCanConfirmExisting: !input.careerConfirmed && input.hasClearMajor,
-    readyToBegin: priorComplete && !input.journeyStarted,
+    readyToBegin: diagnosticComplete && !input.journeyStarted,
     journeyStarted: input.journeyStarted,
   };
 }
