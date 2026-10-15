@@ -278,12 +278,17 @@ function foundationVisual(
 }
 
 function foundationCaption(
+  id: FoundationStepId,
   status: FoundationState["steps"][FoundationStepId],
 ): string {
   if (status === "complete") return "Good to go";
   if (status === "attention") return "Needs info";
-  if (status === "ready") return "Start here";
-  return "Locked";
+  if (status === "locked") return "Locked";
+  // "ready":
+  if (id === "begin") return "Generate";
+  // Career + calendar never block generation — they're optional refinements.
+  if (id === "career" || id === "calendar") return "Optional";
+  return "Start here"; // diagnostic
 }
 
 function milestoneVisual(m: RoadmapMilestone): NodeVisual {
@@ -337,12 +342,17 @@ export function JourneyTree({
     : `0 ${TRUNK_Y - 85} ${viewW} 170`;
   const minWidth = journeyStarted ? 760 : 480;
 
-  // The single glowing "current" foundation step = the first actionable one.
-  const currentFoundationId = FOUNDATION_STEPS.find(
-    (s) =>
-      foundation.steps[s.id] === "ready" ||
-      foundation.steps[s.id] === "attention",
-  )?.id;
+  // The single glowing "current" foundation step. Once the diagnostic is done,
+  // "Generate" is the primary action (career + calendar are optional and stay
+  // plain, still-clickable nodes), so it glows instead of the first ready step.
+  const currentFoundationId =
+    foundation.steps.begin === "ready"
+      ? "begin"
+      : FOUNDATION_STEPS.find(
+          (s) =>
+            foundation.steps[s.id] === "ready" ||
+            foundation.steps[s.id] === "attention",
+        )?.id;
 
   return (
     <div
@@ -470,8 +480,8 @@ export function JourneyTree({
               color="var(--color-brand-teal)"
               glyphLabel={String(i + 1)}
               title={step.title}
-              caption={foundationCaption(status)}
-              ariaLabel={`${step.title} — ${foundationCaption(status)}`}
+              caption={foundationCaption(step.id, status)}
+              ariaLabel={`${step.title} — ${foundationCaption(step.id, status)}`}
               disabled={status === "locked"}
               onActivate={() => onFoundationSelect(step.id)}
             />

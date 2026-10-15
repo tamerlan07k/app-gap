@@ -56,34 +56,19 @@ export async function POST() {
   // tier; the per-account lifetime cap is enforced by the allowance check below.
   const entitled = resolveFeatureAccess("roadmapGeneration", tier).enabled;
 
-  // The four branches are only generated AFTER the shared foundation is complete
-  // (diagnostic + career direction + calendar). "Begin your journey" is what calls
-  // this endpoint; guard it server-side too.
-  const [analysisRes, careerRes, calendarRes] = await Promise.all([
-    admin
-      .from("ai_analyses")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id),
-    admin
-      .from("career_assessments")
-      .select("confirmed")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-    admin
-      .from("calendars")
-      .select("status, confirmed")
-      .eq("user_id", user.id)
-      .maybeSingle(),
-  ]);
-  const foundationComplete =
-    (analysisRes.count ?? 0) > 0 &&
-    (careerRes.data as { confirmed: boolean } | null)?.confirmed === true &&
-    (calendarRes.data as { status: string; confirmed: boolean } | null)
-      ?.confirmed === true;
+  // Generation unlocks on the DIAGNOSTIC alone. Career direction and calendar are
+  // optional refinements, not gates (mirrors computeFoundationState), so the only
+  // server-side prerequisite for a FIRST generation is a completed AppGap analysis.
+  // "Generate roadmap" is what calls this endpoint; generation is always manual.
+  const { count: analysisCount } = await admin
+    .from("ai_analyses")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
+  const diagnosticComplete = (analysisCount ?? 0) > 0;
 
-  // Only block a FIRST generation on an incomplete foundation. If a roadmap is
-  // already in flight / ready, fall through so the saved result is returned.
-  if (!foundationComplete) {
+  // Only block a FIRST generation on a missing diagnostic. If a roadmap is already
+  // in flight / ready, fall through so the saved result is returned.
+  if (!diagnosticComplete) {
     const { data: existing } = await admin
       .from("roadmaps")
       .select("status")
@@ -93,7 +78,7 @@ export async function POST() {
       return Response.json(
         {
           error:
-            "Complete your foundation (diagnostic, career direction, and calendar) before beginning your journey.",
+            "Run your diagnostic (AppGap Analysis) before generating your roadmap.",
         },
         { status: 400 },
       );

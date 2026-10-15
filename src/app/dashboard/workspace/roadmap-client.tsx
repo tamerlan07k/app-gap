@@ -180,7 +180,9 @@ export function RoadmapClient(initial: WorkspaceView) {
         </div>
       )}
 
-      {/* Hero: journey next step once started, else the current foundation action. */}
+      {/* Hero: once the journey is generated, the next milestone. Otherwise, as
+          soon as the diagnostic is done the primary action is "Generate roadmap";
+          before that, the current foundation step (the diagnostic). */}
       {journeyReady ? (
         allDone ? (
           <AllDoneCard />
@@ -190,27 +192,44 @@ export function RoadmapClient(initial: WorkspaceView) {
             onOpenDetail={() => setSelected(nextStep)}
           />
         ) : null
-      ) : currentFoundationId ? (
-        <FoundationHero
-          stepId={currentFoundationId}
-          view={view}
-          onAction={() => onFoundationSelect(currentFoundationId)}
-        />
       ) : view.foundation.readyToBegin ? (
         <FoundationHero
           stepId="begin"
           view={view}
           onAction={() => onFoundationSelect("begin")}
         />
+      ) : currentFoundationId ? (
+        <FoundationHero
+          stepId={currentFoundationId}
+          view={view}
+          onAction={() => onFoundationSelect(currentFoundationId)}
+        />
       ) : null}
 
-      <JourneyTree
-        foundation={view.foundation}
-        journeyStarted={journeyReady}
-        milestones={view.milestones}
-        onFoundationSelect={onFoundationSelect}
-        onMilestoneSelect={setSelected}
-      />
+      {/* Optional refinements, shown ONLY before generation (and only once the
+          diagnostic is done). Career direction and calendar sharpen the roadmap
+          but never block it — they're plain secondary actions here, not a
+          roadmap graphic. */}
+      {!journeyReady && view.foundation.readyToBegin && (
+        <OptionalRefinements
+          foundation={view.foundation}
+          onSelect={onFoundationSelect}
+        />
+      )}
+
+      {/* The roadmap graphic is the PRODUCT of generation — never shown before.
+          Until "Generate roadmap" is clicked there is no roadmap to draw, so the
+          page stays on the hero (and its optional refinements). The branching
+          journey tree appears only once the roadmap is ready. */}
+      {journeyReady && (
+        <JourneyTree
+          foundation={view.foundation}
+          journeyStarted
+          milestones={view.milestones}
+          onFoundationSelect={onFoundationSelect}
+          onMilestoneSelect={setSelected}
+        />
+      )}
 
       {modal === "career" && (
         <AssessmentModal
@@ -326,6 +345,43 @@ function FoundationHero({
           {step.actionLabel}
           <ArrowRight />
         </Button>
+      </div>
+    </div>
+  );
+}
+
+function OptionalRefinements({
+  foundation,
+  onSelect,
+}: {
+  foundation: FoundationState;
+  onSelect: (id: FoundationStepId) => void;
+}) {
+  const optional: FoundationStepId[] = ["career", "calendar"];
+  const pending = optional.filter((id) => foundation.steps[id] !== "complete");
+  if (pending.length === 0) return null;
+  return (
+    <div className="rounded-xl border border-border bg-muted/20 px-4 py-3">
+      <p className="text-xs font-medium text-muted-foreground">
+        Optional — sharpen your roadmap before generating:
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {pending.map((id) => {
+          const step = FOUNDATION_STEPS.find((s) => s.id === id);
+          if (!step) return null;
+          const Icon = STEP_ICON[id];
+          return (
+            <Button
+              key={id}
+              variant="outline"
+              size="sm"
+              onClick={() => onSelect(id)}
+            >
+              <Icon />
+              {step.actionLabel}
+            </Button>
+          );
+        })}
       </div>
     </div>
   );

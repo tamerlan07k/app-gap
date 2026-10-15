@@ -72,33 +72,34 @@ describe("computeFoundationState — career", () => {
 });
 
 describe("computeFoundationState — begin gate", () => {
-  it("is locked until diagnostic + career + calendar are all complete", () => {
+  it("is locked until the diagnostic is complete", () => {
     expect(computeFoundationState(inputs()).steps.begin).toBe("locked");
     expect(
-      computeFoundationState(
-        inputs({ hasAnalysis: true, careerConfirmed: true }),
-      ).steps.begin,
+      computeFoundationState(inputs({ profileReadyForDiagnostic: false })).steps
+        .begin,
     ).toBe("locked");
   });
-  it("is ready when the first three are complete and the journey hasn't started", () => {
+  it("is ready as soon as the diagnostic is complete — career + calendar optional", () => {
+    const s = computeFoundationState(inputs({ hasAnalysis: true }));
+    expect(s.steps.begin).toBe("ready");
+    expect(s.readyToBegin).toBe(true);
+  });
+  it("stays ready even when career and calendar are still incomplete", () => {
     const s = computeFoundationState(
       inputs({
         hasAnalysis: true,
-        careerConfirmed: true,
-        calendarConfirmed: true,
+        careerConfirmed: false,
+        calendarConfirmed: false,
       }),
     );
     expect(s.steps.begin).toBe("ready");
+    expect(s.steps.career).toBe("ready");
+    expect(s.steps.calendar).toBe("ready");
     expect(s.readyToBegin).toBe(true);
   });
   it("is complete once the journey has started", () => {
     const s = computeFoundationState(
-      inputs({
-        hasAnalysis: true,
-        careerConfirmed: true,
-        calendarConfirmed: true,
-        journeyStarted: true,
-      }),
+      inputs({ hasAnalysis: true, journeyStarted: true }),
     );
     expect(s.steps.begin).toBe("complete");
     expect(s.readyToBegin).toBe(false);
