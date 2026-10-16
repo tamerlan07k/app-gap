@@ -12,6 +12,8 @@
 
 import type { RawEvaluation } from "./schemas";
 import {
+  type CoverageModel,
+  coverageAdjustmentFactor,
   DIMENSION_KEYS,
   type DimensionKey,
   type DimensionWeights,
@@ -51,18 +53,26 @@ export type ScoredEvaluation = {
 /**
  * Combine a raw model evaluation with the resolved archetype weighting into the
  * final, displayable scored evaluation. Pure and deterministic.
+ *
+ * `coverageModel` controls how hard directive coverage pulls alignment down:
+ * "strict" (the default — every college today) multiplies alignment by the raw
+ * coverage ratio; "lenient" (Columbia, this task) floors and dampens it so a
+ * minor omission doesn't dominate the score. See ./scoring.
  */
 export function scoreEvaluation(
   raw: RawEvaluation,
   weights: DimensionWeights,
   weightRationale: string,
+  opts: { coverageModel?: CoverageModel } = {},
 ): ScoredEvaluation {
+  const coverageModel = opts.coverageModel ?? "strict";
   const directives: GradedDirective[] = raw.directives.map((d) => ({
     directive: d.directive,
     status: d.status,
     note: d.note,
   }));
   const coverageRatio = directiveCoverageRatio(directives);
+  const coverageFactor = coverageAdjustmentFactor(coverageRatio, coverageModel);
 
   const byKey = new Map(raw.dimensions.map((d) => [d.key, d]));
 
@@ -73,7 +83,7 @@ export function scoreEvaluation(
     // Only alignment is coverage-adjusted. Missing/partial directives scale it
     // down; full coverage (or no explicit directives) leaves it untouched.
     const adjustedScore =
-      key === "alignment" ? Math.round(d.score * coverageRatio) : d.score;
+      key === "alignment" ? Math.round(d.score * coverageFactor) : d.score;
     dimensions.push({
       key,
       score: adjustedScore,

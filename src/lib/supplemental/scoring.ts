@@ -122,6 +122,44 @@ export function directiveCoverageRatio(directives: GradedDirective[]): number {
   return covered / directives.length;
 }
 
+// ─── Coverage → alignment adjustment model ────────────────────────────────────
+//
+// The Prompt-Alignment dimension is adjusted down in code by how much of the
+// prompt the essay covers (see ./evaluate). Two models decide HOW hard:
+//   - "strict" (default, every college today): alignment is multiplied by the raw
+//     coverage ratio, so missing 1 of 3 directives costs a full third of alignment.
+//   - "lenient" (Columbia, this task): the multiplier is floored and dampened, so
+//     a minor omission or a reasonable alternative interpretation no longer tanks
+//     the score. A genuine material failure still costs — but via the model's own
+//     (honestly low) alignment sub-score, not a compounding mechanical penalty.
+// Kept college-agnostic on purpose: callers pass the model (the Columbia mapping
+// lives in ./columbia), so this layer names no college.
+
+export type CoverageModel = "strict" | "lenient";
+
+/**
+ * Floor for the lenient model: alignment keeps at least this fraction of the
+ * model's sub-score regardless of coverage, and the remaining fraction scales
+ * with coverage. 0.7 means missing everything caps the mechanical penalty at
+ * −30% of alignment (not −100%), and missing 1 of 3 costs ~10%, not ~33%.
+ */
+export const LENIENT_COVERAGE_FLOOR = 0.7;
+
+/**
+ * The multiplier applied to the alignment sub-score for a given coverage ratio
+ * and model. "strict" returns the ratio unchanged (today's behavior); "lenient"
+ * maps [0,1] into [FLOOR, 1].
+ */
+export function coverageAdjustmentFactor(
+  ratio: number,
+  model: CoverageModel = "strict",
+): number {
+  if (model === "lenient") {
+    return LENIENT_COVERAGE_FLOOR + (1 - LENIENT_COVERAGE_FLOOR) * ratio;
+  }
+  return ratio;
+}
+
 /** Count of directives fully or partly addressed, for "2 of 3" style display. */
 export function directivesAddressed(directives: GradedDirective[]): number {
   return directives.filter((d) => d.status !== "missing").length;

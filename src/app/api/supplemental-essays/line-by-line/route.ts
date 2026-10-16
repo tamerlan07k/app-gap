@@ -13,7 +13,8 @@ export async function POST(req: Request) {
     requireContent: true,
   });
   if ("response" in auth) return auth.response;
-  const { userId, admin, essay, tier, unlimited, model } = auth.context;
+  const { userId, admin, essay, collegeSlug, tier, unlimited, model } =
+    auth.context;
 
   const { data: parseRow } = await admin
     .from("supplemental_essay_analyses")
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
         essay.content,
         essay.prompt_text,
         parsed.data,
+        collegeSlug,
         model,
       );
 

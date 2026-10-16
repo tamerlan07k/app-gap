@@ -16,6 +16,7 @@ import { Button } from "~/components/ui/button";
 import { Textarea } from "~/components/ui/textarea";
 import { resolveWeights } from "~/lib/supplemental/archetypes";
 import { buildChecklist } from "~/lib/supplemental/checklist";
+import { coverageModelFor } from "~/lib/supplemental/columbia";
 import { scoreEvaluation } from "~/lib/supplemental/evaluate";
 import type {
   LineByLineAnalysis,
@@ -181,9 +182,11 @@ export function EssayWorkspace({
   const scored = useMemo(
     () =>
       evaluation && weighting
-        ? scoreEvaluation(evaluation, weighting.weights, weighting.rationale)
+        ? scoreEvaluation(evaluation, weighting.weights, weighting.rationale, {
+            coverageModel: coverageModelFor(data.collegeSlug),
+          })
         : null,
-    [evaluation, weighting],
+    [evaluation, weighting, data.collegeSlug],
   );
 
   const checklist = useMemo(

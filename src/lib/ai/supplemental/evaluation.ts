@@ -1,6 +1,10 @@
 import { generateText } from "ai";
 import { ARCHETYPE_LABELS } from "~/lib/supplemental/archetypes";
 import {
+  COLUMBIA_EVALUATION_ADDENDUM,
+  isColumbia,
+} from "~/lib/supplemental/columbia";
+import {
   evaluationSchema,
   type PromptParse,
   type RawEvaluation,
@@ -84,6 +88,18 @@ Respond with ONLY valid JSON in this exact shape — no markdown, no code fences
 }
 Include all four dimensions exactly once. Grade every directive you were given. Do NOT include an overall score — it is computed from the four dimensions.`;
 
+// The system prompt for one evaluation. For Columbia University (only), the
+// Columbia addendum is appended — it refines how alignment is weighed, replaces
+// the name-swap "uniqueness" test, requires evidence for generic claims, forbids
+// cross-category repetition, and adds per-prompt understanding. Every other
+// college gets the base prompt unchanged.
+function buildSystemPrompt(collegeSlug: string | null): string {
+  if (isColumbia(collegeSlug)) {
+    return `${SYSTEM_PROMPT}\n\n${COLUMBIA_EVALUATION_ADDENDUM}`;
+  }
+  return SYSTEM_PROMPT;
+}
+
 function buildPrompt(
   content: string,
   promptText: string,
@@ -148,6 +164,7 @@ export async function generateEvaluation(
   promptText: string,
   parse: PromptParse,
   collegeName: string,
+  collegeSlug: string | null,
   verifiedCollege: string | null,
   modelOverride?: string,
 ): Promise<{
@@ -161,7 +178,7 @@ export async function generateEvaluation(
 
   const result = await generateText({
     model: gateway(model),
-    system: SYSTEM_PROMPT,
+    system: buildSystemPrompt(collegeSlug),
     prompt: buildPrompt(
       content,
       promptText,

@@ -1,5 +1,9 @@
 import { generateText } from "ai";
 import {
+  COLUMBIA_LINE_BY_LINE_ADDENDUM,
+  isColumbia,
+} from "~/lib/supplemental/columbia";
+import {
   type LineByLineAnalysis,
   lineByLineSchema,
   type PromptParse,
@@ -54,6 +58,16 @@ Respond with ONLY valid JSON in this exact shape — no markdown, no code fences
 }
 Order comments by where they appear in the essay when you can.`;
 
+// Columbia University (only) gets an appended addendum that keeps the margin-note
+// pass from over-flagging name-drops/generic passages and from marking up the
+// 100-word list prompt as prose. Every other college gets the base prompt.
+function buildSystemPrompt(collegeSlug: string | null): string {
+  if (isColumbia(collegeSlug)) {
+    return `${SYSTEM_PROMPT}\n\n${COLUMBIA_LINE_BY_LINE_ADDENDUM}`;
+  }
+  return SYSTEM_PROMPT;
+}
+
 function buildPrompt(
   content: string,
   promptText: string,
@@ -106,6 +120,7 @@ export async function generateLineByLine(
   content: string,
   promptText: string,
   parse: PromptParse,
+  collegeSlug: string | null,
   modelOverride?: string,
 ): Promise<{
   analysis: LineByLineAnalysis;
@@ -118,7 +133,7 @@ export async function generateLineByLine(
 
   const result = await generateText({
     model: gateway(model),
-    system: SYSTEM_PROMPT,
+    system: buildSystemPrompt(collegeSlug),
     prompt: buildPrompt(content, promptText, parse),
     temperature,
   });

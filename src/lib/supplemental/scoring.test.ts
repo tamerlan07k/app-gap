@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  coverageAdjustmentFactor,
   directiveCoverageRatio,
   directivesAddressed,
   type GradedDirective,
+  LENIENT_COVERAGE_FLOOR,
   scoreBand,
   weightedOverall,
 } from "./scoring";
@@ -44,6 +46,30 @@ describe("weightedOverall", () => {
         { alignment: 25, reflection: 25, specificity: 25, voice: 25 },
       ),
     ).toBe(0);
+  });
+});
+
+describe("coverageAdjustmentFactor", () => {
+  it("strict (default) returns the ratio unchanged", () => {
+    expect(coverageAdjustmentFactor(1)).toBe(1);
+    expect(coverageAdjustmentFactor(0)).toBe(0);
+    expect(coverageAdjustmentFactor(0.5)).toBe(0.5);
+    expect(coverageAdjustmentFactor(2 / 3, "strict")).toBeCloseTo(2 / 3, 5);
+  });
+
+  it("lenient maps [0,1] into [FLOOR,1]", () => {
+    expect(coverageAdjustmentFactor(1, "lenient")).toBe(1);
+    expect(coverageAdjustmentFactor(0, "lenient")).toBe(LENIENT_COVERAGE_FLOOR);
+    // 0.7 + 0.3 * (2/3) = 0.9
+    expect(coverageAdjustmentFactor(2 / 3, "lenient")).toBeCloseTo(0.9, 5);
+  });
+
+  it("lenient is always >= strict (never harsher)", () => {
+    for (const r of [0, 0.25, 0.5, 0.75, 1]) {
+      expect(coverageAdjustmentFactor(r, "lenient")).toBeGreaterThanOrEqual(
+        coverageAdjustmentFactor(r, "strict"),
+      );
+    }
   });
 });
 

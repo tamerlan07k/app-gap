@@ -9,6 +9,7 @@ import { CURRENT_CYCLE_YEAR } from "~/lib/colleges/types";
 import { resolveWeights } from "./archetypes";
 import { collegeEssayChanceDelta, type EssayChanceInput } from "./chance-delta";
 import { chatThreadSchema } from "./chat";
+import { coverageModelFor } from "./columbia";
 import { scoreEvaluation } from "./evaluate";
 import {
   evaluationSchema,
@@ -435,6 +436,9 @@ export async function loadCollegeEssayChanceDeltas(
     if (essays.length === 0) return new Map();
 
     const essayIds = essays.map((e) => e.id as string);
+    const collegeIds = Array.from(
+      new Set(essays.map((e) => e.college_id as string)),
+    );
     const catalogIds = Array.from(
       new Set(
         essays
@@ -443,7 +447,7 @@ export async function loadCollegeEssayChanceDeltas(
       ),
     );
 
-    const [analysesRes, catalogRes] = await Promise.all([
+    const [analysesRes, catalogRes, collegesRes] = await Promise.all([
       client
         .from("supplemental_essay_analyses")
         .select("essay_id, kind, analysis")
@@ -458,7 +462,15 @@ export async function loadCollegeEssayChanceDeltas(
         : Promise.resolve({
             data: [] as { id: string; is_required: boolean }[],
           }),
+      client.from("colleges").select("id, slug").in("id", collegeIds),
     ]);
+
+    // collegeId → slug, so the coverage model (strict/lenient) matches what the
+    // workspace uses when it recomputes the same overall client-side.
+    const slugByCollege = new Map<string, string | null>();
+    for (const row of collegesRes.data ?? []) {
+      slugByCollege.set(row.id as string, (row.slug as string | null) ?? null);
+    }
 
     // essayId → { parse, evaluation } raw jsonb.
     const analysisByEssay = new Map<
@@ -496,7 +508,9 @@ export async function loadCollegeEssayChanceDeltas(
           parse.data.secondaryArchetypes,
           (e.word_limit as number | null) ?? parse.data.wordLimit,
         );
-        overall = scoreEvaluation(evaluation.data, weights, rationale).overall;
+        overall = scoreEvaluation(evaluation.data, weights, rationale, {
+          coverageModel: coverageModelFor(slugByCollege.get(collegeId)),
+        }).overall;
       }
 
       const catalogId = e.catalog_prompt_id as string | null;
