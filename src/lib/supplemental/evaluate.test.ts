@@ -102,3 +102,72 @@ describe("scoreEvaluation", () => {
     expect(scored.weights).toEqual(weights);
   });
 });
+
+describe("scoreEvaluation coverage model (Columbia leniency)", () => {
+  const twoOfThree = raw({
+    directives: [
+      { directive: "a", status: "addressed", note: "" },
+      { directive: "b", status: "addressed", note: "" },
+      { directive: "c", status: "missing", note: "" },
+    ],
+  });
+
+  it("defaults to the strict model (every other college unchanged)", () => {
+    // Regression guard for spec #6: no coverageModel == today's exact behavior.
+    const strict = scoreEvaluation(twoOfThree, equalWeights, "t");
+    const alignment = strict.dimensions.find((d) => d.key === "alignment");
+    // 90 * (2/3) = 60, exactly as before this change.
+    expect(alignment?.score).toBe(60);
+  });
+
+  it("the lenient model dampens the penalty but still penalizes", () => {
+    const lenient = scoreEvaluation(twoOfThree, equalWeights, "t", {
+      coverageModel: "lenient",
+    });
+    const alignment = lenient.dimensions.find((d) => d.key === "alignment");
+    // factor = 0.7 + 0.3*(2/3) = 0.9 → 90 * 0.9 = 81.
+    expect(alignment?.score).toBe(81);
+    // Still below the raw 90 (a real omission costs something)...
+    expect(alignment?.score).toBeLessThan(90);
+    expect(alignment?.adjusted).toBe(true);
+    // ...but materially higher than the strict 60 (compliance no longer dominates).
+    const strict = scoreEvaluation(
+      twoOfThree,
+      equalWeights,
+      "t",
+    ).dimensions.find((d) => d.key === "alignment");
+    expect(alignment?.score).toBeGreaterThan(strict?.score ?? 0);
+  });
+
+  it("the lenient model floors the penalty at 70% even when nothing is covered", () => {
+    const allMissing = raw({
+      directives: [
+        { directive: "a", status: "missing", note: "" },
+        { directive: "b", status: "missing", note: "" },
+      ],
+    });
+    const strict = scoreEvaluation(
+      allMissing,
+      equalWeights,
+      "t",
+    ).dimensions.find((d) => d.key === "alignment");
+    const lenient = scoreEvaluation(allMissing, equalWeights, "t", {
+      coverageModel: "lenient",
+    }).dimensions.find((d) => d.key === "alignment");
+    // strict zeroes alignment; lenient keeps 70% (the model's own sub-score still
+    // carries a true material failure — this only stops the mechanical double hit).
+    expect(strict?.score).toBe(0);
+    expect(lenient?.score).toBe(63); // 90 * 0.7
+  });
+
+  it("leaves alignment untouched under both models when coverage is full", () => {
+    const strict = scoreEvaluation(raw(), equalWeights, "t");
+    const lenient = scoreEvaluation(raw(), equalWeights, "t", {
+      coverageModel: "lenient",
+    });
+    const a = (s: typeof strict) =>
+      s.dimensions.find((d) => d.key === "alignment")?.score;
+    expect(a(strict)).toBe(90);
+    expect(a(lenient)).toBe(90);
+  });
+});

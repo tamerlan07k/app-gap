@@ -36,6 +36,8 @@ export type AuthorizedContext = {
   admin: SupabaseClient;
   essay: SupplementalEssayRow;
   collegeName: string;
+  /** The college's stable slug — gates Columbia-only grading refinements. */
+  collegeSlug: string | null;
   /** The student's intended-field key (profiles.major_category), or null. */
   fieldKey: string | null;
   profile: FullProfile;
@@ -118,10 +120,11 @@ export async function authorizeEssayRequest(
 
   const { data: college } = await admin
     .from("colleges")
-    .select("canonical_name")
+    .select("canonical_name, slug")
     .eq("id", essayRow.college_id)
     .maybeSingle();
   const collegeName = (college?.canonical_name as string) ?? "";
+  const collegeSlug = (college?.slug as string | null) ?? null;
 
   const loaded = await loadFullProfile(admin, user.id);
   if (!loaded) {
@@ -190,6 +193,7 @@ export async function authorizeEssayRequest(
       admin,
       essay: essayRow,
       collegeName,
+      collegeSlug,
       fieldKey,
       profile,
       profileRow: profileRow as EntitlementProfile,

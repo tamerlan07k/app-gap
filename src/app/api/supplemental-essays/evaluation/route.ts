@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     admin,
     essay,
     collegeName,
+    collegeSlug,
     fieldKey,
     tier,
     unlimited,
@@ -51,6 +52,7 @@ export async function POST(req: Request) {
         essay.prompt_text,
         parsed.data,
         collegeName,
+        collegeSlug,
         verified.block,
         model,
       );
