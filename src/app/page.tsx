@@ -1,22 +1,35 @@
 import { ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
 import { AppGapLogo } from "~/components/logo";
+import { AnimatedShinyText } from "~/components/ui/animated-shiny-text";
+import { BlurFade } from "~/components/ui/blur-fade";
 import { Button } from "~/components/ui/button";
+import { DotPattern } from "~/components/ui/dot-pattern";
+import { FlickeringGrid } from "~/components/ui/flickering-grid";
+import { MagicCard } from "~/components/ui/magic-card";
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
 function Hero() {
   return (
     <section className="relative flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
-      {/* Decorative background blobs */}
+      {/* Decorative background blobs + dot pattern */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <DotPattern
+          width={22}
+          height={22}
+          cr={1}
+          className="text-brand-teal/20 [mask-image:radial-gradient(ellipse_at_center,white,transparent_65%)]"
+        />
         <div className="absolute -right-72 -top-32 h-[520px] w-[520px] rounded-full bg-brand-teal/[0.08] blur-3xl" />
         <div className="absolute -left-72 bottom-0 h-[440px] w-[440px] rounded-full bg-brand-teal/[0.06] blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-3xl">
-        <p className="animate-fade-in text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-          College application clarity
+        <p className="animate-fade-in">
+          <AnimatedShinyText className="mx-0 max-w-none text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
+            College application clarity
+          </AnimatedShinyText>
         </p>
         <h1 className="animate-fade-up [animation-delay:0.12s] mt-4 text-5xl font-bold leading-tight tracking-tight sm:text-6xl">
           Know where your
@@ -79,31 +92,35 @@ function HowItWorks() {
         </div>
 
         <div className="grid gap-5 sm:grid-cols-3">
-          {steps.map((step) => (
-            <div
+          {steps.map((step, i) => (
+            <BlurFade
               key={step.number}
-              className="group relative overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-dark-surface p-7 transition-all duration-300 hover:-translate-y-1"
+              inView
+              delay={0.1 + i * 0.1}
+              className="h-full"
             >
-              {/* Ghost number */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -right-2 -top-4 select-none font-mono text-[7rem] font-black leading-none text-white/[0.06]"
-              >
-                {step.number}
-              </div>
-              {/* Step badge */}
-              <div className="mb-5 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-teal/20">
-                <span className="text-xs font-bold text-brand-teal">
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-dark-surface p-7 transition-all duration-300 hover:-translate-y-1">
+                {/* Ghost number */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-2 -top-4 select-none font-mono text-[7rem] font-black leading-none text-white/[0.06]"
+                >
                   {step.number}
-                </span>
+                </div>
+                {/* Step badge */}
+                <div className="mb-5 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-teal/20">
+                  <span className="text-xs font-bold text-brand-teal">
+                    {step.number}
+                  </span>
+                </div>
+                <h3 className="text-base font-semibold text-white">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-base font-semibold text-white">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/55">
-                {step.description}
-              </p>
-            </div>
+            </BlurFade>
           ))}
         </div>
       </div>
@@ -189,16 +206,26 @@ function WhoItsFor() {
           </h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-3">
-          {audiences.map((item) => (
-            <div
+          {audiences.map((item, i) => (
+            <BlurFade
               key={item.title}
-              className="rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+              inView
+              delay={0.1 + i * 0.1}
+              className="h-full"
             >
-              <h3 className="font-semibold text-foreground">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                {item.description}
-              </p>
-            </div>
+              <MagicCard
+                className="h-full rounded-2xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                gradientFrom="#2dd4bf"
+                gradientTo="#148b94"
+                gradientColor="#5eead4"
+                gradientOpacity={0.3}
+              >
+                <h3 className="font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.description}
+                </p>
+              </MagicCard>
+            </BlurFade>
           ))}
         </div>
       </div>
@@ -242,8 +269,23 @@ function FinalCTA() {
 
 function Footer() {
   return (
-    <footer className="bg-muted px-6 pb-10 pt-16">
-      <div className="mx-auto max-w-5xl space-y-10">
+    <footer className="relative overflow-hidden border-t border-border bg-muted px-6 pb-10 pt-16">
+      {/* Animated Magic UI background */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_90%)]"
+      >
+        <FlickeringGrid
+          className="h-full w-full"
+          squareSize={4}
+          gridGap={5}
+          flickerChance={0.35}
+          maxOpacity={0.45}
+          color="rgb(20, 139, 148)"
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-5xl space-y-10">
         {/* Brand + disclaimer */}
         <div className="max-w-xl space-y-4">
           <div className="flex items-center gap-2.5">
