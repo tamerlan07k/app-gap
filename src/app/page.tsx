@@ -1,231 +1,249 @@
-import { ArrowRight, Check } from "lucide-react";
+import {
+  ArrowRight,
+  Compass,
+  Gauge,
+  GraduationCap,
+  PenLine,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
+import { AppWindow } from "~/components/landing/app-window";
+import { Faq } from "~/components/landing/faq";
+import {
+  FeatureRow,
+  type FeatureRowProps,
+} from "~/components/landing/feature-row";
+import { StatsBand } from "~/components/landing/stats-band";
 import { AppGapLogo } from "~/components/logo";
 import { AnimatedShinyText } from "~/components/ui/animated-shiny-text";
-import { BlurFade } from "~/components/ui/blur-fade";
 import { Button } from "~/components/ui/button";
 import { DotPattern } from "~/components/ui/dot-pattern";
 import { FlickeringGrid } from "~/components/ui/flickering-grid";
-import { MagicCard } from "~/components/ui/magic-card";
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
 function Hero() {
   return (
-    <section className="relative flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center">
-      {/* Decorative background blobs + dot pattern */}
+    <section className="relative overflow-hidden px-6 pb-20 pt-20 sm:pt-28">
+      {/* Decorative background: soft teal wash + dots */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-x-0 top-0 h-[32rem] bg-gradient-to-b from-brand-teal-wash to-transparent" />
         <DotPattern
           width={22}
           height={22}
           cr={1}
-          className="text-brand-teal/20 [mask-image:radial-gradient(ellipse_at_center,white,transparent_65%)]"
+          className="text-brand-teal/20 [mask-image:radial-gradient(ellipse_at_top,white,transparent_60%)]"
         />
         <div className="absolute -right-72 -top-32 h-[520px] w-[520px] rounded-full bg-brand-teal/[0.08] blur-3xl" />
-        <div className="absolute -left-72 bottom-0 h-[440px] w-[440px] rounded-full bg-brand-teal/[0.06] blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-3xl">
-        <p className="animate-fade-in">
-          <AnimatedShinyText className="mx-0 max-w-none text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-            College application clarity
-          </AnimatedShinyText>
+      <div className="relative mx-auto max-w-3xl text-center">
+        <p className="animate-fade-in flex justify-center">
+          <span className="inline-flex items-center rounded-full border border-brand-teal/20 bg-brand-teal-wash px-4 py-1.5">
+            <AnimatedShinyText className="mx-0 max-w-none text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
+              College application clarity
+            </AnimatedShinyText>
+          </span>
         </p>
-        <h1 className="animate-fade-up [animation-delay:0.12s] mt-4 text-5xl font-bold leading-tight tracking-tight sm:text-6xl">
+        <h1 className="animate-fade-up [animation-delay:0.12s] mt-6 font-display text-5xl font-extrabold leading-[1.03] tracking-[-0.035em] sm:text-7xl">
           Know where your
-          <br className="hidden sm:block" /> application stands.
+          <br className="hidden sm:block" />{" "}
+          <span className="text-brand-teal">application stands.</span>
         </h1>
-        <p className="animate-fade-up [animation-delay:0.24s] mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-          AppGap helps high school students see exactly where their profile is
-          strong, where the gaps are, and what to do before applying.
+        <p className="animate-fade-up [animation-delay:0.24s] mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+          AppGap reads your academics, activities, and awards and shows you
+          exactly where your profile is strong, where the gaps are, and what to
+          do before you apply.
         </p>
-        <div className="animate-fade-up [animation-delay:0.36s] mt-8">
+        <div className="animate-fade-up [animation-delay:0.36s] mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <Button size="lg" asChild>
             <Link href="/dashboard">
-              Try AppGap
+              Try AppGap free
               <ArrowRight />
             </Link>
           </Button>
+          <Button size="lg" variant="outline" asChild>
+            <Link href="#features">See how it works</Link>
+          </Button>
         </div>
+      </div>
+
+      {/* Hero product preview */}
+      <div className="animate-fade-up [animation-delay:0.48s] relative mx-auto mt-16 max-w-5xl">
+        <AppWindow
+          url="appgap.co/dashboard"
+          label="Your AppGap dashboard"
+          icon={Gauge}
+          media={{
+            src: "/landing/dashboard-v3.png",
+            kind: "image",
+            width: 1336,
+            height: 901,
+          }}
+        />
       </div>
     </section>
   );
 }
 
-// ─── How it works ────────────────────────────────────────────────────────────
+// ─── Features ────────────────────────────────────────────────────────────────
 
-const steps = [
+const features: FeatureRowProps[] = [
   {
-    number: "01",
-    title: "Enter your profile",
+    eyebrow: "AppGap Score",
+    title: (
+      <>
+        See exactly where
+        <br /> your profile stands
+      </>
+    ),
     description:
-      "Share your GPA, coursework, test scores, and extracurricular activities in one place.",
+      "AppGap scores your academics, activities, and awards across six categories — so you know what's strong and what's holding you back.",
+    bullets: [
+      "A clear overall gap score, broken down by category",
+      "Honest, specific feedback — not 'show more passion'",
+      "Updates as your profile grows",
+    ],
+    cta: { label: "Get my score", href: "/dashboard" },
+    icon: Gauge,
+    url: "appgap.co/dashboard",
+    media: {
+      src: "/landing/appgap-score-v3.png",
+      kind: "image",
+      width: 1388,
+      height: 861,
+    },
   },
   {
-    number: "02",
-    title: "See where you stand",
+    eyebrow: "My Colleges",
+    title: (
+      <>
+        Your real chances,
+        <br /> school by school
+      </>
+    ),
     description:
-      "AppGap maps your profile and surfaces where you're strong and where there are real gaps.",
+      "Build your college list and see honest admission chances based on your actual profile — not inflated guesses.",
+    bullets: [
+      "1,500+ colleges with real admissions data",
+      "Holistic chancing with an honest range",
+      "Field-fit and application plans per school",
+    ],
+    cta: { label: "Explore colleges", href: "/dashboard/colleges" },
+    icon: GraduationCap,
+    url: "appgap.co/dashboard/colleges",
+    media: {
+      src: "/landing/my-colleges-v3.png",
+      kind: "image",
+      width: 1347,
+      height: 897,
+    },
+    reverse: true,
   },
   {
-    number: "03",
-    title: "Get a clear plan",
+    eyebrow: "Application Writing",
+    title: (
+      <>
+        Make every
+        <br /> activity count
+      </>
+    ),
     description:
-      "Walk away knowing exactly what to work on — before application season, not during it.",
+      "AppGap scores your activity descriptions and additional-info section and shows you how to sharpen them line by line.",
+    bullets: [
+      "Each activity scored on verb, specificity, and impact",
+      "Polish, rewrite, and template modes",
+      "Guidance built on the current Common App",
+    ],
+    cta: {
+      label: "Sharpen my writing",
+      href: "/dashboard/application-writing",
+    },
+    icon: PenLine,
+    url: "appgap.co/dashboard/application-writing",
+    media: {
+      src: "/landing/application-writing-v3.png",
+      kind: "image",
+      width: 900,
+      height: 560,
+    },
+  },
+  {
+    eyebrow: "Personal Statement",
+    title: (
+      <>
+        Essays that
+        <br /> actually land
+      </>
+    ),
+    description:
+      "Draft, clone, and refine your personal statement and supplemental essays with line-by-line AI coaching toward a stronger story.",
+    bullets: [
+      "Line-by-line feedback and grading",
+      "Per-college supplemental workspaces",
+      "Finalize a clean snapshot when you're ready",
+    ],
+    cta: {
+      label: "Start an essay",
+      href: "/dashboard/application-writing/personal-statement",
+    },
+    icon: Sparkles,
+    url: "appgap.co/dashboard/application-writing/personal-statement",
+    media: {
+      src: "/landing/personal-statement-v3.png",
+      kind: "image",
+      width: 956,
+      height: 793,
+    },
+    reverse: true,
+  },
+  {
+    eyebrow: "My Roadmap",
+    title: (
+      <>
+        A plan built around
+        <br /> your timeline
+      </>
+    ),
+    description:
+      "Turn your gaps into a personalized, step-by-step plan that fits your grade level and your target test and application dates.",
+    bullets: [
+      "Personalized milestones across four tracks",
+      "Tuned to your grade and deadlines",
+      "Concrete next steps, not vague advice",
+    ],
+    cta: { label: "Build my roadmap", href: "/dashboard/workspace" },
+    icon: Compass,
+    url: "appgap.co/dashboard/workspace",
+    media: {
+      src: "/landing/my-roadmap-v3.png",
+      kind: "image",
+      width: 1300,
+      height: 880,
+    },
   },
 ];
 
-function HowItWorks() {
+function Features() {
   return (
-    <section className="bg-brand-dark px-6 py-24">
+    <section id="features" className="bg-background px-6 py-24">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-14 scroll-reveal">
+        <div className="mb-20 max-w-2xl scroll-reveal">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-            Step
+            Everything you need
           </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            How it works
+          <h2 className="mt-3 font-display text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+            Everything you need to understand your application
           </h2>
-          <p className="mt-3 max-w-sm text-base text-white/55">
-            Three steps to a clearer picture of your application.
+          <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+            One place to see where you stand, where you can get in, and what to
+            work on next.
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-3">
-          {steps.map((step, i) => (
-            <BlurFade
-              key={step.number}
-              inView
-              delay={0.1 + i * 0.1}
-              className="h-full"
-            >
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-brand-dark-surface p-7 transition-all duration-300 hover:-translate-y-1">
-                {/* Ghost number */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute -right-2 -top-4 select-none font-mono text-[7rem] font-black leading-none text-white/[0.06]"
-                >
-                  {step.number}
-                </div>
-                {/* Step badge */}
-                <div className="mb-5 inline-flex h-8 w-8 items-center justify-center rounded-lg bg-brand-teal/20">
-                  <span className="text-xs font-bold text-brand-teal">
-                    {step.number}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-white">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/55">
-                  {step.description}
-                </p>
-              </div>
-            </BlurFade>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── What it helps with ──────────────────────────────────────────────────────
-
-const helpItems = [
-  "Identify underdeveloped areas in your academic or extracurricular profile",
-  "Spot gaps in course rigor, activity depth, or how you're positioning yourself",
-  "Understand how your profile reads before it's too late to change it",
-  "Get concrete direction — not vague advice about 'showing passion'",
-];
-
-function WhatItHelps() {
-  return (
-    <section className="bg-card px-6 py-24">
-      <div className="mx-auto max-w-5xl">
-        <div className="grid gap-12 sm:grid-cols-2 sm:gap-20">
-          <div className="scroll-reveal space-y-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-              What it helps with
-            </p>
-            <h2 className="text-3xl font-bold tracking-tight">
-              What AppGap helps with
-            </h2>
-            <p className="leading-relaxed text-muted-foreground">
-              AppGap doesn't make promises about admissions outcomes. It gives
-              you an honest read on where your current profile actually stands —
-              so you can do something about it.
-            </p>
-          </div>
-          <ul className="scroll-reveal space-y-5">
-            {helpItems.map((item) => (
-              <li key={item} className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-teal/15">
-                  <Check className="size-3 text-brand-teal" strokeWidth={3} />
-                </div>
-                <span className="text-sm leading-relaxed text-muted-foreground">
-                  {item}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Who it's for ────────────────────────────────────────────────────────────
-
-const audiences = [
-  {
-    title: "High school students",
-    description:
-      "Planning to apply to college and want a realistic sense of where their profile stands right now.",
-  },
-  {
-    title: "Students who aren't sure if they're on track",
-    description:
-      "Interested in selective schools but unclear whether their current activities and grades tell the right story.",
-  },
-  {
-    title: "Students who want a plan, not anxiety",
-    description:
-      "Looking for something concrete to work toward — not just a list of everything that could go wrong.",
-  },
-];
-
-function WhoItsFor() {
-  return (
-    <section className="bg-muted px-6 py-24">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-12 scroll-reveal">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-            Who it's for
-          </p>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">
-            Who it's for
-          </h2>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-3">
-          {audiences.map((item, i) => (
-            <BlurFade
-              key={item.title}
-              inView
-              delay={0.1 + i * 0.1}
-              className="h-full"
-            >
-              <MagicCard
-                className="h-full rounded-2xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-                gradientFrom="#2dd4bf"
-                gradientTo="#148b94"
-                gradientColor="#5eead4"
-                gradientOpacity={0.3}
-              >
-                <h3 className="font-semibold text-foreground">{item.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {item.description}
-                </p>
-              </MagicCard>
-            </BlurFade>
+        <div className="space-y-24 sm:space-y-32">
+          {features.map((feature) => (
+            <FeatureRow key={feature.eyebrow} {...feature} />
           ))}
         </div>
       </div>
@@ -237,27 +255,35 @@ function WhoItsFor() {
 
 function FinalCTA() {
   return (
-    <section id="get-started" className="px-6 py-16">
+    <section id="get-started" className="px-6 py-20">
       <div className="mx-auto max-w-5xl">
-        <div className="scroll-reveal overflow-hidden rounded-3xl bg-brand-dark px-10 py-14 sm:flex sm:items-center sm:justify-between sm:gap-12">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-teal">
-              Try it now
-            </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-white">
+        <div className="scroll-reveal relative overflow-hidden rounded-3xl bg-brand-dark px-8 py-16 text-center sm:px-16 sm:py-20">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_80%)]"
+          >
+            <DotPattern
+              width={20}
+              height={20}
+              cr={1}
+              className="text-white/[0.07]"
+            />
+          </div>
+          <div className="relative">
+            <h2 className="font-display text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
               Ready to see where you stand?
             </h2>
-            <p className="mt-3 text-base text-white/55">
+            <p className="mx-auto mt-4 max-w-md text-lg text-white/60">
               Takes a few minutes. Free to get started.
             </p>
-          </div>
-          <div className="mt-8 shrink-0 sm:mt-0">
-            <Button size="lg" asChild>
-              <Link href="/dashboard">
-                Try AppGap
-                <ArrowRight />
-              </Link>
-            </Button>
+            <div className="mt-9">
+              <Button size="lg" asChild>
+                <Link href="/dashboard">
+                  Try AppGap free
+                  <ArrowRight />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -270,7 +296,6 @@ function FinalCTA() {
 function Footer() {
   return (
     <footer className="relative overflow-hidden border-t border-border bg-muted px-6 pb-10 pt-16">
-      {/* Animated Magic UI background */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_90%)]"
@@ -285,12 +310,20 @@ function Footer() {
         />
       </div>
 
+      {/* Legibility scrim: veils the animation just enough for text to read
+          cleanly, without altering the grid itself. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-muted/75"
+      />
+
       <div className="relative mx-auto max-w-5xl space-y-10">
-        {/* Brand + disclaimer */}
         <div className="max-w-xl space-y-4">
           <div className="flex items-center gap-2.5">
             <AppGapLogo className="h-7 w-auto" />
-            <span className="text-sm font-bold tracking-tight">AppGap</span>
+            <span className="font-display text-sm font-extrabold tracking-tight">
+              AppGap
+            </span>
           </div>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Student-Led Project
@@ -305,7 +338,6 @@ function Footer() {
           </p>
         </div>
 
-        {/* AI disclaimer */}
         <div className="rounded-xl border border-border bg-card px-5 py-4">
           <p className="text-xs leading-relaxed text-muted-foreground">
             <span className="font-medium text-foreground">Disclaimer: </span>
@@ -315,7 +347,6 @@ function Footer() {
           </p>
         </div>
 
-        {/* Bottom bar */}
         <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
             © 2026 AppGap. All rights reserved.
@@ -358,9 +389,9 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <HowItWorks />
-      <WhatItHelps />
-      <WhoItsFor />
+      <Features />
+      <StatsBand />
+      <Faq />
       <FinalCTA />
       <Footer />
     </main>
