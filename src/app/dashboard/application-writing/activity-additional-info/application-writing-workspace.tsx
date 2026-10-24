@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, PenLine, RefreshCw } from "lucide-react";
+import { Loader2, PenLine, RefreshCw, Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import type {
@@ -11,6 +12,7 @@ import { ActivityWritingCard } from "./activity-writing-card";
 import { AdditionalInfoCard } from "./additional-info-card";
 
 export type WorkspaceActivity = {
+  id: string;
   name: string;
   category: string;
   description: string;
@@ -39,6 +41,32 @@ export function ApplicationWritingWorkspace({
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  // Set once a revised description is applied to the shared profile so we can
+  // offer a single "update your score" re-evaluation (rather than one per card).
+  const [profileChanged, setProfileChanged] = useState(false);
+  const [reassessing, setReassessing] = useState(false);
+  const [reassessError, setReassessError] = useState<string | null>(null);
+
+  async function updateScore() {
+    setReassessing(true);
+    setReassessError(null);
+    try {
+      const res = await fetch("/api/reassess-profile", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setReassessError(data.error ?? "Couldn't update your score.");
+        return;
+      }
+      // Success — the Overview reveals the new score once.
+      router.push("/dashboard/profile");
+      router.refresh();
+    } catch {
+      setReassessError("Something went wrong updating your score.");
+    } finally {
+      setReassessing(false);
+    }
+  }
 
   // Match each AI feedback entry back to exactly one live activity, keeping every
   // activity's analysis under its own card. Primary match is by normalized name
@@ -180,14 +208,45 @@ export function ApplicationWritingWorkspace({
           <div className="divide-y divide-border">
             {activities.map((a) => (
               <ActivityWritingCard
-                key={a.name}
+                key={a.id}
+                id={a.id}
                 name={a.name}
                 category={a.category}
                 description={a.description}
                 feedback={feedbackForActivity.get(a.name) ?? null}
+                onApplied={() => setProfileChanged(true)}
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* After a revised description is applied to the profile, offer a single
+          diagnostic re-evaluation. Changes are already saved to the profile; the
+          score only moves once this succeeds, so a failure never shows a stale
+          score as current. */}
+      {profileChanged && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-brand-teal/30 bg-brand-teal/[0.04] p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-0.5">
+            <p className="text-sm font-medium">
+              Updated description saved to your profile
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Re-evaluate your AppGap diagnostic so your score reflects the
+              change.{" "}
+              {reassessError && (
+                <span className="text-destructive">{reassessError}</span>
+              )}
+            </p>
+          </div>
+          <Button
+            onClick={updateScore}
+            disabled={reassessing}
+            className="shrink-0"
+          >
+            {reassessing ? <Loader2 className="animate-spin" /> : <Sparkles />}
+            Update my AppGap score
+          </Button>
         </div>
       )}
 

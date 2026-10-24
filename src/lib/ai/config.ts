@@ -9,6 +9,7 @@
 
 export type FeatureKey =
   | "profileAnalysis" // the AppGap diagnostic / gap analysis
+  | "profileReassessment" // re-run of the diagnostic after a profile edit (same engine, own meter)
   | "applicationWriting" // activity descriptions + Additional Information help
   | "activitiesAnalysis" // Activities workspace: analysis + verdicts + recommendations
   | "courseworkAnalysis" // Coursework workspace: academic-path interpretation (profile-only, never scores)
@@ -237,6 +238,29 @@ export const FEATURE_ACCESS: Record<
     pro: {
       enabled: true,
       limit: 30,
+      window: "month",
+      model: "google/gemini-2.5-pro",
+    },
+  },
+  // Re-running the diagnostic after the student edits their profile (My Profile →
+  // Edit Profile, or applying a revised activity description from Application
+  // Writing). This reuses the EXACT same scoring engine as profileAnalysis
+  // (analyzeProfile → score.ts); it only has its OWN meter so profile edits don't
+  // exhaust the one-shot profileAnalysis allowance (Free = 1 for life). Sized
+  // generously enough that normal editing never hits the wall, but still capped so
+  // worst-case AI spend stays bounded (same Flash/Pro models as profileAnalysis,
+  // so per-call cost is identical). Recorded only on a SUCCESSFUL reassessment, so
+  // a failed re-run never consumes an allowance.
+  profileReassessment: {
+    free: {
+      enabled: true,
+      limit: 5,
+      window: "month",
+      model: "google/gemini-2.5-flash",
+    },
+    pro: {
+      enabled: true,
+      limit: 60,
       window: "month",
       model: "google/gemini-2.5-pro",
     },

@@ -20,7 +20,7 @@ export default async function ApplicationWritingPage() {
   const [activitiesRes, profileRes, writingRes] = await Promise.all([
     supabase
       .from("activities")
-      .select("name, category, description")
+      .select("id, name, category, description")
       .eq("user_id", user.id)
       .order("sort_order"),
     supabase
@@ -40,6 +40,7 @@ export default async function ApplicationWritingPage() {
   // Live activity descriptions (only those with text to review).
   const activities = (
     (activitiesRes.data ?? []) as Array<{
+      id: string;
       name: string;
       category: string;
       description: string | null;
@@ -47,6 +48,7 @@ export default async function ApplicationWritingPage() {
   )
     .filter((a) => a.description?.trim())
     .map((a) => ({
+      id: a.id,
       name: a.name,
       category: a.category,
       description: a.description ?? "",

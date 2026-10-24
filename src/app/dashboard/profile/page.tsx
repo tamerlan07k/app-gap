@@ -1,10 +1,9 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Pencil } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Button } from "~/components/ui/button";
 import { majorLabel, specializationLabel } from "~/lib/academic-interests";
 import { type Analysis, analysisSchema } from "~/lib/ai/schema";
-import { COMPONENT_WEIGHTS } from "~/lib/ai/score";
 import {
   ACTIVITY_CATEGORY_LABELS,
   AWARD_LEVEL_LABELS,
@@ -14,16 +13,9 @@ import {
   MAJOR_LABELS,
   SCHOOL_TYPE_LABELS,
 } from "~/lib/profile-labels";
+import { describeScoreChange } from "~/lib/score-delta";
 import { createClient } from "~/lib/supabase/server";
-
-const SCORE_COMPONENTS: {
-  key: "academics" | "activities" | "awards";
-  label: string;
-}[] = [
-  { key: "academics", label: "Academics" },
-  { key: "activities", label: "Activities" },
-  { key: "awards", label: "Awards" },
-];
+import { ScoreSummary } from "./score-summary";
 
 // ─── Presentational helpers ──────────────────────────────────────────────────
 
@@ -56,76 +48,6 @@ function InfoGrid({ rows }: { rows: { label: string; value: string }[] }) {
         </div>
       ))}
     </dl>
-  );
-}
-
-// The AppGap Score as a small status element — the full diagnostic lives under
-// My Analysis, so this only summarizes and links there (never regenerates).
-function ScoreSummary({
-  analysis,
-  analysisId,
-}: {
-  analysis: Analysis;
-  analysisId: string;
-}) {
-  const components = analysis.componentScores;
-  return (
-    <Link
-      href={`/dashboard/roadmap/${analysisId}`}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-colors hover:border-brand-teal/30 hover:bg-brand-teal/[0.02]"
-    >
-      <div className="flex items-center justify-between border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-teal">
-          AppGap Score
-        </p>
-        <span className="flex items-center gap-1 text-xs font-medium text-brand-teal">
-          View analysis
-          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-        </span>
-      </div>
-      <div className="flex flex-col gap-6 p-6 sm:flex-row sm:items-center">
-        <div className="flex size-20 shrink-0 items-center justify-center rounded-2xl bg-brand-teal/10">
-          <div className="text-center">
-            <p className="text-2xl font-bold tabular-nums text-brand-teal">
-              {analysis.gapScore}
-            </p>
-            <p className="text-[10px] text-muted-foreground">/ 100</p>
-          </div>
-        </div>
-        {components ? (
-          <div className="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-3">
-            {SCORE_COMPONENTS.map((component) => {
-              const score = components[component.key].score;
-              return (
-                <div key={component.key} className="space-y-1.5">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-xs font-medium">
-                      {component.label}
-                    </span>
-                    <span className="text-sm font-bold tabular-nums">
-                      {score}
-                    </span>
-                  </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-brand-teal"
-                      style={{ width: `${score}%` }}
-                    />
-                  </div>
-                  <span className="text-[10px] text-muted-foreground">
-                    {COMPONENT_WEIGHTS[component.key]}% weight
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <p className="flex-1 text-sm text-muted-foreground">
-            Open your analysis to see the full breakdown.
-          </p>
-        )}
-      </div>
-    </Link>
   );
 }
 
@@ -181,13 +103,14 @@ export default async function ProfileOverviewPage() {
         .select("id, name, level, grade")
         .eq("user_id", user.id)
         .order("sort_order"),
+      // Latest two analyses: the most recent drives the displayed score; the one
+      // before it is the "previous score" used for the post-edit delta + reveal.
       supabase
         .from("ai_analyses")
         .select("id, analysis, created_at")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+        .limit(2),
     ]);
 
   const profile = profileRes.data;
@@ -195,20 +118,47 @@ export default async function ProfileOverviewPage() {
   const activities = activitiesRes.data ?? [];
   const awards = awardsRes.data ?? [];
 
+  const analysisRows = (analysisRes.data ?? []) as {
+    id: string;
+    analysis: unknown;
+  }[];
+
   let analysis: Analysis | null = null;
   let analysisId: string | null = null;
-  if (analysisRes.data) {
-    const parsed = analysisSchema.safeParse(analysisRes.data.analysis);
+  if (analysisRows[0]) {
+    const parsed = analysisSchema.safeParse(analysisRows[0].analysis);
     if (parsed.success) {
       analysis = parsed.data;
-      analysisId = analysisRes.data.id as string;
+      analysisId = analysisRows[0].id;
     }
+  }
+
+  // Previous analysis (for the score-change delta + "what changed" line). Parsed
+  // defensively — a legacy/invalid prior row simply means "no previous score".
+  let previousAnalysis: Analysis | null = null;
+  if (analysisRows[1]) {
+    const parsedPrev = analysisSchema.safeParse(analysisRows[1].analysis);
+    if (parsedPrev.success) previousAnalysis = parsedPrev.data;
   }
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" asChild>
+          <Link href="/dashboard/profile/edit">
+            <Pencil />
+            Edit Profile
+          </Link>
+        </Button>
+      </div>
+
       {analysis && analysisId ? (
-        <ScoreSummary analysis={analysis} analysisId={analysisId} />
+        <ScoreSummary
+          analysis={analysis}
+          analysisId={analysisId}
+          previousScore={previousAnalysis?.gapScore ?? null}
+          changeText={describeScoreChange(previousAnalysis, analysis)}
+        />
       ) : (
         <NoAnalysisCard />
       )}
