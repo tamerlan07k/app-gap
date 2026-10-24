@@ -1,13 +1,17 @@
 "use client";
 
 import {
+  Check,
   Lightbulb,
+  Loader2,
   Pencil,
   Scissors,
   Sparkles,
   TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Button } from "~/components/ui/button";
 import type { ActivityWritingFeedback } from "~/lib/ai/writing-schema";
 import { cn } from "~/lib/utils";
 import {
@@ -18,6 +22,61 @@ import {
   countChars,
   enforceActivityCharLimit,
 } from "~/lib/writing/checks";
+import { applyActivityDescription } from "./actions";
+
+// A one-click "apply this suggestion to my profile" control. Writes the revised
+// text to the SHARED activities row so My Profile and a diagnostic re-evaluation
+// use the same description — never a divergent copy. Reports success upward so the
+// workspace can offer a single score re-evaluation.
+function ApplySuggestion({
+  activityId,
+  text,
+  onApplied,
+}: {
+  activityId: string;
+  text: string;
+  onApplied: () => void;
+}) {
+  const [state, setState] = useState<"idle" | "saving" | "applied">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  async function apply() {
+    setState("saving");
+    setError(null);
+    const res = await applyActivityDescription(activityId, text);
+    if (res.ok) {
+      setState("applied");
+      onApplied();
+    } else {
+      setState("idle");
+      setError(res.error ?? "Couldn't apply this change.");
+    }
+  }
+
+  if (state === "applied") {
+    return (
+      <p className="flex items-center gap-1.5 text-xs font-medium text-brand-teal">
+        <Check className="size-3.5" />
+        Applied to your profile
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={apply}
+        disabled={state === "saving"}
+      >
+        {state === "saving" ? <Loader2 className="animate-spin" /> : null}
+        Apply to my profile
+      </Button>
+      {error && <span className="text-xs text-destructive">{error}</span>}
+    </div>
+  );
+}
 
 // Category slug → human label. Kept local so the client bundle doesn't pull in
 // the server-side writing prompt just for these labels.
@@ -77,16 +136,22 @@ function CriterionRow({
 }
 
 export function ActivityWritingCard({
+  id,
   name,
   category,
   description,
   feedback,
+  onApplied,
 }: {
+  /** The shared activities row id — target for an applied revision. */
+  id: string;
   name: string;
   category: string;
   description: string;
   /** Matched AI feedback, or null if this activity hasn't been analyzed yet. */
   feedback: ActivityWritingFeedback | null;
+  /** Called after a suggestion is persisted to the profile. */
+  onApplied: () => void;
 }) {
   const chars = countChars(description);
   const over = chars > ACTIVITY_CHAR_LIMIT;
@@ -218,6 +283,11 @@ export function ActivityWritingCard({
                   <p className="text-right text-xs tabular-nums text-muted-foreground">
                     {countChars(tightened)} / {ACTIVITY_CHAR_LIMIT} characters
                   </p>
+                  <ApplySuggestion
+                    activityId={id}
+                    text={tightened}
+                    onApplied={onApplied}
+                  />
                 </>
               ) : (
                 <p className="text-sm leading-relaxed text-muted-foreground">
@@ -257,6 +327,11 @@ export function ActivityWritingCard({
                 <p className="text-right text-xs tabular-nums text-muted-foreground">
                   {countChars(improved)} / {ACTIVITY_CHAR_LIMIT} characters
                 </p>
+                <ApplySuggestion
+                  activityId={id}
+                  text={improved}
+                  onApplied={onApplied}
+                />
               </div>
             </div>
           )}
