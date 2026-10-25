@@ -28,6 +28,7 @@ import {
   type Step3Data,
 } from "~/lib/profile-storage";
 import { ADDITIONAL_INFO_WORD_LIMIT, countWords } from "~/lib/writing/checks";
+import { AnalysisLoader } from "./analysis-loader";
 
 // ─── Label maps ───────────────────────────────────────────────────────────────
 
@@ -241,6 +242,7 @@ export default function ReviewPage() {
 
   return (
     <main className="px-6 py-16">
+      {isGenerating && <AnalysisLoader />}
       <div className="mx-auto max-w-2xl space-y-8">
         {/* Page header */}
         <div className="space-y-3">
