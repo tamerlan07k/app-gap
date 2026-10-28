@@ -18,6 +18,7 @@ import type {
   ActivityAnalysis,
 } from "~/lib/ai/activities-schema";
 import { cn } from "~/lib/utils";
+import { ActivitiesAnalysisLoader } from "./activities-analysis-loader";
 import { ActivityForm, type EditableActivity } from "./activity-form";
 import { ActivityItem } from "./activity-item";
 import { ProfileAnalysisCard } from "./profile-analysis-card";
@@ -119,6 +120,8 @@ export function ActivitiesWorkspace({
 
   return (
     <section className="space-y-6">
+      {loading && <ActivitiesAnalysisLoader />}
+
       {/* Intro + action */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">

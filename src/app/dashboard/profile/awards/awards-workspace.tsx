@@ -11,6 +11,7 @@ import type {
   RecognitionProfile,
 } from "~/lib/awards/types";
 import { cn } from "~/lib/utils";
+import { AwardsAnalysisLoader } from "./awards-analysis-loader";
 import { OpportunityExperiment } from "./opportunity-experiment";
 import { OpportunityFinder } from "./opportunity-finder";
 import { RecognitionMap } from "./recognition-map";
@@ -93,6 +94,8 @@ export function AwardsWorkspace({
 
   return (
     <div className="space-y-6">
+      {loading && <AwardsAnalysisLoader />}
+
       {/* Hero */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
