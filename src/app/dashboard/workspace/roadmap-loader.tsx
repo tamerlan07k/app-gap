@@ -8,6 +8,7 @@
 // overlay so the page shows ONLY the animation while generating. Honors
 // prefers-reduced-motion.
 
+import { createPortal } from "react-dom";
 import { BRANCH_COLOR_VARS } from "./roadmap-graph";
 
 const STATUS_LINES = [
@@ -17,7 +18,11 @@ const STATUS_LINES = [
 ];
 
 export function RoadmapLoader() {
-  return (
+  // Portal to <body> so the overlay escapes any ancestor that establishes a
+  // containing block for fixed elements and reliably covers the full viewport.
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
       role="status"
@@ -277,6 +282,7 @@ export function RoadmapLoader() {
           <span className="rml-dots">{STATUS_LINES[2]}</span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

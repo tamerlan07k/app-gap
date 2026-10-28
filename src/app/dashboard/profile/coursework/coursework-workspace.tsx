@@ -27,6 +27,7 @@ import { cn } from "~/lib/utils";
 import { AvailabilityChecklist } from "./availability-checklist";
 import { CourseForm, type EditableCourse } from "./course-form";
 import { CourseItem } from "./course-item";
+import { CourseworkAnalysisLoader } from "./coursework-analysis-loader";
 import { FindingCard } from "./finding-card";
 import { TargetFitCard } from "./target-fit-card";
 import { WhatIfSimulator } from "./whatif-simulator";
@@ -195,6 +196,8 @@ export function CourseworkWorkspace({
 
   return (
     <section className="space-y-6">
+      {loading && <CourseworkAnalysisLoader />}
+
       {/* Intro + action */}
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
         <div className="border-b border-brand-teal/20 bg-brand-teal/[0.04] px-6 py-4">
