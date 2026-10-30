@@ -8,6 +8,7 @@ import {
 import { createAdminClient } from "~/lib/supabase/admin";
 import { createClient } from "~/lib/supabase/server";
 import { BillingCards } from "./billing-cards";
+import { PurchaseReceipt } from "./purchase-receipt";
 import {
   type BillingNotification,
   SubscriptionNotification,
@@ -15,7 +16,30 @@ import {
 
 export const metadata = { title: "Billing — AppGap" };
 
-export default async function BillingPage() {
+function formatDate(iso: string | null): string | null {
+  if (!iso) return null;
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+// Short, human-facing order reference. Derived from the subscription id when we
+// have one (stable across a refresh); otherwise a random fallback.
+function orderNumber(subscriptionId: string | null): string {
+  const raw = (subscriptionId ?? Math.random().toString(36).slice(2))
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .toUpperCase();
+  return `#AG-${raw.slice(-6).padStart(6, "0")}`;
+}
+
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string }>;
+}) {
+  const { success } = await searchParams;
   const supabase = await createClient();
   const {
     data: { user },
@@ -53,8 +77,19 @@ export default async function BillingPage() {
     .is("read_at", null)
     .order("created_at", { ascending: false });
 
+  const showReceipt = success === "1";
+
   return (
     <div className="space-y-6">
+      {showReceipt && (
+        <PurchaseReceipt
+          email={user.email ?? null}
+          priceLabel="$14.99"
+          renewsOn={formatDate(entitlement.expiresAt)}
+          purchasedOn={formatDate(new Date().toISOString()) ?? "Today"}
+          orderNumber={orderNumber(profile?.stripe_subscription_id ?? null)}
+        />
+      )}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Billing</h1>
