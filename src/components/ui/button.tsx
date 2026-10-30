@@ -9,14 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        // Tactile: solid face on a darker same-hue edge that sinks on press.
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
+          "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_3px_0_0_oklch(0.42_0.1_204)] hover:-translate-y-px hover:shadow-[0_4px_0_0_oklch(0.42_0.1_204)] active:translate-y-[3px] active:shadow-[0_0_0_0_oklch(0.42_0.1_204)]",
         destructive:
-          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+          "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 shadow-[0_3px_0_0_oklch(0.43_0.2_27)] hover:-translate-y-px hover:shadow-[0_4px_0_0_oklch(0.43_0.2_27)] active:translate-y-[3px] active:shadow-[0_0_0_0_oklch(0.43_0.2_27)]",
         outline:
-          "border border-foreground/15 bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border border-foreground/15 bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50 shadow-[0_3px_0_0_oklch(0.85_0.012_202)] dark:shadow-[0_3px_0_0_oklch(0.22_0_0)] hover:-translate-y-px active:translate-y-[3px] active:shadow-none",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[0_3px_0_0_oklch(0.82_0.015_202)] dark:shadow-[0_3px_0_0_oklch(0.18_0_0)] hover:-translate-y-px active:translate-y-[3px] active:shadow-none",
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
