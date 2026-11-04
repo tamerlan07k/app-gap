@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AppGap — College admissions, finally clear</title>
+<meta name="description" content="AppGap reads your academics, activities, and essays and shows you exactly where you stand — and what to fix before you apply." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;450;500;600&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================================
+   AppGap — landing rebuild (design review build, self-contained)
+   Creative direction: "Luminous clarity" — light editorial + one navy band,
+   teal single accent, Manrope display, bespoke CSS product surfaces.
+   ========================================================================== */
+
+:root{
+  /* Brand tokens (matched to the app's OKLCH design system) */
+  --bg:        oklch(0.976 0.008 200);
+  --bg-2:      oklch(0.955 0.012 202);
+  --surface:   #ffffff;
+  --ink:       oklch(0.18 0.03 224);
+  --ink-2:     oklch(0.44 0.026 218);
+  --ink-3:     oklch(0.56 0.022 212);
+  --line:      oklch(0.9 0.012 202);
+  --line-2:    oklch(0.86 0.014 202);
+
+  --teal:      oklch(0.56 0.11 200);
+  --teal-deep: oklch(0.47 0.1 202);
+  --teal-wash: oklch(0.975 0.016 200);
+  --teal-rgb:  20 139 148;
+
+  --navy:      oklch(0.205 0.04 223);
+  --navy-2:    oklch(0.26 0.04 220);
+  --navy-3:    oklch(0.32 0.038 218);
+  --amber:     oklch(0.74 0.14 66);
+
+  --maxw: 1140px;
+  --gutter: clamp(20px, 5vw, 56px);
+
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 30px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --shadow-sm: 0 1px 2px rgb(16 32 44 / .05), 0 2px 8px rgb(16 32 44 / .04);
+  --shadow-md: 0 10px 30px -12px rgb(16 32 44 / .18), 0 2px 8px rgb(16 32 44 / .05);
+  --shadow-lg: 0 40px 80px -28px rgb(16 32 44 / .30), 0 8px 24px -12px rgb(16 32 44 / .12);
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body{
+  font-family:"Inter", ui-sans-serif, system-ui, sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.6;
+  font-size:17px;
+  letter-spacing:-0.006em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{ font-family:"Manrope", ui-sans-serif, system-ui, sans-serif; letter-spacing:-0.035em; line-height:1.02; font-weight:800; }
+a{ color:inherit; text-decoration:none; }
+img,svg{ display:block; max-width:100%; }
+::selection{ background:oklch(0.56 0.11 200 / .22); }
+
+.wrap{ width:100%; max-width:var(--maxw); margin-inline:auto; padding-inline:var(--gutter); }
+.eyebrow{
+  font-family:"Manrope"; font-weight:700; font-size:.72rem; letter-spacing:.2em;
+  text-transform:uppercase; color:var(--teal-deep);
+}
+.muted{ color:var(--ink-2); }
+
+/* ---- Buttons --------------------------------------------------------------- */
+.btn{
+  --bg:var(--teal);
+  display:inline-flex; align-items:center; gap:.55rem;
+  font-family:"Manrope"; font-weight:700; font-size:.95rem; letter-spacing:-0.01em;
+  padding:.85rem 1.4rem; border-radius:999px; border:1px solid transparent;
+  cursor:pointer; position:relative; transition:transform .5s var(--ease), box-shadow .4s var(--ease), background .3s;
+  will-change:transform;
+}
+.btn svg{ width:17px; height:17px; transition:transform .4s var(--ease); }
+.btn-primary{
+  background:linear-gradient(180deg, oklch(0.6 0.11 200), var(--teal));
+  color:#fff; box-shadow:0 1px 0 oklch(0.7 0.1 200 / .6) inset, 0 10px 24px -10px oklch(0.56 0.11 200 / .7);
+}
+.btn-primary:hover{ transform:translateY(-2px); box-shadow:0 1px 0 oklch(0.72 0.1 200 / .7) inset, 0 18px 34px -12px oklch(0.56 0.11 200 / .75); }
+.btn-primary:hover svg{ transform:translateX(3px); }
+.btn-ghost{ background:transparent; color:var(--ink); border-color:var(--line-2); }
+.btn-ghost:hover{ background:var(--surface); border-color:var(--teal); transform:translateY(-2px); box-shadow:var(--shadow-sm); }
+.btn-lg{ padding:1rem 1.7rem; font-size:1.02rem; }
+.btn-light{ background:#fff; color:var(--navy); }
+.btn-light:hover{ transform:translateY(-2px); box-shadow:0 18px 40px -14px rgb(0 0 0 / .5); }
+.btn-light:hover svg{ transform:translateX(3px); }
+
+/* ---- Nav ------------------------------------------------------------------- */
+header.nav{
+  position:fixed; inset:0 0 auto 0; z-index:60;
+  transition:background .4s var(--ease), border-color .4s, backdrop-filter .4s;
+  border-bottom:1px solid transparent;
+}
+header.nav.scrolled{
+  background:oklch(0.976 0.008 200 / .75);
+  backdrop-filter:saturate(1.3) blur(14px);
+  -webkit-backdrop-filter:saturate(1.3) blur(14px);
+  border-bottom-color:var(--line);
+}
+.nav-inner{ display:flex; align-items:center; justify-content:space-between; height:70px; }
+.brand{ display:flex; align-items:center; gap:.6rem; font-family:"Manrope"; font-weight:800; font-size:1.12rem; letter-spacing:-0.03em; }
+.brand .mark{ width:26px; height:32px; }
+.nav-links{ display:flex; align-items:center; gap:2rem; }
+.nav-links a.lnk{ font-size:.92rem; font-weight:500; color:var(--ink-2); transition:color .25s; }
+.nav-links a.lnk:hover{ color:var(--ink); }
+.nav-cta{ display:flex; align-items:center; gap:.9rem; }
+.nav-cta .signin{ font-family:"Manrope"; font-weight:600; font-size:.92rem; color:var(--ink-2); }
+.nav-cta .signin:hover{ color:var(--ink); }
+@media (max-width:860px){ .nav-links, .nav-cta .signin{ display:none; } }
+
+/* ---- Logo mark (reused) ---------------------------------------------------- */
+.mark path.body{ fill:var(--navy); }
+.mark .blk{ fill:var(--teal); }
+.mark .bar{ stroke:var(--teal); }
+.mark.on-dark path.body{ fill:#fff; }
+
+/* ---- Hero ------------------------------------------------------------------ */
+.hero{ position:relative; padding:clamp(120px,16vh,180px) 0 clamp(60px,9vh,110px); overflow:clip; }
+.hero-bg{ position:absolute; inset:0; pointer-events:none; overflow:clip; }
+.aurora{
+  position:absolute; width:900px; height:900px; left:50%; top:-360px; translate:-50% 0;
+  background:
+    radial-gradient(42% 42% at 30% 35%, oklch(0.6 0.12 200 / .28), transparent 70%),
+    radial-gradient(40% 40% at 70% 40%, oklch(0.68 0.1 188 / .22), transparent 72%),
+    radial-gradient(38% 38% at 50% 70%, oklch(0.78 0.11 66 / .14), transparent 70%);
+  filter:blur(18px); opacity:.9; animation:aurora 18s var(--ease) infinite alternate;
+}
+@keyframes aurora{ from{ transform:translate(-4%,0) rotate(-4deg) scale(1); } to{ transform:translate(4%,22px) rotate(5deg) scale(1.08); } }
+.dots{
+  position:absolute; inset:0;
+  background-image:radial-gradient(oklch(0.56 0.11 200 / .18) 1px, transparent 1.4px);
+  background-size:24px 24px;
+  -webkit-mask-image:radial-gradient(ellipse 80% 55% at 50% 22%, #000, transparent 75%);
+  mask-image:radial-gradient(ellipse 80% 55% at 50% 22%, #000, transparent 75%);
+}
+
+.hero-grid{ position:relative; display:grid; grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); gap:clamp(32px,5vw,72px); align-items:center; }
+@media (max-width:1060px){ .hero-grid{ grid-template-columns:1fr; gap:48px; text-align:center; } }
+
+.pill{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.4rem .85rem .4rem .6rem; border-radius:999px;
+  background:var(--teal-wash); border:1px solid oklch(0.56 0.11 200 / .2);
+  font-family:"Manrope"; font-weight:700; font-size:.76rem; letter-spacing:.02em; color:var(--teal-deep);
+}
+.pill .dot{ width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 0 4px oklch(0.56 0.11 200 / .18); animation:pulse 2.4s ease-in-out infinite; }
+@keyframes pulse{ 50%{ box-shadow:0 0 0 7px oklch(0.56 0.11 200 / 0); } }
+
+.hero h1{
+  font-size:clamp(2.7rem, 5.4vw, 5.2rem); margin-top:1.5rem; letter-spacing:-0.045em; line-height:.98;
+}
+.hero h1 .accent{ position:relative; color:var(--teal-deep); white-space:nowrap; }
+.hero h1 .accent svg{ position:absolute; left:-2%; right:-2%; bottom:-.18em; width:104%; height:.42em; overflow:visible; }
+.hero h1 .accent svg path{ fill:none; stroke:var(--teal); stroke-width:7; stroke-linecap:round; stroke-dasharray:420; stroke-dashoffset:420; }
+.lead{ margin-top:1.5rem; max-width:34rem; font-size:1.14rem; color:var(--ink-2); line-height:1.62; }
+@media (max-width:1060px){ .lead{ margin-inline:auto; } }
+.hero-cta{ margin-top:2.2rem; display:flex; gap:.9rem; flex-wrap:wrap; }
+@media (max-width:1060px){ .hero-cta{ justify-content:center; } }
+.trust-line{ margin-top:1.6rem; display:flex; align-items:center; gap:.7rem; font-size:.86rem; color:var(--ink-3); }
+@media (max-width:1060px){ .trust-line{ justify-content:center; } }
+.trust-line .avatars{ display:flex; }
+.trust-line .avatars span{
+  width:26px; height:26px; border-radius:50%; margin-left:-8px; border:2px solid var(--bg);
+  background:linear-gradient(135deg, oklch(0.7 0.1 200), oklch(0.5 0.1 210)); font-size:.6rem; color:#fff;
+  display:grid; place-items:center; font-family:"Manrope"; font-weight:700;
+}
+.trust-line .avatars span:first-child{ margin-left:0; }
+
+/* ---- Hero product panel (bespoke AppGap Score card) ------------------------ */
+.panel-stage{ position:relative; }
+.score-card{
+  position:relative; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-xl); padding:1.5rem; box-shadow:var(--shadow-lg);
+}
+.score-card .sc-head{ display:flex; align-items:center; justify-content:space-between; }
+.sc-head .who{ display:flex; align-items:center; gap:.65rem; }
+.sc-head .ava{ width:38px; height:38px; border-radius:12px; background:linear-gradient(135deg, var(--navy-2), var(--navy)); color:#fff; display:grid; place-items:center; font-family:"Manrope"; font-weight:800; font-size:.9rem; }
+.sc-head .nm{ font-family:"Manrope"; font-weight:700; font-size:.95rem; line-height:1.1; }
+.sc-head .sub{ font-size:.75rem; color:var(--ink-3); }
+.sc-head .tag{ font-family:"Manrope"; font-weight:700; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--teal-deep); background:var(--teal-wash); border:1px solid oklch(0.56 0.11 200 / .2); padding:.3rem .55rem; border-radius:999px; }
+
+.gauge-row{ display:flex; align-items:center; gap:1.3rem; margin:1.3rem 0 .4rem; }
+.gauge{ position:relative; width:128px; height:128px; flex:none; }
+.gauge svg{ width:100%; height:100%; transform:rotate(-90deg); }
+.gauge .track{ fill:none; stroke:var(--line); stroke-width:11; }
+.gauge .fill{ fill:none; stroke:url(#scoreGrad); stroke-width:11; stroke-linecap:round; stroke-dasharray:var(--circ); stroke-dashoffset:var(--circ); transition:stroke-dashoffset 1.6s var(--ease); }
+.gauge .num{ position:absolute; inset:0; display:grid; place-content:center; text-align:center; }
+.gauge .num b{ font-family:"Manrope"; font-weight:800; font-size:2.3rem; letter-spacing:-0.04em; line-height:1; }
+.gauge .num small{ display:block; font-size:.64rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:.25rem; }
+.cats{ flex:1; display:flex; flex-direction:column; gap:.6rem; min-width:0; }
+.cat{ display:grid; grid-template-columns:1fr auto; gap:.3rem .6rem; align-items:center; }
+.cat .cl{ font-size:.78rem; font-weight:500; color:var(--ink-2); }
+.cat .cv{ font-family:"Manrope"; font-weight:700; font-size:.76rem; color:var(--ink); }
+.cat .bar{ grid-column:1 / -1; height:6px; border-radius:999px; background:var(--bg-2); overflow:hidden; }
+.cat .bar i{ display:block; height:100%; width:0; border-radius:999px; background:linear-gradient(90deg, oklch(0.6 0.11 200), var(--teal)); transition:width 1.3s var(--ease); }
+.cat.warn .bar i{ background:linear-gradient(90deg, oklch(0.82 0.13 70), var(--amber)); }
+
+.sc-foot{ margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line); display:flex; align-items:flex-start; gap:.6rem; }
+.sc-foot .ic{ width:26px; height:26px; border-radius:8px; background:var(--teal-wash); color:var(--teal-deep); display:grid; place-items:center; flex:none; }
+.sc-foot p{ font-size:.82rem; color:var(--ink-2); line-height:1.45; }
+.sc-foot b{ color:var(--ink); font-weight:600; }
+
+/* floating chips around hero panel */
+.chip{
+  position:absolute; z-index:3; background:var(--surface); border:1px solid var(--line);
+  border-radius:12px; padding:.5rem .7rem; box-shadow:var(--shadow-md);
+  font-family:"Manrope"; font-weight:700; font-size:.76rem; display:flex; align-items:center; gap:.45rem;
+  animation:float 6s ease-in-out infinite;
+}
+.chip .d{ width:8px; height:8px; border-radius:50%; }
+.chip.c1{ left:-22px; top:-20px; animation-delay:0s; }
+.chip.c2{ right:-26px; top:46%; border-color:oklch(0.74 0.14 66 / .4); animation-delay:1.2s; }
+.chip.c3{ left:8%; bottom:-20px; animation-delay:.6s; }
+@keyframes float{ 50%{ transform:translateY(-10px); } }
+@media (max-width:1040px){ .chip.c1{ left:-10px; } .chip.c2{ right:-8px; } }
+@media (max-width:520px){ .chip{ display:none; } }
+
+/* ---- Marquee --------------------------------------------------------------- */
+.marquee-sec{ border-block:1px solid var(--line); background:var(--bg-2); padding:1.9rem 0; }
+.marquee-sec .cap{ text-align:center; font-size:.72rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:var(--ink-3); margin-bottom:1.2rem; }
+.marquee{ position:relative; overflow:hidden; -webkit-mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image:linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.marquee-track{ display:flex; gap:.7rem; width:max-content; animation:scroll 46s linear infinite; }
+@keyframes scroll{ to{ transform:translateX(-50%); } }
+.marquee:hover .marquee-track{ animation-play-state:paused; }
+.college{ display:flex; align-items:center; gap:.6rem; padding:.5rem .95rem; border:1px solid var(--line); border-radius:999px; background:oklch(1 0 0 / .6); white-space:nowrap; }
+.college .ini{ width:26px; height:26px; border-radius:50%; background:var(--navy); color:#fff; display:grid; place-items:center; font-family:"Manrope"; font-weight:800; font-size:.66rem; }
+.college span.nm{ font-size:.86rem; font-weight:600; color:var(--ink-2); }
+
+/* ---- Section scaffolding --------------------------------------------------- */
+.section{ padding:clamp(72px,11vh,130px) 0; }
+.sec-head{ max-width:44rem; }
+.sec-head.center{ margin-inline:auto; text-align:center; }
+.sec-head h2{ font-size:clamp(2.1rem, 4.6vw, 3.4rem); margin-top:.9rem; }
+.sec-head p{ margin-top:1.1rem; font-size:1.1rem; color:var(--ink-2); }
+
+/* ---- Bento feature grid ---------------------------------------------------- */
+.bento{ margin-top:clamp(40px,6vh,66px); display:grid; grid-template-columns:repeat(6,1fr); gap:18px; }
+.cell{
+  position:relative; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg);
+  padding:1.6rem; overflow:hidden; transition:transform .5s var(--ease), box-shadow .5s var(--ease), border-color .4s;
+}
+.cell:hover{ transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--line-2); }
+.cell .ic{ width:40px; height:40px; border-radius:12px; background:var(--teal-wash); color:var(--teal-deep); display:grid; place-items:center; margin-bottom:1rem; }
+.cell h3{ font-size:1.28rem; letter-spacing:-0.03em; }
+.cell p{ margin-top:.55rem; font-size:.96rem; color:var(--ink-2); line-height:1.55; }
+.cell .lk{ margin-top:1.1rem; display:inline-flex; align-items:center; gap:.4rem; font-family:"Manrope"; font-weight:700; font-size:.86rem; color:var(--teal-deep); }
+.cell .lk svg{ width:15px; height:15px; transition:transform .35s var(--ease); }
+.cell:hover .lk svg{ transform:translateX(4px); }
+.cell.span-3{ grid-column:span 3; }
+.cell.span-2{ grid-column:span 2; }
+.cell.span-6{ grid-column:span 6; }
+.cell.feature-hero{ background:linear-gradient(160deg, var(--surface), var(--teal-wash)); }
+@media (max-width:900px){ .bento{ grid-template-columns:repeat(2,1fr); } .cell.span-3,.cell.span-2,.cell.span-6{ grid-column:span 2; } }
+@media (max-width:560px){ .bento{ grid-template-columns:1fr; } .cell.span-3,.cell.span-2,.cell.span-6{ grid-column:span 1; } }
+
+/* mini visual: chance meter inside feature-hero */
+.mini-chance{ margin-top:1.3rem; display:flex; align-items:center; gap:1rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:1rem 1.1rem; box-shadow:var(--shadow-sm); }
+.mini-chance .big{ font-family:"Manrope"; font-weight:800; font-size:2rem; letter-spacing:-0.04em; color:var(--teal-deep); }
+.mini-chance .mc-body{ flex:1; }
+.mini-chance .mc-body .nm{ font-family:"Manrope"; font-weight:700; font-size:.92rem; }
+.mini-chance .mc-body .mt{ font-size:.76rem; color:var(--ink-3); margin-bottom:.4rem; }
+.mini-chance .mc-bar{ height:7px; border-radius:999px; background:var(--bg-2); overflow:hidden; }
+.mini-chance .mc-bar i{ display:block; height:100%; width:0; background:linear-gradient(90deg, oklch(0.6 0.11 200), var(--teal)); border-radius:999px; transition:width 1.4s var(--ease); }
+.mc-label{ font-family:"Manrope"; font-weight:700; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; padding:.22rem .5rem; border-radius:999px; background:oklch(0.74 0.14 66 / .16); color:oklch(0.5 0.12 66); }
+
+/* mini visual: scored activity line */
+.activity-mini{ margin-top:1.2rem; display:flex; flex-direction:column; gap:.5rem; }
+.activity-mini .ln{ display:flex; align-items:center; gap:.55rem; font-size:.82rem; }
+.activity-mini .sc{ font-family:"Manrope"; font-weight:800; font-size:.8rem; width:30px; height:30px; border-radius:9px; display:grid; place-items:center; flex:none; }
+.activity-mini .sc.g{ background:var(--teal-wash); color:var(--teal-deep); }
+.activity-mini .sc.a{ background:oklch(0.74 0.14 66 / .16); color:oklch(0.5 0.12 66); }
+.activity-mini .tx{ color:var(--ink-2); }
+.activity-mini .tx s{ color:var(--ink-3); }
+
+/* ---- How it works ---------------------------------------------------------- */
+.steps{ margin-top:clamp(40px,6vh,60px); display:grid; grid-template-columns:repeat(3,1fr); gap:20px; counter-reset:step; }
+@media (max-width:820px){ .steps{ grid-template-columns:1fr; } }
+.step{ position:relative; padding:1.9rem 1.6rem 1.7rem; border:1px solid var(--line); border-radius:var(--r-lg); background:var(--surface); }
+.step::before{ counter-increment:step; content:"0" counter(step); font-family:"Manrope"; font-weight:800; font-size:2.6rem; letter-spacing:-0.05em; color:oklch(0.56 0.11 200 / .18); line-height:1; }
+.step h3{ margin-top:.7rem; font-size:1.2rem; }
+.step p{ margin-top:.5rem; font-size:.94rem; color:var(--ink-2); }
+
+/* ---- Dark immersive band --------------------------------------------------- */
+.band{ position:relative; background:var(--navy); color:#fff; overflow:clip; }
+.band .b-aurora{ position:absolute; inset:0; pointer-events:none; opacity:.5;
+  background:radial-gradient(50% 60% at 18% 0%, oklch(0.56 0.14 200 / .5), transparent 70%),
+            radial-gradient(44% 56% at 90% 90%, oklch(0.5 0.12 210 / .45), transparent 72%); }
+.band .b-dots{ position:absolute; inset:0; background-image:radial-gradient(oklch(1 0 0 / .08) 1px, transparent 1.4px); background-size:26px 26px; -webkit-mask-image:radial-gradient(ellipse at center, #000 30%, transparent 85%); mask-image:radial-gradient(ellipse at center, #000 30%, transparent 85%); }
+.band .wrap{ position:relative; padding:clamp(72px,11vh,120px) var(--gutter); }
+.odds{ max-width:48rem; }
+.odds .eyebrow{ color:oklch(0.78 0.1 196); }
+.odds h2{ font-size:clamp(2.2rem,5vw,3.8rem); margin-top:1rem; color:#fff; }
+.odds h2 em{ font-style:normal; color:oklch(0.8 0.11 194); }
+.odds p{ margin-top:1.2rem; font-size:1.12rem; color:oklch(0.9 0.015 210 / .7); max-width:36rem; }
+.stats{ margin-top:clamp(42px,6vh,64px); display:grid; grid-template-columns:repeat(4,1fr); gap:28px; }
+@media (max-width:720px){ .stats{ grid-template-columns:repeat(2,1fr); gap:34px 20px; } }
+.stat .v{ font-family:"Manrope"; font-weight:800; font-size:clamp(2.6rem,5vw,3.4rem); letter-spacing:-0.045em; color:#fff; }
+.stat .v span{ color:oklch(0.8 0.11 194); }
+.stat .l{ margin-top:.4rem; font-size:.9rem; color:oklch(0.9 0.015 210 / .6); }
+
+/* ---- Founder --------------------------------------------------------------- */
+.founder{ display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(36px,6vw,80px); align-items:center; }
+@media (max-width:860px){ .founder{ grid-template-columns:1fr; text-align:center; } }
+.founder .f-tag{ display:inline-flex; align-items:center; gap:.5rem; font-family:"Manrope"; font-weight:700; font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--teal-deep); }
+.founder h2{ font-size:clamp(2rem,4.4vw,3.1rem); margin-top:1rem; }
+.founder p.body{ margin-top:1.3rem; font-size:1.1rem; color:var(--ink-2); max-width:34rem; line-height:1.64; }
+@media (max-width:860px){ .founder p.body{ margin-inline:auto; } }
+.founder .sign{ margin-top:1.5rem; font-family:"Caveat"; font-weight:700; font-size:1.7rem; color:var(--ink); }
+.founder .role{ font-size:.82rem; color:var(--ink-3); margin-top:.1rem; }
+.portrait{ position:relative; width:min(340px,80%); margin-inline:auto; aspect-ratio:1; }
+.portrait .ring{ position:absolute; inset:0; }
+.portrait .ring path{ fill:none; stroke:var(--teal); stroke-width:3; stroke-linecap:round; }
+.portrait .photo{ position:absolute; inset:7%; border-radius:50%; overflow:hidden; background:linear-gradient(160deg, var(--teal-wash), oklch(0.9 0.04 200)); display:grid; place-items:center; ring:1px solid oklch(0.56 0.11 200 / .2); box-shadow:inset 0 0 0 1px oklch(0.56 0.11 200 / .25); }
+.portrait .photo span{ font-family:"Manrope"; font-weight:800; font-size:4rem; color:oklch(0.5 0.1 202 / .55); letter-spacing:-0.04em; }
+.portrait .note{ position:absolute; right:-6%; bottom:4%; background:var(--surface); border:1px solid var(--line); box-shadow:var(--shadow-md); border-radius:12px; padding:.55rem .8rem; font-family:"Caveat"; font-weight:700; font-size:1.1rem; color:var(--teal-deep); rotate:-4deg; }
+
+/* ---- FAQ ------------------------------------------------------------------- */
+.faq-list{ margin-top:clamp(36px,5vh,52px); display:flex; flex-direction:column; gap:.7rem; max-width:48rem; margin-inline:auto; }
+details.faq{ border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface); overflow:hidden; transition:border-color .3s, background .3s; }
+details.faq[open]{ border-color:oklch(0.56 0.11 200 / .35); background:var(--teal-wash); }
+details.faq summary{ list-style:none; cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.15rem 1.3rem; font-family:"Manrope"; font-weight:700; font-size:1.04rem; letter-spacing:-0.02em; }
+details.faq summary::-webkit-details-marker{ display:none; }
+details.faq .plus{ flex:none; width:22px; height:22px; position:relative; transition:transform .3s var(--ease); }
+details.faq .plus::before,.plus::after{ content:""; position:absolute; background:var(--teal); border-radius:2px; }
+details.faq .plus::before{ left:50%; top:3px; bottom:3px; width:2px; translate:-50% 0; }
+details.faq .plus::after{ top:50%; left:3px; right:3px; height:2px; translate:0 -50%; }
+details.faq[open] .plus{ transform:rotate(135deg); }
+details.faq .ans{ padding:0 1.3rem 1.2rem; color:var(--ink-2); font-size:.98rem; line-height:1.6; max-width:42rem; }
+
+/* ---- Final CTA ------------------------------------------------------------- */
+.final{ padding:clamp(40px,7vh,90px) 0 clamp(70px,10vh,120px); }
+.cta-card{ position:relative; overflow:clip; background:var(--navy); border-radius:var(--r-xl); padding:clamp(48px,8vw,86px) var(--gutter); text-align:center; }
+.cta-card .b-aurora{ position:absolute; inset:0; opacity:.6; background:radial-gradient(50% 70% at 50% -10%, oklch(0.56 0.14 200 / .55), transparent 68%); }
+.cta-card .mark{ width:40px; height:48px; margin:0 auto 1.3rem; position:relative; }
+.cta-card h2{ position:relative; font-size:clamp(2.1rem,4.8vw,3.5rem); color:#fff; }
+.cta-card p{ position:relative; margin:1.1rem auto 0; max-width:32rem; color:oklch(0.9 0.015 210 / .68); font-size:1.08rem; }
+.cta-card .hero-cta{ position:relative; justify-content:center; margin-top:2.1rem; }
+
+/* ---- Footer ---------------------------------------------------------------- */
+footer.ft{ border-top:1px solid var(--line); background:var(--bg-2); padding:clamp(48px,7vh,72px) 0 2.4rem; }
+.ft-top{ display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:36px; }
+@media (max-width:760px){ .ft-top{ grid-template-columns:1fr; gap:28px; } }
+.ft .brand{ margin-bottom:1rem; }
+.ft-top p.desc{ font-size:.88rem; color:var(--ink-2); line-height:1.6; max-width:30rem; }
+.ft-col h4{ font-family:"Manrope"; font-weight:700; font-size:.76rem; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3); margin-bottom:.9rem; }
+.ft-col a{ display:block; font-size:.9rem; color:var(--ink-2); padding:.28rem 0; transition:color .25s; }
+.ft-col a:hover{ color:var(--teal-deep); }
+.disclaimer{ margin-top:2.2rem; padding:1rem 1.2rem; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); font-size:.78rem; color:var(--ink-3); line-height:1.55; }
+.disclaimer b{ color:var(--ink-2); font-weight:600; }
+.ft-bot{ margin-top:2rem; padding-top:1.6rem; border-top:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; font-size:.8rem; color:var(--ink-3); }
+
+/* ---- Scroll reveal --------------------------------------------------------- */
+.reveal{ opacity:0; transform:translateY(26px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.in{ opacity:1; transform:none; }
+.reveal.d1{ transition-delay:.08s; } .reveal.d2{ transition-delay:.16s; } .reveal.d3{ transition-delay:.24s; } .reveal.d4{ transition-delay:.32s; }
+
+/* ---- Cursor glow (desktop only) ------------------------------------------- */
+#glow{ position:fixed; z-index:0; width:460px; height:460px; border-radius:50%; pointer-events:none; translate:-50% -50%; background:radial-gradient(circle, oklch(0.56 0.11 200 / .1), transparent 62%); opacity:0; transition:opacity .5s; mix-blend-mode:multiply; }
+
+@media (prefers-reduced-motion:reduce){
+  *{ animation:none !important; transition:none !important; scroll-behavior:auto; }
+  .reveal{ opacity:1; transform:none; }
+  .gauge .fill{ stroke-dashoffset:var(--target-offset,0); }
+}
+</style>
+</head>
+<body>
+<div id="glow"></div>
+
+<!-- SVG defs (gradients) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="oklch(0.66 0.11 198)"/>
+      <stop offset="1" stop-color="oklch(0.52 0.11 204)"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ============================ NAV ============================ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <svg class="mark" viewBox="0 0 36 44" aria-label="AppGap logo">
+        <path class="body" d="M17 7 Q18 2 19 7 L34.5 43 L26 43 L19 27 Q18 24 17 27 L10 43 L1.5 43 Z"/>
+        <rect class="blk" x="10" y="33" width="6" height="6" rx="1.5"/>
+        <rect class="blk" x="20" y="33" width="6" height="6" rx="1.5"/>
+        <line class="bar" x1="16" y1="36" x2="20" y2="36" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      AppGap
+    </a>
+    <nav class="nav-links">
+      <a class="lnk" href="#features">Features</a>
+      <a class="lnk" href="#how">How it works</a>
+      <a class="lnk" href="#founder">Our story</a>
+      <a class="lnk" href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="signin" href="#">Sign in</a>
+      <a class="btn btn-primary" data-magnetic href="#">Try AppGap free
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============================ HERO ============================ -->
+<section class="hero">
+  <div class="hero-bg"><div class="aurora"></div><div class="dots"></div></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <span class="pill"><span class="dot"></span> Honest odds — not inflated ones</span>
+      <h1>
+        College admissions,<br>
+        finally <span class="accent">clear.
+          <svg viewBox="0 0 300 20" preserveAspectRatio="none"><path d="M4 14 C70 5 150 4 210 9 C250 12 285 11 296 7"/></svg>
+        </span>
+      </h1>
+      <p class="lead">
+        Private counselors charge families thousands for the playbook that gets students in.
+        AppGap reads your academics, activities, and essays and shows you exactly where you
+        stand — and what to fix before you apply.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" data-magnetic href="#">Get started free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="#how">See how it works</a>
+      </div>
+      <div class="trust-line">
+        <span class="avatars"><span>A</span><span>M</span><span>J</span><span>+</span></span>
+        Built on <b style="color:var(--ink-2);font-weight:600">1,540+ colleges</b> of real admissions data.
+      </div>
+    </div>
+
+    <div class="panel-stage reveal d1">
+      <div class="chip c1"><span class="d" style="background:var(--teal)"></span> AppGap Score · 72</div>
+      <div class="chip c2"><span class="d" style="background:var(--amber)"></span> Michigan · Target · 46%</div>
+      <div class="chip c3"><span class="d" style="background:var(--teal)"></span> Essay: 148 / 150 ✓</div>
+
+      <div class="score-card">
+        <div class="sc-head">
+          <div class="who">
+            <div class="ava">AG</div>
+            <div><div class="nm">Your profile</div><div class="sub">Class of 2027 · updated today</div></div>
+          </div>
+          <span class="tag">AppGap Score</span>
+        </div>
+
+        <div class="gauge-row">
+          <div class="gauge" data-gauge>
+            <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="fill" cx="60" cy="60" r="52"/></svg>
+            <div class="num"><b data-count="72">0</b><small>Overall</small></div>
+          </div>
+          <div class="cats">
+            <div class="cat"><span class="cl">Academics</span><span class="cv">81</span><span class="bar"><i data-w="81"></i></span></div>
+            <div class="cat"><span class="cl">Activities</span><span class="cv">74</span><span class="bar"><i data-w="74"></i></span></div>
+            <div class="cat warn"><span class="cl">Awards</span><span class="cv">48</span><span class="bar"><i data-w="48"></i></span></div>
+            <div class="cat"><span class="cl">Essays</span><span class="cv">69</span><span class="bar"><i data-w="69"></i></span></div>
+          </div>
+        </div>
+
+        <div class="sc-foot">
+          <span class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="4"/></svg></span>
+          <p><b>Biggest gap: Awards.</b> You have the activities — now turn two of them into recognized results before November.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ MARQUEE ============================ -->
+<section class="marquee-sec">
+  <p class="cap">Where AppGap students are headed</p>
+  <div class="marquee"><div class="marquee-track" id="mq"></div></div>
+</section>
+
+<!-- ============================ FEATURES ============================ -->
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">Everything in one place</span>
+      <h2>Everything your application needs</h2>
+      <p>Your score, your list, your essays, your plan — read together, by a coach that knows your whole file.</p>
+    </div>
+
+    <div class="bento">
+      <!-- Score — feature hero -->
+      <article class="cell span-3 feature-hero reveal">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></span>
+        <h3>See exactly where your profile stands</h3>
+        <p>AppGap scores your academics, activities, and awards across six categories — so you know what's strong and what's holding you back. Honest, specific feedback, not "show more passion."</p>
+        <div class="mini-chance">
+          <div class="big" data-count="46" data-suffix="%">0%</div>
+          <div class="mc-body">
+            <div class="nm">University of Michigan</div>
+            <div class="mt">Target · honest range 38–54%</div>
+            <div class="mc-bar"><i data-w="46"></i></div>
+          </div>
+          <span class="mc-label">Target</span>
+        </div>
+      </article>
+
+      <!-- Colleges -->
+      <article class="cell span-3 reveal d1">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 4 2 10l10 6 10-6Z"/><path d="M6 12v5c0 1 2.7 3 6 3s6-2 6-3v-5"/></svg></span>
+        <h3>Your real chances, school by school</h3>
+        <p>Build your college list and see honest admission chances based on your actual profile — 1,500+ colleges, holistic chancing with a real range, and field-fit for every school.</p>
+        <a class="lk" href="#">Explore colleges <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </article>
+
+      <!-- Application writing -->
+      <article class="cell span-2 reveal">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+        <h3>Make every activity count</h3>
+        <p>Each line scored on verb, specificity, and impact — with polish, rewrite, and template modes.</p>
+        <div class="activity-mini">
+          <div class="ln"><span class="sc a">4</span><span class="tx"><s>Member of robotics club, helped with projects.</s></span></div>
+          <div class="ln"><span class="sc g">9</span><span class="tx">Led 6-person robotics team to 2nd of 40 at regionals.</span></div>
+        </div>
+      </article>
+
+      <!-- Personal statement -->
+      <article class="cell span-2 reveal d1">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.9 5.8L20 10l-5 3.6L16.5 20 12 16.5 7.5 20 9 13.6 4 10l6.1-1.2L12 3Z"/></svg></span>
+        <h3>Essays that actually land</h3>
+        <p>Draft, clone, and refine your personal statement and supplementals with line-by-line AI coaching toward a stronger story.</p>
+        <a class="lk" href="#">Start an essay <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </article>
+
+      <!-- Roadmap -->
+      <article class="cell span-2 reveal d2">
+        <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 4 9v12l5-3 6 3 5-3V6l-5 3-6-3Z"/><path d="M9 6v12M15 9v12"/></svg></span>
+        <h3>A plan built around your timeline</h3>
+        <p>Turn your gaps into a personalized, step-by-step plan tuned to your grade and your test and application dates.</p>
+        <a class="lk" href="#">Build my roadmap <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ HOW IT WORKS ============================ -->
+<section class="section" id="how" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps to a clearer application</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><h3>Build your profile</h3><p>A guided 5-step setup captures your academics, activities, awards, and goals — in a few minutes.</p></div>
+      <div class="step reveal d1"><h3>Get your honest read</h3><p>AppGap scores six categories, maps real chances across your list, and names your biggest gaps.</p></div>
+      <div class="step reveal d2"><h3>Follow the plan</h3><p>Turn gaps into concrete next steps and sharpen every essay and activity before you hit submit.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ DARK BAND ============================ -->
+<section class="band" id="odds">
+  <div class="b-aurora"></div><div class="b-dots"></div>
+  <div class="wrap">
+    <div class="odds reveal">
+      <span class="eyebrow">The odds</span>
+      <h2>At the most selective schools,<br><em>fewer than 5 in 100</em> get in.</h2>
+      <p>So the default answer is no. Unless something in your file makes the reader stop, it goes in the pile. Qualified isn't the bar — memorable is. AppGap's job is to make sure yours is the file they remember.</p>
+    </div>
+    <div class="stats">
+      <div class="stat reveal"><div class="v" data-count="1540" data-suffix="+">0</div><div class="l">Colleges analyzed</div></div>
+      <div class="stat reveal d1"><div class="v" data-count="6">0</div><div class="l">Profile categories scored</div></div>
+      <div class="stat reveal d2"><div class="v" data-count="5"><span>-step</span></div><div class="l">Guided onboarding</div></div>
+      <div class="stat reveal d3"><div class="v" data-count="100" data-suffix="%">0</div><div class="l">Free to start</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FOUNDER ============================ -->
+<section class="section" id="founder">
+  <div class="wrap founder">
+    <div class="reveal">
+      <span class="f-tag"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> A student-led project</span>
+      <h2>Hi — I built AppGap.</h2>
+      <p class="body">
+        Here's what I wish every student knew: the playbook that gets people into great schools
+        isn't a secret — it's just expensive. I taught AppGap everything a $12,000 counselor
+        taught me, so every student gets the honest read, the real list, and the feedback that
+        actually changes the draft. Not just the ones who can pay.
+      </p>
+      <div class="sign">— The AppGap founder</div>
+      <div class="role">Founder · built for students, by a student</div>
+    </div>
+    <div class="portrait reveal d1">
+      <svg class="ring" viewBox="0 0 200 200" fill="none" aria-hidden="true"><path d="M100 8 C150 6 196 44 193 100 C190 156 150 194 100 192 C48 190 8 150 10 98 C12 46 52 10 100 8 Z"/></svg>
+      <div class="photo"><span>AG</span></div>
+      <div class="note">this one's for you ✦</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FAQ ============================ -->
+<section class="section" id="faq" style="background:var(--bg-2);">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>Frequently asked questions</h2>
+    </div>
+    <div class="faq-list">
+      <details class="faq reveal" open><summary>What exactly does AppGap do?<span class="plus"></span></summary><div class="ans">AppGap analyzes your academics, activities, and awards and shows you where your college application profile is strong and where the real gaps are — with concrete direction on what to work on before you apply.</div></details>
+      <details class="faq reveal"><summary>Is AppGap free to try?<span class="plus"></span></summary><div class="ans">Yes. You can build your profile and get started for free. Advanced features like the Personal Statement workspace and additional analyses are part of AppGap Pro.</div></details>
+      <details class="faq reveal"><summary>Does AppGap guarantee admission or predict decisions?<span class="plus"></span></summary><div class="ans">No. AppGap gives you an honest read on where your current profile stands and realistic chances by school — it is not a guarantee of any admissions outcome, and it isn't a substitute for a professional counselor.</div></details>
+      <details class="faq reveal"><summary>How are my chances calculated?<span class="plus"></span></summary><div class="ans">Chances come from a holistic model that weighs your academics, course rigor, activities, and awards against each school's selectivity — presented as an honest range, not a single inflated number.</div></details>
+      <details class="faq reveal"><summary>Can AppGap help with my essays?<span class="plus"></span></summary><div class="ans">Yes. AppGap scores your activities and additional-info sections, and the Personal Statement and supplemental-essay workspaces give line-by-line coaching toward stronger drafts.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ FINAL CTA ============================ -->
+<section class="final">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <div class="b-aurora"></div>
+      <svg class="mark on-dark" viewBox="0 0 36 44" aria-hidden="true">
+        <path class="body" d="M17 7 Q18 2 19 7 L34.5 43 L26 43 L19 27 Q18 24 17 27 L10 43 L1.5 43 Z"/>
+        <rect class="blk" x="10" y="33" width="6" height="6" rx="1.5"/>
+        <rect class="blk" x="20" y="33" width="6" height="6" rx="1.5"/>
+        <line class="bar" x1="16" y1="36" x2="20" y2="36" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <h2>Ready to see where you stand?</h2>
+      <p>Takes a few minutes. Free to get started — no card required.</p>
+      <div class="hero-cta">
+        <a class="btn btn-light btn-lg" data-magnetic href="#">Try AppGap free
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft-top">
+      <div>
+        <a class="brand" href="#top">
+          <svg class="mark" viewBox="0 0 36 44" aria-label="AppGap logo"><path class="body" d="M17 7 Q18 2 19 7 L34.5 43 L26 43 L19 27 Q18 24 17 27 L10 43 L1.5 43 Z"/><rect class="blk" x="10" y="33" width="6" height="6" rx="1.5"/><rect class="blk" x="20" y="33" width="6" height="6" rx="1.5"/><line class="bar" x1="16" y1="36" x2="20" y2="36" stroke-width="1.5" stroke-linecap="round"/></svg>
+          AppGap
+        </a>
+        <p class="desc">An independent, student-led project built to help students navigate the college admissions process with honest, AI-powered guidance.</p>
+      </div>
+      <div class="ft-col">
+        <h4>Product</h4>
+        <a href="#features">AppGap Score</a><a href="#features">My Colleges</a><a href="#features">Application Writing</a><a href="#features">Personal Statement</a><a href="#features">My Roadmap</a>
+      </div>
+      <div class="ft-col">
+        <h4>Company</h4>
+        <a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Partners</a><a href="#">Contact</a>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <b>Disclaimer:</b> AI-generated recommendations are intended for guidance only and should not be considered official admissions decisions or guarantees. AppGap is not a substitute for a professional college counselor. Always verify important information directly with colleges and scholarship providers.
+    </div>
+    <div class="ft-bot">
+      <span>© 2026 AppGap. All rights reserved.</span>
+      <span style="font-family:'Caveat';font-weight:700;font-size:1.05rem;color:var(--teal-deep)">college admissions, finally clear.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* Nav background on scroll */
+  var nav = document.getElementById("nav");
+  var onScroll = function(){ nav.classList.toggle("scrolled", window.scrollY > 24); };
+  onScroll(); window.addEventListener("scroll", onScroll, {passive:true});
+
+  /* Build college marquee (duplicated for seamless loop) */
+  var colleges = ["Stanford","MIT","Harvard","Yale","Princeton","Columbia","Brown","Cornell","Duke","UChicago","UPenn","Johns Hopkins","Northwestern","Michigan","UCLA","Berkeley","Rice","Carnegie Mellon"];
+  function ini(n){ var skip={of:1,the:1}; var w=n.split(/\s+/).filter(function(x){return !skip[x.toLowerCase()];}); return (w.length===1? w[0].slice(0,2): w[0][0]+w[1][0]).toUpperCase(); }
+  var mq = document.getElementById("mq");
+  var html = colleges.concat(colleges).map(function(c){ return '<span class="college"><span class="ini">'+ini(c)+'</span><span class="nm">'+c+'</span></span>'; }).join("");
+  mq.innerHTML = html;
+
+  /* Gauge circumference */
+  document.querySelectorAll(".gauge .fill").forEach(function(c){
+    var r = c.r.baseVal.value, circ = 2*Math.PI*r;
+    c.style.setProperty("--circ", circ);
+    c.dataset.circ = circ;
+  });
+
+  /* Count-up helper */
+  function countUp(el){
+    var target = +el.dataset.count, suffix = el.dataset.suffix || "";
+    if(reduce){ el.textContent = target.toLocaleString()+suffix; return; }
+    var dur = 1500, start = performance.now();
+    function tick(now){
+      var t = Math.min((now-start)/dur, 1), e = 1-Math.pow(1-t,3);
+      el.textContent = Math.round(e*target).toLocaleString()+suffix;
+      if(t<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  /* Reveal + trigger animations on view */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target;
+      el.classList.add("in");
+      el.querySelectorAll("[data-count]").forEach(countUp);
+      if(el.hasAttribute("data-count")) countUp(el);
+      el.querySelectorAll(".gauge .fill").forEach(function(c){
+        var pct = 72/100, circ = +c.dataset.circ;
+        c.style.strokeDashoffset = circ*(1-pct);
+      });
+      el.querySelectorAll("i[data-w]").forEach(function(i){ i.style.width = i.dataset.w+"%"; });
+      io.unobserve(el);
+    });
+  }, {threshold:0.2, rootMargin:"0px 0px -8% 0px"});
+
+  document.querySelectorAll(".reveal, [data-gauge], [data-count]").forEach(function(el){ io.observe(el); });
+  // ensure gauge/bars inside hero panel fire even if panel isn't a .reveal target
+  document.querySelectorAll(".panel-stage").forEach(function(el){ io.observe(el); });
+
+  /* Magnetic buttons (desktop, pointer:fine) */
+  if(!reduce && window.matchMedia("(pointer:fine)").matches){
+    document.querySelectorAll("[data-magnetic]").forEach(function(btn){
+      btn.addEventListener("mousemove", function(ev){
+        var r = btn.getBoundingClientRect();
+        var x = ev.clientX-r.left-r.width/2, y = ev.clientY-r.top-r.height/2;
+        btn.style.transform = "translate("+x*0.22+"px,"+(y*0.3-2)+"px)";
+      });
+      btn.addEventListener("mouseleave", function(){ btn.style.transform=""; });
+    });
+
+    /* Cursor glow */
+    var glow = document.getElementById("glow");
+    window.addEventListener("mousemove", function(ev){
+      glow.style.opacity = "1";
+      glow.style.left = ev.clientX+"px";
+      glow.style.top = ev.clientY+"px";
+    }, {passive:true});
+    window.addEventListener("mouseleave", function(){ glow.style.opacity="0"; });
+  }
+})();
+</script>
+</body>
+</html>

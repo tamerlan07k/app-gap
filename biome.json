@@ -6,6 +6,8 @@
       "!.next",
       "!.agents",
       "!.claude/worktrees",
+      "!supabase/.temp",
+      "!appgap-admissions-video",
       "!scripts/college-ingest/harvest-results.json",
       "!scripts/college-ingest/harvest-headless-results.json"
     ]

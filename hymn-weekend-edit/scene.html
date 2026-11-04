@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>Hymn for the Weekend — slowed edit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Playfair+Display:ital,wght@1,700;1,900&family=Pacifico&family=Dancing+Script:wght@700&family=Poppins:wght@700;800&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1080px;height:1920px;overflow:hidden;background:#000;}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#04020a;
+    perspective:1100px;perspective-origin:50% 50%;}
+  #bg{position:absolute;inset:-12%;}
+  .neb{position:absolute;left:0;top:0;border-radius:50%;filter:blur(52px);mix-blend-mode:screen;will-change:transform,opacity;}
+  .neb.a{width:1000px;height:1000px;background:radial-gradient(circle,#6b22ff,transparent 68%);}
+  .neb.b{width:900px;height:900px;background:radial-gradient(circle,#ff2d7e,transparent 68%);}
+  .neb.c{width:900px;height:900px;background:radial-gradient(circle,#1f6bff,transparent 68%);}
+  .neb.d{width:760px;height:760px;background:radial-gradient(circle,#19d3ff,transparent 70%);}
+
+  #world{position:absolute;inset:0;transform-style:preserve-3d;will-change:transform;}
+  #stars,#deco,#lines{position:absolute;inset:0;transform-style:preserve-3d;}
+  #lines{will-change:filter;}
+  .star{position:absolute;left:540px;top:960px;width:3px;height:3px;border-radius:50%;
+    background:#fff;box-shadow:0 0 6px #fff;will-change:transform,opacity;}
+  .bokeh{position:absolute;left:540px;top:960px;border-radius:50%;filter:blur(16px);
+    mix-blend-mode:screen;will-change:transform,opacity;}
+  .streak{position:absolute;left:540px;top:960px;
+    background:linear-gradient(180deg,transparent,rgba(255,255,255,.85),transparent);
+    box-shadow:0 0 10px rgba(255,255,255,.55);will-change:transform,opacity;}
+
+  .line{position:absolute;left:0;top:0;width:1080px;height:1920px;
+    display:flex;align-items:center;justify-content:center;
+    transform-style:preserve-3d;will-change:transform,opacity;backface-visibility:hidden;}
+  .line .wrap{max-width:1020px;text-align:center;line-height:0.98;will-change:filter;}
+  .tx{display:block;color:#fff;padding:0 10px;
+    text-shadow:0 0 16px rgba(255,255,255,.45),0 0 40px rgba(150,130,255,.5),0 2px 2px rgba(0,0,0,.45);
+    -webkit-text-stroke:1px rgba(255,255,255,.07);}
+  .f-anton .tx{font-family:'Anton',sans-serif;font-size:160px;letter-spacing:-1px;text-transform:uppercase;}
+  .f-archivo .tx{font-family:'Archivo Black',sans-serif;font-size:124px;letter-spacing:-3px;}
+  .f-playfair .tx{font-family:'Playfair Display',serif;font-style:italic;font-weight:900;font-size:146px;}
+  .f-pacifico .tx{font-family:'Pacifico',cursive;font-size:124px;}
+  .f-dancing .tx{font-family:'Dancing Script',cursive;font-weight:700;font-size:150px;}
+  .f-poppins .tx{font-family:'Poppins',sans-serif;font-weight:800;font-size:132px;letter-spacing:-2px;}
+  .hl{color:#ffe234;
+    text-shadow:0 0 16px rgba(255,226,52,.95),0 0 44px rgba(255,180,0,.8),0 0 90px rgba(255,140,0,.5);
+    -webkit-text-stroke:1px rgba(255,200,0,.14);}
+  .gl{color:#8fe9ff;
+    text-shadow:0 0 16px rgba(143,233,255,.95),0 0 48px rgba(37,190,255,.75),0 0 90px rgba(0,140,255,.45);}
+  #vig{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(130% 100% at 50% 42%,transparent 52%,rgba(0,0,0,.5) 100%);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"><div class="neb a"></div><div class="neb b"></div><div class="neb c"></div><div class="neb d"></div></div>
+  <div id="world">
+    <div id="stars"></div>
+    <div id="deco"></div>
+    <div id="lines"></div>
+  </div>
+  <div id="vig"></div>
+</div>
+
+<script>
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(77777);
+const lerp=(a,b,u)=>a+(b-a)*u, clamp=(x,a,b)=>x<a?a:(x>b?b:x);
+function smoother(a,b,x){let u=clamp((x-a)/(b-a),0,1);return u*u*u*(u*(u*6-15)+10);}
+
+const GAP=1600;
+
+/* ===== LINES (swap these phrases for the real lyric lines) ===== */
+const LINES=[
+  {html:'close your <span class="hl">eyes</span>', font:'f-pacifico'},
+  {html:'we’re <span class="hl">weightless</span>', font:'f-anton'},
+  {html:'drift into<br>the <span class="gl">light</span>', font:'f-playfair'},
+  {html:'feel it<br><span class="hl">slow</span> down', font:'f-archivo'},
+  {html:'colors <span class="hl">bleed</span>', font:'f-dancing'},
+  {html:'hold this<br><span class="gl">moment</span>', font:'f-poppins'},
+  {html:'don’t let<br><span class="hl">go</span>', font:'f-anton'},
+  {html:'lost in the<br><span class="hl">sound</span>', font:'f-playfair'},
+  {html:'fade <span class="gl">away</span>', font:'f-pacifico'},
+];
+const N=LINES.length;
+const READ=[1.3,3.9,6.5,9.1,11.7,14.3,16.9,19.5,22.1];
+
+const linesEl=document.getElementById('lines');
+const lineData=[];
+LINES.forEach((L,k)=>{
+  const el=document.createElement('div'); el.className='line '+L.font;
+  el.innerHTML='<div class="wrap"><span class="tx">'+L.html+'</span></div>';
+  linesEl.appendChild(el);
+  lineData.push({el, wrap:el.firstChild, x:(rnd()*2-1)*150, y:(rnd()*2-1)*170,
+    z:-k*GAP, rz:(rnd()*2-1)*8, ry:(rnd()*2-1)*9, k});
+});
+
+const starsEl=document.getElementById('stars');
+const stars=[]; const Zmin=-(N*GAP+2500), Zmax=500;
+for(let i=0;i<210;i++){
+  const s=document.createElement('div'); s.className='star';
+  const sz=rnd()*2.6+0.8; s.style.width=sz+'px'; s.style.height=sz+'px';
+  starsEl.appendChild(s);
+  stars.push({el:s, x:(rnd()*2-1)*1600, y:(rnd()*2-1)*2300, z:lerp(Zmin,Zmax,rnd()),
+    base:rnd()*0.5+0.45, sp:rnd()*2.4+0.6, ph:rnd()*7});
+}
+
+const decoEl=document.getElementById('deco');
+const decos=[];
+for(let i=0;i<10;i++){
+  const d=document.createElement('div'); d.className='streak';
+  const h=rnd()*1300+700, w=rnd()*2.5+1.2;
+  d.style.width=w+'px'; d.style.height=h+'px';
+  decoEl.appendChild(d);
+  decos.push({el:d, x:(rnd()*2-1)*1150, y:(rnd()*2-1)*950, z:lerp(Zmin+1500,Zmax,rnd()),
+    rz:(rnd()*2-1)*70, base:rnd()*0.3+0.22, sp:rnd()*1.6+0.4, ph:rnd()*7});
+}
+for(let i=0;i<14;i++){
+  const b=document.createElement('div'); b.className='bokeh';
+  const sz=rnd()*120+50; const cols=['#7b4bff','#ff5ba0','#49b7ff','#ffd36b'];
+  b.style.width=sz+'px'; b.style.height=sz+'px';
+  b.style.background=`radial-gradient(circle,${cols[(rnd()*cols.length)|0]},transparent 70%)`;
+  decoEl.appendChild(b);
+  decos.push({el:b, x:(rnd()*2-1)*1350, y:(rnd()*2-1)*1850, z:lerp(Zmin,Zmax-300,rnd()),
+    rz:0, base:rnd()*0.3+0.14, sp:rnd()*1.2+0.3, ph:rnd()*7});
+}
+
+/* ===== camera depth path ===== */
+const cps=[{t:0,z:-1400}];
+for(let k=0;k<N;k++){ cps.push({t:READ[k]-0.7, z:k*GAP}); cps.push({t:READ[k]+0.7, z:k*GAP}); }
+cps.push({t:24.9, z:(N-1)*GAP+380});
+cps.push({t:27.0, z:(N-1)*GAP+700});
+function camZ(t){
+  if(t<=cps[0].t) return cps[0].z;
+  for(let i=0;i<cps.length-1;i++) if(t<=cps[i+1].t) return lerp(cps[i].z,cps[i+1].z,smoother(cps[i].t,cps[i+1].t,t));
+  return cps[cps.length-1].z;
+}
+function camRot(t){return{
+  roll:7*Math.sin(t*0.55)+3.5*Math.sin(t*0.9+1)+t*1.15,
+  yaw:6*Math.sin(t*0.40+0.5)+2.5*Math.sin(t*0.8),
+  pitch:3*Math.sin(t*0.33+1),
+  cx:46*Math.sin(t*0.30), cy:34*Math.sin(t*0.42+1)};}
+
+const world=document.getElementById('world'), bg=document.getElementById('bg');
+const nA=document.querySelector('.neb.a'),nB=document.querySelector('.neb.b'),nC=document.querySelector('.neb.c'),nD=document.querySelector('.neb.d');
+
+window.__duration=27000;
+window.seek=function(ms){
+  const t=ms/1000, cz=camZ(t);
+  const dz=(camZ(t+0.016)-camZ(t-0.016))/0.032;
+  const r=camRot(t);
+  world.style.transform=`rotateZ(${r.roll}deg) rotateY(${r.yaw}deg) rotateX(${r.pitch}deg) translate3d(${r.cx}px,${r.cy}px,0)`;
+
+  const vBlur=clamp((Math.abs(dz)-560)/120,0,16);
+  linesEl.style.filter=vBlur>0.3?`blur(${vBlur.toFixed(1)}px)`:'none';
+
+  // move the whole 3D world toward the camera by shifting each element's Z
+  for(const s of stars) s.el.style.transform=`translate3d(${s.x}px,${s.y}px,${(s.z+cz).toFixed(1)}px)`;
+  for(const d of decos){ const rot=d.rz?` rotateZ(${d.rz}deg)`:''; d.el.style.transform=`translate3d(${d.x}px,${d.y}px,${(d.z+cz).toFixed(1)}px)${rot}`; }
+
+  for(const L of lineData){
+    const z=L.z+cz;                       // effective depth of this line
+    L.el.style.transform=`translate3d(${L.x}px,${L.y}px,${z.toFixed(1)}px) rotateZ(${L.rz}deg) rotateY(${L.ry}deg)`;
+    let op;
+    if(z<-2000) op=0;
+    else if(z<-520) op=smoother(-2000,-520,z);
+    else if(z<170)  op=1;
+    else if(z<760)  op=1-smoother(170,760,z);
+    else op=0;
+    L.el.style.opacity=op.toFixed(3);
+    let b=0;
+    if(z<-520) b=clamp((-520-z)/280,0,9);
+    else if(z>170) b=clamp((z-170)/100,0,14);
+    L.wrap.style.filter=b>0.3?`blur(${b.toFixed(1)}px)`:'none';
+  }
+
+  for(const s of stars) s.el.style.opacity=(s.base*(0.45+0.55*Math.sin(t*s.sp+s.ph))).toFixed(3);
+  for(const d of decos) d.el.style.opacity=(d.base*(0.5+0.5*Math.sin(t*d.sp+d.ph))).toFixed(3);
+
+  bg.style.transform=`translate3d(${22*Math.sin(t*0.12)}px,${18*Math.cos(t*0.1)}px,0)`;
+  const p=t/27;
+  // GPU-friendly: move nebulas with transforms (no layout), absolute px positions.
+  const aX=lerp(-220,120,0.5+0.5*Math.sin(t*0.13)), aY=lerp(120,380,p);
+  nA.style.transform=`translate3d(${aX}px,${aY}px,0)`; nA.style.opacity=0.5+0.15*Math.sin(t*0.2);
+  const bX=180-lerp(-260,-20,0.5+0.5*Math.cos(t*0.11)), bY=lerp(760,520,p);
+  nB.style.transform=`translate3d(${bX}px,${bY}px,0)`; nB.style.opacity=0.45+0.15*Math.cos(t*0.17);
+  const cX=lerp(60,300,0.5+0.5*Math.sin(t*0.09+2)), cY=1020-lerp(-200,40,p);
+  nC.style.transform=`translate3d(${cX}px,${cY}px,0)`; nC.style.opacity=0.4+0.15*Math.sin(t*0.15+1);
+  const dX=320-lerp(120,460,0.5+0.5*Math.cos(t*0.14)), dY=lerp(1180,980,p);
+  nD.style.transform=`translate3d(${dX}px,${dY}px,0)`; nD.style.opacity=0.35+0.15*Math.cos(t*0.19);
+};
+window.__ready=true;
+window.seek(0);
+</script>
+</body>
+</html>
