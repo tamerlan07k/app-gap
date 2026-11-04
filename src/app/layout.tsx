@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import { Navbar } from "~/components/navbar";
+import { SmoothScrollProvider } from "./smooth-scroll-provider";
 import { ThemeProvider } from "./theme-provider";
 import "./globals.css";
 
@@ -31,7 +32,7 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <Navbar />
-          {children}
+          <SmoothScrollProvider>{children}</SmoothScrollProvider>
         </ThemeProvider>
       </body>
     </html>

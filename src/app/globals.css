@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -190,6 +191,104 @@
 @utility font-display {
   font-family: var(--font-display);
   letter-spacing: -0.03em;
+}
+
+/* ── Landing v2: marquee, floating chips, scroll reveals ──────────────────── */
+
+/* Infinite logo marquee — the track holds two copies of the set; translating it
+   by -50% loops seamlessly. */
+@keyframes marquee-x {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-marquee {
+  animation: marquee-x 42s linear infinite;
+}
+
+/* Gentle bob for floating annotation chips. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@utility animate-float-soft {
+  animation: float-soft var(--float-dur, 6s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+}
+
+/* IntersectionObserver-driven reveal: elements start hidden+shifted and settle
+   when `.is-in` is toggled on. The hidden state is gated behind `.io-ready`
+   (added by JS on mount) so that without JS everything stays visible. */
+.io-ready .io-reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.io-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+.io-reveal.delay-1 {
+  transition-delay: 0.08s;
+}
+.io-reveal.delay-2 {
+  transition-delay: 0.16s;
+}
+.io-reveal.delay-3 {
+  transition-delay: 0.24s;
+}
+
+/* Floating chips drift in from a scatter and settle when their section enters. */
+.io-ready .io-chip {
+  opacity: 0;
+  transform: translateY(32px) scale(0.92) rotate(var(--chip-rot, 0deg));
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--chip-delay, 0s);
+}
+.io-chip.is-in {
+  opacity: 1;
+  transform: translateY(0) scale(1) rotate(var(--chip-rot, 0deg));
+}
+
+/* Document grid: each tile's checkmark pops in sequence when the grid enters. */
+.io-ready .io-doc .doc-check {
+  opacity: 0;
+  transform: scale(0.4);
+  transition:
+    opacity 0.45s ease-out,
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.io-doc.is-in .doc-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-float-soft {
+    animation: none;
+  }
+  .io-ready .io-reveal,
+  .io-ready .io-chip,
+  .io-ready .io-doc .doc-check {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 @layer base {

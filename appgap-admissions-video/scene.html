@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1080, initial-scale=1" />
+<title>Build the Perfect College Applicant — Episode 1</title>
+<style>
+  :root{
+    --bg0:#05070d; --bg1:#0a0e1a; --ink:#ffffff;
+    --blue:#2e6bff; --blue-lo:#1b3a7a; --blue-hi:#8fb4ff;
+    --muted:#8a93a8; --card:#0e1526; --line:rgba(143,180,255,.18);
+    --font:"Inter","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+  }
+  @font-face{font-family:"Inter";src:local("Inter");font-weight:100 900;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1080px;height:1920px;background:#000;overflow:hidden;}
+  #stage{
+    position:relative;width:1080px;height:1920px;overflow:hidden;
+    background:
+      radial-gradient(130% 80% at 50% 20%, #0d1426 0%, var(--bg1) 42%, var(--bg0) 80%, #03050a 100%);
+    font-family:var(--font);color:var(--ink);
+    -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+    perspective:1600px;perspective-origin:50% 44%;
+  }
+  .grid{position:absolute;inset:0;opacity:.05;
+    background-image:linear-gradient(rgba(143,180,255,.6) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(143,180,255,.6) 1px,transparent 1px);
+    background-size:90px 90px;mask-image:radial-gradient(70% 60% at 50% 42%,#000 0%,transparent 75%);}
+  .vignette{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(90% 70% at 50% 44%,transparent 55%,rgba(0,0,0,.66) 100%);}
+  .grain{position:absolute;inset:-50%;opacity:.045;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  .glow{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;}
+  #glowA{width:720px;height:720px;left:180px;top:420px;background:rgba(46,107,255,.22);}
+  #glowB{width:520px;height:520px;left:520px;top:1180px;background:rgba(46,107,255,.10);}
+
+  .layer{position:absolute;inset:0;transform-style:preserve-3d;will-change:opacity,transform;}
+  .c{position:absolute;left:50%;transform:translateX(-50%);will-change:opacity,transform;}
+  .kicker{position:absolute;left:0;right:0;top:188px;text-align:center;
+    font-size:26px;letter-spacing:.5em;color:var(--blue-hi);text-transform:uppercase;}
+
+  /* ---------- profile card (scenes 1 & 5) ---------- */
+  .profile{width:560px;height:600px;border-radius:30px;
+    background:linear-gradient(160deg,#141c30,#0b1120 60%,#070b15);
+    border:1px solid rgba(143,180,255,.16);
+    box-shadow:0 60px 120px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.05);}
+  .profile .tab{position:absolute;top:-30px;left:56px;width:260px;height:44px;border-radius:14px 14px 0 0;
+    background:linear-gradient(160deg,#17213a,#0c1322);border:1px solid rgba(143,180,255,.16);border-bottom:none;
+    font-size:20px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;justify-content:center;}
+  .profile .av{position:absolute;left:50%;top:84px;transform:translateX(-50%);
+    width:188px;height:188px;border-radius:50%;
+    background:radial-gradient(circle at 40% 34%,#2a344c,#161d30 60%,#0e1424);
+    border:1px solid rgba(143,180,255,.2);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
+  .profile .av svg{width:150px;height:150px;fill:#4a5572;opacity:.9;}
+  .profile .nameline{position:absolute;left:90px;right:90px;top:316px;height:3px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,rgba(143,180,255,.5),transparent);}
+  .profile .nameghost{position:absolute;left:0;right:0;top:300px;text-align:center;
+    font-size:30px;letter-spacing:.3em;color:#39415a;text-transform:uppercase;}
+  .profile .idlab{position:absolute;left:0;right:0;top:378px;text-align:center;
+    font-size:24px;letter-spacing:.34em;color:var(--muted);text-transform:uppercase;}
+  .profile .idlab b{color:#dfe6f5;font-weight:700;}
+  .profile .status{position:absolute;left:50%;transform:translateX(-50%);top:452px;
+    padding:14px 34px;border-radius:999px;border:1px solid rgba(143,180,255,.28);
+    background:rgba(46,107,255,.08);font-size:26px;letter-spacing:.24em;color:var(--blue-hi);text-transform:uppercase;font-weight:700;}
+
+  .title{top:1080px;width:1000px;text-align:center;font-weight:800;line-height:.98;
+    font-size:104px;letter-spacing:-.02em;filter:drop-shadow(0 10px 40px rgba(0,0,0,.6));}
+  .title .accent{color:var(--blue-hi);}
+
+  /* ---------- scene 2: dashboard ---------- */
+  .dash{top:440px;width:980px;}
+  .dhead{position:absolute;left:50%;transform:translateX(-50%);top:0;width:980px;display:flex;align-items:center;gap:26px;justify-content:center;}
+  .dhead .mini{width:76px;height:76px;border-radius:50%;background:radial-gradient(circle at 40% 34%,#2a344c,#141b2d);
+    border:1px solid rgba(143,180,255,.2);display:flex;align-items:flex-end;justify-content:center;overflow:hidden;}
+  .dhead .mini svg{width:60px;height:60px;fill:#4a5572;}
+  .dhead .who{font-size:34px;font-weight:700;letter-spacing:.06em;}
+  .dhead .who small{display:block;font-size:22px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;font-weight:600;}
+  .dhead .solid{margin-left:10px;padding:16px 30px;border-radius:16px;border:1px solid rgba(143,180,255,.34);
+    background:rgba(46,107,255,.12);font-size:28px;font-weight:700;letter-spacing:.05em;color:var(--blue-hi);}
+  .slots{position:absolute;top:150px;left:50%;transform:translateX(-50%);width:980px;
+    display:grid;grid-template-columns:1fr 1fr;gap:34px;}
+  .slot{height:310px;border-radius:26px;border:2px dashed rgba(143,180,255,.26);
+    background:rgba(255,255,255,.015);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;}
+  .slot .plus{width:88px;height:88px;border-radius:50%;border:2px solid rgba(143,180,255,.4);
+    display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:300;color:var(--blue-hi);line-height:1;padding-bottom:8px;}
+  .slot .lab{font-size:32px;font-weight:700;letter-spacing:.14em;color:#c7cedd;text-transform:uppercase;}
+  .slot .empty{font-size:24px;letter-spacing:.28em;color:#4b5571;text-transform:uppercase;}
+
+  /* ---------- scene 3: options ---------- */
+  .s3head{top:300px;width:1000px;text-align:center;}
+  .s3head .q{font-size:62px;font-weight:800;letter-spacing:-.01em;line-height:1.04;}
+  .s3head .q .accent{color:var(--blue-hi);}
+  .s3head .pill{display:inline-block;margin-top:24px;padding:12px 30px;border-radius:999px;
+    border:1px solid rgba(143,180,255,.26);background:rgba(255,255,255,.02);
+    font-size:26px;letter-spacing:.26em;color:var(--muted);text-transform:uppercase;font-weight:600;}
+  .optwrap{top:540px;width:1000px;}
+  .opt{position:absolute;left:50%;width:910px;height:250px;border-radius:26px;
+    background:linear-gradient(155deg,rgba(21,30,52,.96),rgba(10,16,30,.96));
+    border:1px solid rgba(143,180,255,.2);
+    box-shadow:0 40px 90px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06);
+    display:flex;align-items:center;gap:40px;padding:0 48px;}
+  .opt .badge{flex:0 0 150px;height:150px;border-radius:26px;display:flex;align-items:center;justify-content:center;
+    font-size:104px;font-weight:800;color:#fff;
+    background:linear-gradient(160deg,var(--blue),#1f50d0);
+    box-shadow:0 20px 50px rgba(46,107,255,.4),inset 0 2px 0 rgba(255,255,255,.3);}
+  .opt .body{flex:1;}
+  .opt .body .ot{font-size:52px;font-weight:800;letter-spacing:-.01em;line-height:1.02;}
+  .opt .body .od{margin-top:12px;font-size:30px;color:var(--muted);font-weight:500;letter-spacing:.01em;}
+  .opt .ico{flex:0 0 112px;height:112px;border-radius:22px;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 40% 35%,rgba(46,107,255,.34),rgba(27,58,122,.2));
+    border:1px solid rgba(143,180,255,.3);}
+  .opt .ico svg{width:64px;height:64px;stroke:var(--blue-hi);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+
+  /* ---------- scene 4: vote ---------- */
+  .s4head{top:360px;width:1000px;text-align:center;font-size:40px;font-weight:700;letter-spacing:.3em;color:var(--blue-hi);text-transform:uppercase;}
+  .votewrap{top:520px;width:1000px;}
+  .vote{position:absolute;left:50%;width:760px;height:224px;border-radius:28px;
+    display:flex;align-items:center;gap:44px;padding:0 56px;
+    background:linear-gradient(155deg,rgba(18,26,46,.96),rgba(9,14,26,.96));
+    border:1px solid rgba(143,180,255,.22);box-shadow:0 36px 80px rgba(0,0,0,.5);}
+  .vote .L{flex:0 0 150px;font-size:150px;font-weight:800;line-height:1;color:var(--blue-hi);
+    text-shadow:0 0 50px rgba(46,107,255,.5);}
+  .vote .n{font-size:46px;font-weight:700;letter-spacing:.02em;color:#dfe6f5;}
+  .vote .ring{position:absolute;inset:-12px;border-radius:36px;border:2px solid rgba(46,107,255,.6);opacity:0;}
+
+  /* ---------- captions ---------- */
+  #capwrap{position:absolute;left:60px;right:60px;bottom:250px;text-align:center;}
+  #capscrim{position:absolute;left:-40px;right:-40px;top:-30px;bottom:-30px;border-radius:30px;
+    background:radial-gradient(120% 140% at 50% 50%,rgba(3,5,10,.82),rgba(3,5,10,.0) 72%);}
+  #caption{position:relative;font-size:52px;font-weight:700;line-height:1.18;letter-spacing:-.005em;
+    text-shadow:0 4px 24px rgba(0,0,0,.9);}
+  #caption .em{color:var(--blue-hi);font-style:normal;}
+
+  /* ---------- scene 5 branding ---------- */
+  .faintopts{top:1150px;width:1000px;display:flex;gap:30px;justify-content:center;}
+  .faintopts .fo{width:150px;height:92px;border-radius:18px;border:1px solid rgba(143,180,255,.16);
+    background:rgba(255,255,255,.015);display:flex;align-items:center;justify-content:center;
+    font-size:58px;font-weight:800;color:#2f3a54;}
+  .brand{position:absolute;left:64px;bottom:150px;display:flex;align-items:center;gap:18px;}
+  .brand .cap{width:62px;height:62px;border-radius:14px;background:linear-gradient(160deg,var(--blue),#1f50d0);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 14px 34px rgba(46,107,255,.4);}
+  .brand .cap svg{width:40px;height:40px;fill:#fff;}
+  .brand .mark{font-size:52px;font-weight:800;letter-spacing:-.01em;}
+  .brand .mark .dot{color:var(--blue-hi);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="grid"></div>
+  <div class="glow" id="glowA"></div>
+  <div class="glow" id="glowB"></div>
+
+  <!-- SCENE 1 -->
+  <div class="layer" id="s1">
+    <div class="kicker" id="s1kick">Interactive Series · Episode 01</div>
+    <div class="c profile" id="prof1" style="top:300px">
+      <div class="tab">Applicant Builder</div>
+      <div class="av"><svg viewBox="0 0 24 24"><title>Blank applicant</title><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-5 0-9 3-9 7v1h18v-1c0-4-4-7-9-7z"/></svg></div>
+      <div class="nameghost">— unnamed —</div>
+      <div class="nameline"></div>
+      <div class="idlab">Applicant · Profile <b>#001</b></div>
+      <div class="status">Status: Unbuilt</div>
+    </div>
+    <div class="c title" id="s1title">BUILD THE<br><span class="accent">PERFECT</span><br>COLLEGE<br>APPLICANT</div>
+  </div>
+
+  <!-- SCENE 2 -->
+  <div class="layer" id="s2">
+    <div class="c dash" id="dash">
+      <div class="dhead" id="dhead">
+        <div class="mini"><svg viewBox="0 0 24 24"><title>Profile</title><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-5 0-9 3-9 7v1h18v-1c0-4-4-7-9-7z"/></svg></div>
+        <div class="who">PROFILE #001<small>Application file</small></div>
+        <div class="solid" id="solidChip">GRADES: SOLID</div>
+      </div>
+      <div class="slots">
+        <div class="slot" id="sl1"><div class="plus">+</div><div class="lab">Extracurriculars</div><div class="empty">Empty</div></div>
+        <div class="slot" id="sl2"><div class="plus">+</div><div class="lab">Awards</div><div class="empty">Empty</div></div>
+        <div class="slot" id="sl3"><div class="plus">+</div><div class="lab">Projects</div><div class="empty">Empty</div></div>
+        <div class="slot" id="sl4"><div class="plus">+</div><div class="lab">Essays</div><div class="empty">Empty</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 3 -->
+  <div class="layer" id="s3">
+    <div class="c s3head" id="s3head">
+      <div class="q">Their first big<br><span class="accent">extracurricular</span>?</div>
+      <div class="pill">You decide</div>
+    </div>
+    <div class="c optwrap" id="optwrap">
+      <div class="opt" id="optA" style="top:0;transform:translateX(-50%)">
+        <div class="badge">A</div>
+        <div class="body"><div class="ot">Start a club</div><div class="od" id="odA">Bring people together around one idea</div></div>
+        <div class="ico"><svg viewBox="0 0 48 48"><title>Club</title><ellipse cx="24" cy="30" rx="17" ry="7"/><circle cx="10" cy="19" r="4"/><circle cx="24" cy="16" r="4"/><circle cx="38" cy="19" r="4"/></svg></div>
+      </div>
+      <div class="opt" id="optB" style="top:290px;transform:translateX(-50%)">
+        <div class="badge">B</div>
+        <div class="body"><div class="ot">Build an app</div><div class="od" id="odB">Ship something people can actually use</div></div>
+        <div class="ico"><svg viewBox="0 0 48 48"><title>App</title><rect x="15" y="6" width="18" height="36" rx="4"/><line x1="20" y1="14" x2="28" y2="14"/><rect x="20" y="20" width="8" height="6" rx="1.5"/><line x1="20" y1="31" x2="28" y2="31"/></svg></div>
+      </div>
+      <div class="opt" id="optC" style="top:580px;transform:translateX(-50%)">
+        <div class="badge">C</div>
+        <div class="body"><div class="ot">Launch a community project</div><div class="od" id="odC">Start something local that grows</div></div>
+        <div class="ico"><svg viewBox="0 0 48 48"><title>Community</title><path d="M24 42c8-9 12-15 12-21a12 12 0 0 0-24 0c0 6 4 12 12 21z"/><circle cx="24" cy="20" r="4.5"/></svg></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 4 -->
+  <div class="layer" id="s4">
+    <div class="c s4head" id="s4head">Comment to vote</div>
+    <div class="c votewrap" id="votewrap">
+      <div class="vote" id="voteA" style="top:0;transform:translateX(-50%)"><div class="ring"></div><div class="L">A</div><div class="n">Start a club</div></div>
+      <div class="vote" id="voteB" style="top:264px;transform:translateX(-50%)"><div class="ring"></div><div class="L">B</div><div class="n">Build an app</div></div>
+      <div class="vote" id="voteC" style="top:528px;transform:translateX(-50%)"><div class="ring"></div><div class="L">C</div><div class="n">Community project</div></div>
+    </div>
+  </div>
+
+  <!-- SCENE 5 -->
+  <div class="layer" id="s5">
+    <div class="c profile" id="prof5" style="top:470px">
+      <div class="tab">Applicant Builder</div>
+      <div class="av"><svg viewBox="0 0 24 24"><title>Applicant in progress</title><path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-5 0-9 3-9 7v1h18v-1c0-4-4-7-9-7z"/></svg></div>
+      <div class="nameghost">— to be continued —</div>
+      <div class="nameline"></div>
+      <div class="idlab">Applicant · Profile <b>#001</b></div>
+      <div class="status">Extracurricular: your vote</div>
+    </div>
+    <div class="c faintopts" id="faintopts"><div class="fo">A</div><div class="fo">B</div><div class="fo">C</div></div>
+    <div class="brand" id="brand">
+      <div class="cap"><svg viewBox="0 0 24 24"><title>AppGap</title><path d="M12 3L1 8l11 5 9-4.09V15h2V8L12 3zM4 13v3c0 1.66 3.58 3 8 3s8-1.34 8-3v-3l-8 3.64L4 13z"/></svg></div>
+      <div class="mark">App<span class="dot">·</span>Gap</div>
+    </div>
+  </div>
+
+  <!-- CAPTIONS -->
+  <div id="capwrap"><div id="capscrim"></div><div id="caption"></div></div>
+
+  <div class="vignette"></div>
+  <div class="grain" id="grain"></div>
+</div>
+
+<script>
+const E=id=>document.getElementById(id);
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const p=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+const eo=x=>1-(1-x) ** 3;                 // easeOutCubic
+const ei=x=>x*x*x;                        // easeInCubic
+const bk=x=>{const c=1.70158+1;return 1+(c+1)*(x-1) ** 3+c*(x-1) ** 2;}; // overshoot
+// fade in [a,b], hold, out [c,d]
+const win=(t,a,b,c,d)=>{ if(t<a||t>d)return 0; if(t<b)return eo(p(t,a,b)); if(t>c)return 1-ei(p(t,c,d)); return 1;};
+const set=(el,o,{x=0,y=0,z=0,s=1,rx=0,ry=0}={})=>{el.style.opacity=o;
+  el.style.transform=`translateX(-50%) translate3d(${x}px,${y}px,${z}px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${s})`;};
+const setL=(el,o)=>{el.style.opacity=o;};
+
+// ---------- CAPTIONS (follow the narration, emphasis on YOU / FROM SCRATCH / A,B,C) ----------
+const CAPS=[
+ [0.15, 3.60,"What if <span class='em'>YOU</span> could build the\nperfect college applicant?"],
+ [3.90, 6.50,"We're creating a student\n<span class='em'>from scratch</span>."],
+ [6.60, 9.55,"And <span class='em'>YOU</span> are making\nthe decisions."],
+ [9.90,12.55,"They've got decent grades."],
+ [12.70,14.60,"Now — their first big\nextracurricular."],
+ [14.70,16.95,"What should they do?"],
+ [17.20,19.00,"Option <span class='em'>A</span> — start a club."],
+ [19.10,21.00,"Option <span class='em'>B</span> — build an app."],
+ [21.10,23.45,"Option <span class='em'>C</span> — launch a\ncommunity project."],
+ [23.75,27.15,"Comment <span class='em'>A</span>, <span class='em'>B</span>, or <span class='em'>C</span>."],
+ [27.30,30.15,"Your choice decides\nwhat happens next."],
+ [30.60,35.30,"Let's see if we can build an\napplicant worth remembering."],
+];
+function caption(t){
+  let cur=null;for(const c of CAPS){if(t>=c[0]&&t<=c[1]){cur=c;break;}}
+  const cap=E('caption');
+  if(!cur){cap.style.opacity=0;return;}
+  cap.innerHTML=cur[2].replace(/\n/g,'<br>');
+  const fin=p(t,cur[0],cur[0]+0.14), fout=1-p(t,cur[1]-0.16,cur[1]);
+  cap.style.opacity=Math.min(fin,fout);
+  cap.style.transform=`translateY(${(1-eo(fin))*18}px)`;
+}
+
+// ---------- MAIN TIMELINE (DUR 36s) ----------
+function render(t){
+  // ambient
+  E('glowA').style.opacity=.22+0.05*Math.sin(t*0.8);
+  E('glowB').style.opacity=.10+0.04*Math.sin(t*0.6+1.5);
+  E('grain').style.transform=`translate(${(t*37)%80-40}px,${(t*53)%80-40}px)`;
+
+  // layer windows
+  setL(E('s1'),win(t,0,0.5, 3.6,4.0));
+  setL(E('s2'),win(t,3.7,4.3, 9.7,10.2));
+  setL(E('s3'),win(t,10.0,10.6, 23.1,23.7));
+  setL(E('s4'),win(t,23.4,24.1, 30.1,30.6));
+  setL(E('s5'),win(t,30.3,31.0, 36,36));
+
+  // ===== SCENE 1: hook =====
+  {
+    const push=p(t,0,2.4);
+    const z=-620+eo(push)*620;
+    set(E('prof1'),1,{y:-50,z:z, ry:-12+eo(push)*12, rx:5-eo(push)*5});
+    const ti=win(t,0.6,1.4, 3.2,3.8);
+    set(E('s1title'),ti,{y:(1-eo(p(t,0.6,1.4)))*28, z:120, s:0.92+0.08*eo(p(t,0.6,1.4))});
+    E('s1kick').style.opacity=win(t,0.3,1.1, 3.2,3.7)*0.9;
+  }
+
+  // ===== SCENE 2: dashboard =====
+  {
+    const drift=Math.sin(t*0.5)*6;
+    set(E('dash'),1,{y:drift, z:20});
+    E('dhead').style.opacity=win(t,4.0,4.6, 9.5,10.1);
+    E('dhead').style.transform=`translateX(-50%) translateY(${(1-eo(p(t,4.0,4.6)))*-24}px)`;
+    const slots=[['sl1',4.5],['sl2',4.8],['sl3',5.1],['sl4',5.4]];
+    slots.forEach(([id,ts])=>{
+      const a=win(t,ts,ts+0.5, 9.4,10.0);
+      const inp=eo(p(t,ts,ts+0.5));
+      const el=E(id);
+      el.style.opacity=a;
+      el.style.transform=`translateY(${(1-inp)*40}px) scale(${0.94+0.06*inp})`;
+    });
+    // grades chip gets a gentle emphasis as "decent grades" is said
+    const g=win(t,4.6,5.2, 9.4,10.0);
+    const bump=1+0.06*Math.max(0,Math.sin(p(t,8.4,9.2)*Math.PI));
+    E('solidChip').style.opacity=g;
+    E('solidChip').style.transform=`scale(${bump})`;
+  }
+
+  // ===== SCENE 3: options =====
+  {
+    E('s3head').style.opacity=win(t,10.3,10.9, 22.6,23.3);
+    set(E('optwrap'),1,{z:10});
+    // card frames fly in one by one
+    const cards=[['optA',10.7],['optB',11.4],['optC',12.1]];
+    cards.forEach(([id,ts])=>{
+      const a=win(t,ts,ts+0.6, 22.6,23.3);
+      const inp=eo(p(t,ts,ts+0.6));
+      const el=E(id);
+      el.style.opacity=a;
+      el.style.transform=`translateX(-50%) translate3d(0,${(1-inp)*70}px,${(1-inp)*-40}px) scale(${0.92+0.08*inp})`;
+    });
+    // descriptors + badge glow reveal as each option is named
+    const rev=[['odA',17.1],['odB',19.1],['odC',21.1]];
+    rev.forEach(([id,ts])=>{ E(id).style.opacity=win(t,ts,ts+0.6, 22.8,23.4); });
+    const badges=[['optA',17.1],['optB',19.1],['optC',21.1]];
+    badges.forEach(([id,ts])=>{
+      const flash=Math.max(0,1-p(t,ts,ts+0.7));
+      const b=E(id).querySelector('.badge');
+      b.style.boxShadow=`0 20px 50px rgba(46,107,255,${.4+.5*flash}),inset 0 2px 0 rgba(255,255,255,.3)`;
+    });
+  }
+
+  // ===== SCENE 4: vote =====
+  {
+    const camp=eo(p(t,23.9,26.5));                 // slow camera push
+    set(E('votewrap'),1,{y:-camp*16, z:10, s:0.95+0.05*camp});
+    E('s4head').style.opacity=win(t,23.8,24.4, 29.8,30.4);
+    const tiles=[['voteA',23.7],['voteB',24.0],['voteC',24.3]];
+    tiles.forEach(([id,ts])=>{
+      const a=win(t,ts,ts+0.5, 29.8,30.4);
+      const inp=bk(clamp(p(t,ts,ts+0.6),0,1));
+      const el=E(id);
+      el.style.opacity=a;
+      el.style.transform=`translateX(-50%) scale(${0.9+0.1*clamp(inp,0,1.1)})`;
+      // each letter pulses once shortly after it lands, then a soft shared pulse
+      const once=Math.max(0,1-p(t,ts+0.5,ts+1.3));
+      const soft=0.35+0.4*(0.5+0.5*Math.sin(t*3.4));
+      el.querySelector('.ring').style.opacity=a*Math.max(once,soft*0.6);
+    });
+  }
+
+  // ===== SCENE 5: ending =====
+  {
+    const push=p(t,30.3,33.5);
+    set(E('prof5'),win(t,30.6,31.4, 36,36),{y:0, z:-80+eo(push)*80, ry:8-eo(push)*8});
+    E('faintopts').style.opacity=win(t,31.0,31.8, 36,36)*0.8;
+    E('faintopts').style.transform=`translateX(-50%) translateY(${(1-eo(p(t,31.0,31.8)))*20}px)`;
+    E('brand').style.opacity=win(t,32.2,33.0, 36,36);
+  }
+
+  caption(t);
+}
+
+window.__render=render;
+window.__DURATION=36.0;
+
+// live preview (browser pane) — skipped during headless capture
+let _start=null, _playing=true;
+function loop(ts){ if(_start===null)_start=ts; let t=((ts-_start)/1000); if(t>window.__DURATION){_start=ts;t=0;} if(_playing)render(t); requestAnimationFrame(loop);}
+if(!window.__CAPTURE){ render(0); requestAnimationFrame(loop);}
+document.addEventListener('keydown',e=>{if(e.key===' ')_playing=!_playing;});
+</script>
+</body>
+</html>

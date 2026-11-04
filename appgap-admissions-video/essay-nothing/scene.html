@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1080, initial-scale=1" />
+<title>This College Essay Says Absolutely Nothing — AppGap</title>
+<style>
+  :root{
+    --bg0:#04080e; --bg1:#0a141f; --ink:#f2f7fa;
+    --teal:#39bdd1; --teal-brand:#3f8ba6; --teal-hi:#8fe7f2; --teal-lo:#17414c;
+    --navy:#163243;
+    --amber:#f6b24b; --amber-hi:#ffd28a;
+    --green:#36e0a6; --green-hi:#9ff3d3;
+    --muted:#88a0ad; --line:rgba(143,210,230,.16);
+    --paper:#f6f3ea; --paper-ink:#1b2630; --paper-line:#d8d2c2;
+    --font:"Inter","Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif;
+    --serif:"Georgia","Times New Roman",serif;
+  }
+  @font-face{font-family:"Inter";src:local("Inter");font-weight:100 900;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{width:1080px;height:1920px;background:#000;overflow:hidden;}
+  #stage{
+    position:relative;width:1080px;height:1920px;overflow:hidden;
+    background:radial-gradient(135% 85% at 50% 24%, #0f1d2b 0%, var(--bg1) 44%, var(--bg0) 82%, #02050a 100%);
+    font-family:var(--font);color:var(--ink);
+    -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+    perspective:1700px;perspective-origin:50% 44%;
+  }
+  .grid{position:absolute;inset:0;opacity:.055;
+    background-image:linear-gradient(rgba(143,210,230,.6) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(143,210,230,.6) 1px,transparent 1px);
+    background-size:92px 92px;mask-image:radial-gradient(72% 62% at 50% 42%,#000 0%,transparent 76%);}
+  .vignette{position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(94% 74% at 50% 44%,transparent 52%,rgba(0,0,0,.70) 100%);}
+  .grain{position:absolute;inset:-50%;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
+  .glow{position:absolute;border-radius:50%;filter:blur(95px);pointer-events:none;}
+  #glowA{width:760px;height:760px;left:160px;top:380px;background:rgba(57,189,209,.20);}
+  #glowB{width:560px;height:560px;left:520px;top:1200px;background:rgba(63,139,166,.12);}
+  #glowG{width:720px;height:720px;left:200px;top:640px;background:rgba(54,224,166,.0);}
+
+  .layer{position:absolute;inset:0;transform-style:preserve-3d;will-change:opacity,transform;}
+  .c{position:absolute;left:50%;transform:translateX(-50%);will-change:opacity,transform;}
+
+  /* ---------- shared paper document ---------- */
+  .paper{position:absolute;left:50%;width:820px;border-radius:14px;
+    background:linear-gradient(170deg,#fbf9f2,var(--paper));
+    box-shadow:0 50px 120px rgba(0,0,0,.6),0 8px 26px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.7);
+    transform-style:preserve-3d;overflow:hidden;will-change:opacity,transform;}
+  .paper::before{content:"";position:absolute;left:0;top:0;width:10px;height:100%;
+    background:linear-gradient(90deg,rgba(0,0,0,.05),transparent);}
+  .paper .ph{position:absolute;left:58px;right:58px;height:16px;border-radius:6px;background:var(--paper-line);opacity:.7;}
+
+  /* ---------- SCENE 1 ---------- */
+  #s1doc{top:980px;height:560px;transform-origin:50% 50%;}
+  #s1doc .ph{height:14px;}
+  #s1cursor{position:absolute;width:5px;height:84px;background:var(--teal);box-shadow:0 0 22px var(--teal);border-radius:2px;}
+  .hooktitle{top:560px;width:1000px;text-align:center;line-height:1.0;filter:drop-shadow(0 14px 46px rgba(0,0,0,.6));}
+  .hooktitle .l1{font-size:70px;font-weight:800;letter-spacing:.005em;color:#e6edf6;}
+  .hooktitle .l2{display:block;margin-top:14px;font-size:150px;font-weight:900;letter-spacing:-.02em;line-height:.92;
+    color:var(--amber);text-shadow:0 0 70px rgba(246,178,75,.4);}
+  #s1kick{top:430px;left:0;right:0;text-align:center;font-size:26px;letter-spacing:.5em;
+    color:var(--teal-hi);text-transform:uppercase;font-weight:600;}
+
+  /* ---------- SCENE 2 / 3 essay cards ---------- */
+  .essaycard{top:430px;width:900px;border-radius:26px;padding:62px 58px 72px;
+    background:linear-gradient(160deg,rgba(21,34,50,.96),rgba(9,16,26,.97));
+    border:1px solid var(--line);
+    box-shadow:0 44px 96px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.05);
+    transform-style:preserve-3d;will-change:opacity,transform;}
+  .essaycard .tag{position:absolute;left:58px;top:-26px;padding:12px 26px;border-radius:999px;
+    font-size:24px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;}
+  .tag.vague{background:rgba(246,178,75,.14);border:1px solid rgba(246,178,75,.5);color:var(--amber-hi);}
+  .tag.specific{background:rgba(54,224,166,.13);border:1px solid rgba(54,224,166,.5);color:var(--green-hi);}
+  .essaytext{font-family:var(--serif);font-size:52px;line-height:1.5;letter-spacing:.002em;color:#eaf0f8;font-weight:400;}
+  .essaytext .fade{color:#5c6b7a;}
+  .buzz{color:var(--amber);font-weight:700;will-change:opacity;
+    text-shadow:0 0 1px rgba(246,178,75,.4);}
+  .fact{color:var(--green-hi);font-weight:700;will-change:opacity;}
+
+  /* scene-2 verdict */
+  #s2ask{top:1230px;width:1000px;text-align:center;}
+  #s2ask .q{font-size:62px;font-weight:800;letter-spacing:-.01em;color:#fff;line-height:1.08;}
+  #s2ask .q b{color:var(--amber-hi);}
+  #s2ask .meta{margin-top:26px;display:inline-flex;gap:14px;align-items:center;font-size:30px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:14px 30px;}
+  #s2ask .meta .ghost{width:30px;height:30px;border-radius:50%;border:2px dashed var(--muted);}
+
+  /* scene-3 detail chips + verdict */
+  #s3chips{top:1270px;left:50%;width:1000px;transform:translateX(-50%);
+    display:flex;gap:18px;justify-content:center;flex-wrap:nowrap;}
+  .dchip{display:inline-flex;align-items:center;gap:12px;padding:16px 24px;border-radius:15px;
+    background:rgba(54,224,166,.09);border:1px solid rgba(54,224,166,.4);white-space:nowrap;
+    font-size:27px;font-weight:700;color:var(--green-hi);opacity:0;will-change:opacity,transform;}
+  .dchip svg{width:27px;height:27px;flex:0 0 auto;}
+  #s3verdict{top:1440px;width:1000px;text-align:center;}
+  #s3verdict .v{display:inline-flex;align-items:baseline;gap:20px;font-size:84px;font-weight:900;letter-spacing:-.02em;}
+  #s3verdict .v .g{color:var(--green);} #s3verdict .v .m{color:var(--muted);font-size:60px;font-weight:700;}
+  #s3verdict .v .i{color:#fff;}
+
+  /* shatter shards (scene 2 -> 3 transition) */
+  .shard{position:absolute;border-radius:10px;background:linear-gradient(160deg,rgba(21,34,50,.96),rgba(9,16,26,.97));
+    border:1px solid var(--line);opacity:0;will-change:transform,opacity;}
+
+  /* ---------- SCENE 4: product ---------- */
+  #s4head{top:250px;width:1000px;text-align:center;}
+  #s4head .k{font-size:26px;letter-spacing:.46em;color:var(--teal-hi);text-transform:uppercase;font-weight:600;}
+  #s4head .t{margin-top:16px;font-size:60px;font-weight:800;letter-spacing:-.01em;color:#fff;line-height:1.06;}
+  #s4head .t .accent{color:var(--teal-hi);}
+  #browser{position:absolute;left:50%;top:470px;width:960px;height:1120px;border-radius:26px;
+    background:#0b1622;border:1px solid rgba(143,210,230,.22);overflow:hidden;
+    box-shadow:0 60px 130px rgba(0,0,0,.6),0 0 0 1px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.05);
+    transform-style:preserve-3d;will-change:transform,opacity;}
+  #browser .bar{position:absolute;left:0;top:0;right:0;height:72px;background:linear-gradient(180deg,#132334,#0d1a28);
+    border-bottom:1px solid rgba(143,210,230,.14);display:flex;align-items:center;gap:14px;padding:0 28px;z-index:3;}
+  #browser .dot{width:16px;height:16px;border-radius:50%;}
+  #browser .url{margin-left:18px;flex:1;height:40px;border-radius:10px;background:rgba(5,12,20,.7);
+    border:1px solid rgba(143,210,230,.16);display:flex;align-items:center;padding:0 18px;
+    font-size:24px;color:#9fb4c4;letter-spacing:.01em;gap:12px;}
+  #browser .url svg{width:20px;height:20px;opacity:.7;}
+  #viewport{position:absolute;left:0;top:72px;right:0;bottom:0;overflow:hidden;background:#fff;}
+  .shotwrap{position:absolute;inset:0;overflow:hidden;will-change:transform,opacity;transform-origin:50% 0;}
+  .shotimg{position:absolute;left:0;top:0;width:960px;display:block;}
+  #hiRing{position:absolute;border:3px solid var(--teal);border-radius:16px;opacity:0;
+    box-shadow:0 0 0 6px rgba(57,189,209,.2),0 0 44px rgba(57,189,209,.5);z-index:4;}
+  #s4cap{position:absolute;left:60px;right:60px;top:1630px;text-align:center;font-size:40px;font-weight:700;
+    color:#dbe6ef;line-height:1.16;}
+  #s4cap b{color:var(--teal-hi);}
+
+  /* ---------- SCENE 5: branding ---------- */
+  #s5logo{position:absolute;left:0;right:0;top:600px;display:flex;flex-direction:column;align-items:center;gap:40px;}
+  .logo-tile{width:188px;height:188px;border-radius:44px;background:linear-gradient(160deg,#ffffff,#eef2f3);
+    box-shadow:0 30px 70px rgba(0,0,0,.5),0 0 60px rgba(57,189,209,.2),inset 0 2px 0 rgba(255,255,255,.9);
+    display:flex;align-items:center;justify-content:center;}
+  .logo-tile svg{width:132px;height:132px;}
+  .wordmark{font-size:112px;font-weight:900;letter-spacing:-.03em;}
+  .wordmark .app{color:#fff;} .wordmark .gap{color:var(--teal-hi);}
+  #s5tag{position:absolute;left:80px;right:80px;top:1020px;text-align:center;
+    font-size:66px;font-weight:900;line-height:1.1;letter-spacing:-.01em;color:#fff;}
+  #s5tag .accent{color:var(--teal-hi);}
+  #s5sub{position:absolute;left:0;right:0;top:1220px;text-align:center;
+    font-size:32px;letter-spacing:.06em;color:var(--muted);font-weight:500;}
+
+  /* ---------- caption band ---------- */
+  #cap{position:absolute;left:70px;right:70px;top:1760px;text-align:center;
+    font-size:38px;font-weight:700;line-height:1.2;color:#eaf1f8;
+    text-shadow:0 4px 18px rgba(0,0,0,.7);will-change:opacity;}
+  #cap .hl{color:var(--teal-hi);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="grid"></div>
+  <div class="glow" id="glowA"></div>
+  <div class="glow" id="glowB"></div>
+  <div class="glow" id="glowG"></div>
+
+  <!-- SCENE 1: hook -->
+  <div class="layer" id="s1">
+    <div class="paper" id="s1doc">
+      <div class="ph" style="top:70px;width:70%;"></div>
+      <div class="ph" style="top:118px;"></div>
+      <div class="ph" style="top:166px;"></div>
+      <div class="ph" style="top:214px;width:88%;"></div>
+      <div class="ph" style="top:262px;"></div>
+      <div class="ph" style="top:310px;width:64%;"></div>
+      <div class="ph" style="top:378px;"></div>
+      <div class="ph" style="top:426px;width:80%;"></div>
+      <div class="ph" style="top:474px;width:46%;"></div>
+      <div id="s1cursor" style="left:58px;top:70px;"></div>
+    </div>
+    <div class="c" id="s1kick" style="transform:none;">A college essay teardown</div>
+    <div class="c hooktitle" id="s1title">
+      <span class="l1">THIS COLLEGE ESSAY SAYS…</span>
+      <span class="l2" id="slamWord">ABSOLUTELY NOTHING.</span>
+    </div>
+  </div>
+
+  <!-- SCENE 2: the generic paragraph -->
+  <div class="layer" id="s2">
+    <div class="essaycard c" id="s2card">
+      <div class="tag vague">Generic draft</div>
+      <div class="essaytext" id="s2text">
+        Throughout my life, I have always been
+        <span class="buzz" id="b1">passionate</span> about
+        <span class="buzz" id="b2">helping&nbsp;others</span>. These experiences taught me the importance of
+        <span class="buzz" id="b3">perseverance</span>, leadership, and
+        <span class="buzz" id="b4">personal&nbsp;growth</span>.
+      </div>
+    </div>
+    <div class="c" id="s2ask">
+      <div class="q">Sounds great. But <b>what did we actually learn?</b></div>
+      <div class="meta"><span class="ghost"></span> About this student: nothing specific</div>
+    </div>
+  </div>
+
+  <!-- shatter shards -->
+  <div class="layer" id="shards">
+    <div class="shard" id="sh0"></div><div class="shard" id="sh1"></div>
+    <div class="shard" id="sh2"></div><div class="shard" id="sh3"></div>
+    <div class="shard" id="sh4"></div><div class="shard" id="sh5"></div>
+  </div>
+
+  <!-- SCENE 3: the specific rewrite -->
+  <div class="layer" id="s3">
+    <div class="essaycard c" id="s3card">
+      <div class="tag specific">Specific rewrite</div>
+      <div class="essaytext" id="s3text">
+        When I started
+        <span class="fact" id="f1">tutoring my neighbor</span> in
+        <span class="fact" id="f2">algebra</span>, I realized I understood equations differently once I had to
+        <span class="fact" id="f3">explain them to someone else</span>.
+      </div>
+    </div>
+    <div class="c" id="s3chips">
+      <div class="dchip" id="dc1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> What they did</div>
+      <div class="dchip" id="dc2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> Who they helped</div>
+      <div class="dchip" id="dc3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg> What they learned</div>
+    </div>
+    <div class="c" id="s3verdict">
+      <div class="v"><span class="g">Specific</span><span class="m">beats</span><span class="i">impressive.</span></div>
+    </div>
+  </div>
+
+  <!-- SCENE 4: product reveal -->
+  <div class="layer" id="s4">
+    <div class="c" id="s4head">
+      <div class="k">Inside AppGap</div>
+      <div class="t">See what your essay<br><span class="accent">is actually saying.</span></div>
+    </div>
+    <div id="browser">
+      <div class="bar">
+        <span class="dot" style="background:#ff5f57;"></span>
+        <span class="dot" style="background:#febc2e;"></span>
+        <span class="dot" style="background:#28c840;"></span>
+        <span class="url"><svg viewBox="0 0 24 24" fill="none" stroke="#7fe7f2" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> appgap.app/dashboard/application-writing/personal-statement</span>
+      </div>
+      <div id="viewport">
+        <div class="shotwrap" id="edWrap"><img class="shotimg" id="shotEditor" src="shots/ps_editor.png" alt="AppGap personal statement editor" /></div>
+        <div class="shotwrap" id="fbWrap"><img class="shotimg" id="shotFeedback" src="shots/ps_feedback.png" alt="AppGap essay feedback" /><div id="hiRing"></div></div>
+      </div>
+    </div>
+    <div id="s4cap">Real, honest feedback — even where you're still too <b>general</b>.</div>
+  </div>
+
+  <!-- SCENE 5: branding -->
+  <div class="layer" id="s5">
+    <div id="s5logo">
+      <div class="logo-tile">
+        <svg viewBox="0 0 100 100" role="img" aria-label="AppGap logo">
+          <path d="M50,11 L89,89 L11,89 Z M50,55 L64,81 L36,81 Z" fill="#163243" fill-rule="evenodd"/>
+          <rect x="23" y="67" width="17" height="19" rx="6" fill="#3f8ba6"/>
+          <rect x="60" y="67" width="17" height="19" rx="6" fill="#3f8ba6"/>
+          <rect x="39" y="73.5" width="22" height="6" rx="3" fill="#3f8ba6"/>
+        </svg>
+      </div>
+      <div class="wordmark"><span class="app">App</span><span class="gap">Gap</span></div>
+    </div>
+    <div id="s5tag">MAKE EVERY WORD<br><span class="accent">MEAN SOMETHING.</span></div>
+    <div id="s5sub">BUILD A STRONGER APPLICATION · UNDERSTAND YOUR GAPS</div>
+  </div>
+
+  <!-- caption band -->
+  <div id="cap"></div>
+
+  <div class="vignette"></div>
+  <div class="grain" id="grain"></div>
+</div>
+
+<script>
+const E=id=>document.getElementById(id);
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const p=(t,a,b)=>clamp((t-a)/(b-a),0,1);
+const eo=x=>1-(1-x)**3;                 // easeOutCubic
+const ei=x=>x*x*x;                       // easeInCubic
+const eio=x=>x<.5?4*x*x*x:1-(-2*x+2)**3/2;
+const bk=x=>{const c=1.70158+1;return 1+(c+1)*(x-1)**3+c*(x-1)**2;}; // overshoot
+const win=(t,a,b,c,d)=>{ if(t<a||t>d)return 0; if(t<b)return eo(p(t,a,b)); if(t>c)return 1-ei(p(t,c,d)); return 1;};
+const L=(el,o)=>{el.style.opacity=o;};
+const noise=x=>{const s=Math.sin(x*127.1)*43758.5453;return (s-Math.floor(s))*2-1;};
+
+// cue times (from timeline.json)
+const CUE={s1a:0.30,s1b:2.60,s2a:4.95,s2b:6.15,s2c:9.25,s3a:13.00,s3b:14.05,s3c:17.95,s3d:22.55,s4a:24.80,s4b:27.55,s5:31.70};
+
+// caption track: [start, end, html]
+const CAPS=[
+  [0.30,2.45,'Your college essay can sound <span class="hl">impressive</span>.'],
+  [2.60,4.35,'And still say <span class="hl">absolutely nothing</span>.'],
+  [4.95,5.85,'Take this line.'],
+  [6.15,9.00,'Passionate. Perseverance. Personal growth.'],
+  [9.25,12.45,'But what did we actually learn about this student?'],
+  [13.00,13.85,'Now watch.'],
+  [14.05,17.65,'They tutored a neighbor in <span class="hl">algebra</span> — and got it by explaining it.'],
+  [17.95,22.30,'Now we know what they did, who they helped, what they figured out.'],
+  [22.55,24.25,'<span class="hl">Specific</span> beats impressive.'],
+  [24.80,27.40,"That's why AppGap helps you look past the big words,"],
+  [27.55,29.80,'and see what your essay is actually <span class="hl">saying</span>.'],
+  [31.70,34.60,'Make every word <span class="hl">mean something</span>.'],
+];
+
+function renderCaption(t){
+  let cur=null;
+  for(const c of CAPS){ if(t>=c[0]&&t<=c[1]){cur=c;break;} }
+  const cap=E('cap');
+  if(!cur){ cap.style.opacity=0; return; }
+  if(cap.dataset.k!==cur[0]+''){ cap.innerHTML=cur[2]; cap.dataset.k=cur[0]+''; }
+  const fin=p(t,cur[0],cur[0]+0.18), fout=1-p(t,cur[1]-0.2,cur[1]);
+  cap.style.opacity=(Math.min(fin,fout)*0.98).toFixed(3);
+}
+
+// shatter shard layout (cover the scene-2 card region)
+const SHARDS=[
+  [360,470,300,150],[660,470,260,170],[360,640,260,180],
+  [630,650,290,160],[360,830,310,150],[670,830,250,150],
+];
+function initShards(){
+  SHARDS.forEach((s,i)=>{const el=E('sh'+i);el.style.left=s[0]+'px';el.style.top=s[1]+'px';el.style.width=s[2]+'px';el.style.height=s[3]+'px';});
+}
+
+function render(t){
+  // ambient
+  E('glowA').style.opacity=.20+0.05*Math.sin(t*0.8);
+  E('glowB').style.opacity=.12+0.04*Math.sin(t*0.6+1.5);
+  E('grain').style.transform=`translate(${(t*37)%80-40}px,${(t*53)%80-40}px)`;
+
+  // layer windows
+  L(E('s1'),       win(t,0,0.4, 4.3,4.75));
+  L(E('s2'),       win(t,4.5,5.0, 12.5,13.15));
+  L(E('shards'),   win(t,12.55,12.6, 13.6,13.75));
+  L(E('s3'),       win(t,12.95,13.5, 24.15,24.6));
+  L(E('s4'),       win(t,24.25,24.85, 31.1,31.55));
+  L(E('s5'),       win(t,31.2,31.85, 35,35));
+  // green ambient swells across scene 3
+  E('glowG').style.opacity=win(t,13.4,14.4, 24.0,24.5)*0.16;
+
+  renderCaption(t);
+
+  // ===== SCENE 1 =====
+  {
+    const kin=win(t,0.2,0.9, 4.0,4.3); E('s1kick').style.opacity=kin*0.95;
+    // rotating essay sheet, drifting in depth
+    const doc=E('s1doc');
+    const spin=Math.sin(t*0.5)*7, tiltX=8+Math.sin(t*0.4+1)*3;
+    const rise=eo(p(t,0.1,1.6));
+    doc.style.opacity=win(t,0.1,0.9, 4.0,4.4);
+    doc.style.transform=`translateX(-50%) translateZ(${(-120+rise*60)}px) rotateX(${tiltX}deg) rotateY(${spin}deg) scale(${0.9+0.08*rise})`;
+    // typing cursor runs along first lines, then title types in
+    const cur=E('s1cursor');
+    const typ=p(t,0.25,2.4);
+    const line=Math.min(3,Math.floor(typ*4));
+    cur.style.top=(70+line*48)+'px';
+    const lw=[0.70,1.0,1.0,0.64][line]||1;
+    cur.style.left=(58+ (820-116) * lw * ((typ*4)%1) )+'px';
+    cur.style.opacity=(t<2.5? (0.4+0.6*Math.abs(Math.sin(t*9))) : 0);
+    // title
+    const l1=E('s1title').querySelector('.l1');
+    l1.style.opacity=win(t,0.9,1.6, 4.0,4.3);
+    E('s1title').style.transform=`translateX(-50%) translateZ(${eo(p(t,0.9,1.8))*40}px)`;
+    // slam word
+    const sw=E('slamWord');
+    const in1=p(t,CUE.s1b-0.08,CUE.s1b+0.26);
+    const sc=in1<1? (1.6-0.6*eo(in1)) : 1;
+    const op=win(t,CUE.s1b-0.08,CUE.s1b+0.22, 4.0,4.3);
+    const sh=Math.max(0,1-p(t,CUE.s1b,CUE.s1b+0.4));
+    const jig=Math.sin((t-CUE.s1b)*55)*5*sh;
+    sw.style.opacity=op;
+    sw.style.transform=`translateX(${jig.toFixed(2)}px) scale(${sc.toFixed(3)})`;
+    sw.style.filter=`blur(${((1-eo(in1))*14).toFixed(1)}px)`;
+  }
+
+  // ===== SCENE 2 =====
+  {
+    const card=E('s2card');
+    const zin=eo(p(t,4.6,5.4));
+    // push-in feel: start slightly small/low, settle
+    let s=0.9+0.1*zin, y=(1-zin)*40, z=(1-zin)*-60;
+    // on s2c, gentle extra push toward the hollowed sentence
+    const push=win(t,9.1,9.9, 12.3,12.9);
+    s+=0.04*push; z+=push*40;
+    card.style.transform=`translateX(-50%) translateZ(${z.toFixed(1)}px) scale(${s.toFixed(4)})`;
+    E('s2card').style.opacity=win(t,4.6,5.2, 12.45,13.1);
+
+    // buzzwords bloom amber on s2b, then fade to a faint ghost — the sentence
+    // visibly hollows out, so "impressive words" literally leave nothing behind.
+    const bids=['b1','b2','b3','b4'];
+    const blit=[6.35,6.95,7.60,8.25];
+    bids.forEach((id,i)=>{
+      const b=E(id);
+      const bloom=win(t,blit[i]-0.3,blit[i], blit[i]+0.25,blit[i]+0.6);
+      const fade=p(t,blit[i]+0.35,blit[i]+1.1);
+      b.style.textShadow=`0 0 ${(28*bloom).toFixed(0)}px rgba(246,178,75,${(0.6*bloom).toFixed(2)})`;
+      b.style.opacity=(1-0.9*fade).toFixed(3);
+    });
+
+    // verdict block
+    const a=E('s2ask');
+    a.style.opacity=win(t,9.2,9.9, 12.4,13.0);
+    a.style.transform=`translateX(-50%) translateY(${(1-eo(p(t,9.2,10.0)))*24}px)`;
+  }
+
+  // ===== shatter shards (scene 2 -> 3) =====
+  {
+    if(t>=12.55&&t<=13.8){
+      const r=p(t,12.6,13.5);
+      SHARDS.forEach((s,i)=>{
+        const el=E('sh'+i);
+        const dir=noise(i*3)-0.2, up=0.6+Math.abs(noise(i*5));
+        el.style.opacity=(win(t,12.6,12.8, 13.2,13.7)).toFixed(3);
+        const tx=dir*420*eo(r), ty=-up*360*eo(r);
+        const rot=noise(i+2)*40*r;
+        el.style.transform=`translate(${tx.toFixed(0)}px,${ty.toFixed(0)}px) rotate(${rot.toFixed(1)}deg) scale(${(1-0.3*r).toFixed(3)})`;
+        el.style.filter=`blur(${(r*3).toFixed(1)}px)`;
+      });
+    }
+  }
+
+  // ===== SCENE 3 =====
+  {
+    const card=E('s3card');
+    // assembles from below/blur into place on s3a..s3b
+    const asm=eo(p(t,13.1,14.1));
+    const y=(1-asm)*70, s=0.92+0.08*asm, bl=(1-asm)*10;
+    card.style.opacity=win(t,13.1,13.9, 24.1,24.55);
+    card.style.transform=`translateX(-50%) translateY(${y.toFixed(1)}px) scale(${s.toFixed(4)})`;
+    card.style.filter=`blur(${bl.toFixed(1)}px)`;
+
+    // facts light up green in sequence (inline glow — keeps word spacing intact)
+    const flit=[14.35,15.15,16.05];
+    ['f1','f2','f3'].forEach((id,i)=>{
+      const f=E(id); const on=eo(p(t,flit[i]-0.25,flit[i]+0.25));
+      f.style.textShadow=`0 0 ${(24*on).toFixed(0)}px rgba(54,224,166,${(0.5*on).toFixed(2)})`;
+    });
+    // detail chips pop on s3c
+    const chipT=[18.2,19.35,20.5];
+    ['dc1','dc2','dc3'].forEach((id,i)=>{
+      const c=E(id); const o=win(t,chipT[i],chipT[i]+0.4, 24.0,24.5);
+      c.style.opacity=o.toFixed(3);
+      c.style.transform=`translateY(${((1-eo(p(t,chipT[i],chipT[i]+0.45)))*22).toFixed(1)}px) scale(${(0.9+0.1*bk(clamp(p(t,chipT[i],chipT[i]+0.5),0,1))).toFixed(3)})`;
+    });
+    // verdict
+    const v=E('s3verdict');
+    v.style.opacity=win(t,22.5,23.1, 24.0,24.5);
+    v.querySelector('.v').style.transform=`scale(${(0.9+0.1*bk(clamp(p(t,22.55,23.2),0,1))).toFixed(4)})`;
+  }
+
+  // ===== SCENE 4: product =====
+  {
+    const head=E('s4head');
+    head.style.opacity=win(t,24.4,25.1, 30.9,31.4);
+    head.style.transform=`translateX(-50%) translateY(${((1-eo(p(t,24.4,25.1)))*20).toFixed(1)}px)`;
+
+    const br=E('browser');
+    const inp=eo(p(t,24.5,25.5));
+    const brO=win(t,24.5,25.3, 31.0,31.5);
+    // fly in with slight 3D tilt, settle flat
+    const rotX=(1-inp)*12, yy=(1-inp)*120, sc=0.92+0.08*inp;
+    br.style.opacity=brO;
+    br.style.transform=`translateX(-50%) translateY(${yy.toFixed(0)}px) rotateX(${rotX.toFixed(1)}deg) scale(${sc.toFixed(4)})`;
+
+    // Phase A: editor — establish the real essay in the real workspace
+    const ed=E('edWrap');
+    const edK=eo(p(t,24.9,27.4));
+    ed.style.opacity=(1-p(t,27.1,27.8)).toFixed(3);
+    ed.style.transformOrigin='50% 0';
+    ed.style.transform=`scale(${(1.02+0.09*edK).toFixed(4)}) translateY(${(-16*edK).toFixed(1)}px)`;
+
+    // Phase B: feedback — real analysis; zoom into the Specificity card
+    const fb=E('fbWrap');
+    fb.style.opacity=win(t,27.3,27.9, 31.0,31.4).toFixed(3);
+    const fbK=eo(p(t,28.0,30.3));
+    fb.style.transformOrigin='760px 737px';
+    fb.style.transform=`scale(${(1.0+0.42*fbK).toFixed(4)})`;
+
+    // highlight ring glued over the Specificity card (inside fbWrap, so it zooms too)
+    const ring=E('hiRing');
+    ring.style.left='610px'; ring.style.top='634px'; ring.style.width='300px'; ring.style.height='207px';
+    ring.style.opacity=(win(t,28.7,29.2, 30.7,31.1)*(0.92+0.08*Math.sin(t*6))).toFixed(3);
+
+    E('s4cap').style.opacity=win(t,25.8,26.5, 30.8,31.3).toFixed(3);
+  }
+
+  // ===== SCENE 5 =====
+  {
+    const lg=E('s5logo');
+    const li=win(t,31.3,32.1, 35,35);
+    lg.style.opacity=li;
+    lg.style.transform=`translateY(${((1-eo(p(t,31.3,32.1)))*26).toFixed(1)}px) scale(${(0.9+0.1*bk(clamp(p(t,31.3,32.2),0,1))).toFixed(4)})`;
+    const tag=E('s5tag'); tag.style.opacity=win(t,32.0,32.7, 35,35);
+    tag.style.transform=`translateY(${((1-eo(p(t,32.0,32.7)))*20).toFixed(1)}px)`;
+    E('s5sub').style.opacity=win(t,32.6,33.3, 35,35)*0.9;
+  }
+}
+
+initShards();
+let t=0;
+window.__render=tt=>{t=tt;render(tt);};
+window.__DURATION=35.0;
+
+// live preview (skipped during headless capture)
+let _start=null,_playing=true;
+function loop(ts){ if(_start===null)_start=ts; let tt=((ts-_start)/1000); if(tt>window.__DURATION){_start=ts;tt=0;} if(_playing){t=tt;render(tt);} requestAnimationFrame(loop);}
+if(!window.__CAPTURE){ t=0;render(0); requestAnimationFrame(loop);}
+document.addEventListener('keydown',e=>{if(e.key===' ')_playing=!_playing;});
+</script>
+</body>
+</html>

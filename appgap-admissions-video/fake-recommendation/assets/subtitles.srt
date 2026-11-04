@@ -1,0 +1,39 @@
+1
+00:00:00,180 --> 00:00:04,454
+Only one of these three college recommendations is actually unsupported. Can you spot it?
+
+2
+00:00:04,754 --> 00:00:09,316
+A — apply to a research program, after confirming you meet its published requirements.
+
+3
+00:00:09,596 --> 00:00:13,883
+B — explore volunteering in your intended major, and check the requirements first.
+
+4
+00:00:14,163 --> 00:00:18,024
+C — you're eligible for this research program, because you're interested in the subject.
+
+5
+00:00:18,424 --> 00:00:20,980
+Which one's unsupported? Take a guess before the reveal.
+
+6
+00:00:21,730 --> 00:00:22,333
+It's C.
+
+7
+00:00:22,713 --> 00:00:26,133
+Being interested in a subject doesn't automatically mean you qualify.
+
+8
+00:00:26,383 --> 00:00:29,601
+An AI recommendation shouldn't present an assumption as a fact.
+
+9
+00:00:29,981 --> 00:00:32,678
+That's why the reasoning behind a recommendation matters.
+
+10
+00:00:32,878 --> 00:00:33,586
+Meet AppGap.

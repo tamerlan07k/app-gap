@@ -13,6 +13,7 @@ import {
   FeatureRow,
   type FeatureRowProps,
 } from "~/components/landing/feature-row";
+import { ScrollStory } from "~/components/landing/scroll-story";
 import { StatsBand } from "~/components/landing/stats-band";
 import { AppGapLogo } from "~/components/logo";
 import { AnimatedShinyText } from "~/components/ui/animated-shiny-text";
@@ -389,6 +390,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
+      <ScrollStory />
       <Features />
       <StatsBand />
       <Faq />
